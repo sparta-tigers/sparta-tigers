@@ -2,7 +2,7 @@
 name: epic
 about: Epic 이슈(상위-하위 이슈)를 위한 이슈 템플릿
 title: "[EPIC] "
-labels: feature
+labels: epic
 assignees: ''
 
 ---
