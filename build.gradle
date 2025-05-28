@@ -24,19 +24,31 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // === Spring Boot Starters ===
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'         // JPA (데이터베이스 ORM)
+    implementation 'org.springframework.boot:spring-boot-starter-security'         // Spring Security (인증/인가)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'       // Bean Validation (입력값 검증)
+    implementation 'org.springframework.boot:spring-boot-starter-web'              // 웹 애플리케이션 (REST API 포함)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'        // WebSocket (실시간 통신)
+
+    // === 데이터베이스 드라이버 ===
+    runtimeOnly 'com.mysql:mysql-connector-j'                                      // MySQL JDBC 드라이버
+
+    // === 개발 편의성 ===
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'                // 자동 재시작, 라이브 리로드 등 개발 편의 기능
+
+    // === Lombok ===
+    compileOnly 'org.projectlombok:lombok'                                         // 컴파일 시만 적용 (Getter/Setter 등 자동 생성)
+    annotationProcessor 'org.projectlombok:lombok'                                 // Lombok을 위한 Annotation Processor
+
+    // === 설정 관련 ===
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor' // @ConfigurationProperties 지원
+
+    // === 테스트 관련 ===
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'         // 기본 테스트 도구 (JUnit, AssertJ 등)
+    testImplementation 'org.springframework.security:spring-security-test'         // Security 테스트 지원
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                   // JUnit 플랫폼 런처 (테스트 실행기)
+
 }
 
 tasks.named('test') {
