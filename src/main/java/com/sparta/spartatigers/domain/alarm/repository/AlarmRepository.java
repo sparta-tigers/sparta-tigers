@@ -1,5 +1,9 @@
 package com.sparta.spartatigers.domain.alarm.repository;
 
-public interface AlarmRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.sparta.spartatigers.domain.alarm.model.entity.Alarm;
+
+public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
 }

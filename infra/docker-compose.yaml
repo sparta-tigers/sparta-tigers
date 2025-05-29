@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.35
+
+    platform: linux/amd64
+    volumes:
+      - sparta_tigers_mysql_volume:/data
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: qwer1234
+      MYSQL_DATABASE: sparta_tigers
+    command:
+      [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--lower_case_table_names=1' ]
+
+  redis:
+    image: redis:7.2
+    ports:
+      - '6379:6379'
+    volumes:
+      - sparta_tigers_redis_volume:/data
+
+
+volumes:
+  # Named Volume 컨테이너 내부 파일 시스템과 마운트 될 볼륨 위치를 알아서 잡아줌
+  sparta_tigers_mysql_volume:
+  sparta_tigers_redis_volume:
