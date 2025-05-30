@@ -9,15 +9,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ServerException extends BaseException {
 
-	private final ExceptionCode exceptionCode;
+    private final ExceptionCode exceptionCode;
 
-	@Override
-	public HttpStatus getStatus() {
-		return HttpStatus.INTERNAL_SERVER_ERROR;
-	}
+    @Override
+    public HttpStatus getStatus() {
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
 
-	@Override
-	public String getMessage() {
-		return exceptionCode.getMessage();
-	}
+    @Override
+    public String getMessage() {
+        return exceptionCode.getMessage();
+    }
 }

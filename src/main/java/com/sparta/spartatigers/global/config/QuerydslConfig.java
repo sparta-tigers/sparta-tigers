@@ -1,11 +1,11 @@
 package com.sparta.spartatigers.global.config;
 
+import jakarta.persistence.EntityManager;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import jakarta.persistence.EntityManager;
 
 @Configuration
 public class QuerydslConfig {
@@ -14,5 +14,4 @@ public class QuerydslConfig {
     public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
         return new JPAQueryFactory(entityManager);
     }
-
 }

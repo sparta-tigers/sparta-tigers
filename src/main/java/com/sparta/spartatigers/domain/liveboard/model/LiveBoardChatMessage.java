@@ -13,8 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LiveBoardChatMessage {
 
-	private String roomId;
-	private String sender;
-	private String content;
-	private LocalDateTime createdAt = LocalDateTime.now();
+    private String roomId;
+    private String sender;
+    private String content;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
