@@ -47,20 +47,31 @@ public class WebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception{
 		// 역직렬화
-		LiveBoardMessage message = objectMapper.readValue(textMessage.getPayload(), LiveBoardMessage.class);
+		LiveBoardMessage rawMessage = objectMapper.readValue(textMessage.getPayload(), LiveBoardMessage.class);
+
+		// 유저 정보 가져오기
+		String senderSessionId = session.getId();
+		LiveBoardUser sender = user.get(senderSessionId);
+
+		// 메세지 객체 생성
+		LiveBoardMessage message = new LiveBoardMessage(
+			sender.getRoomId(),
+			sender.getUserId(),
+			sender.getNickname(),
+			rawMessage.getContent(),
+			LocalDateTime.now()
+		);
+
 		// 직렬화
 		String json = objectMapper.writeValueAsString(message);
 
-		// 유저 정보 가져오기
-
-
 		// 현재 사용자와 roomId가 같은 유저들 찾기
-		String senderSessionId = session.getId();
 		String roomId = user.get(senderSessionId).getRoomId();
 
 		// 접속중인 모든 유저에게 브로드캐스트
 		for (Map.Entry<String, LiveBoardUser> all : user.entrySet()) {
-			if (roomId.equals(all.getValue().getRoomId())) {
+			LiveBoardUser targetUser = all.getValue();
+			if (roomId.equals(targetUser.getRoomId())) {
 				WebSocketSession targetSession = this.sessions.get(all.getKey());
 				if (targetSession.isOpen()) {
 					targetSession.sendMessage(new TextMessage(json));
