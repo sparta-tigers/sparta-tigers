@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class CreateDirectRoomRequestDto {
 
     private Long exchangeRequestId;
-
 }
