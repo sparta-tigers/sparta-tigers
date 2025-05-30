@@ -1,7 +1,5 @@
 package com.sparta.spartatigers.domain.chatroom.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +21,14 @@ public class DirectRoomService {
     @Transactional
     public DirectRoomDto createRoom(Long exchangeRequestId) {
         ExchangeRequest exchangeRequest =
-                exchangeRequestRepository
-                        .findById(exchangeRequestId)
-                        .orElseThrow(() -> new IllegalArgumentException("교환 요청을 찾을 수 없습니다."));
-
-        Optional<DirectRoom> existingRoom =
-                directRoomRepository.findByExchangeRequest(exchangeRequest);
+                exchangeRequestRepository.findByIdOrElseThrow(exchangeRequestId);
         DirectRoom room =
-                existingRoom.orElseGet(
-                        () -> directRoomRepository.save(DirectRoom.create(exchangeRequest)));
+                directRoomRepository
+                        .findByExchangeRequest(exchangeRequest)
+                        .orElseGet(
+                                () ->
+                                        directRoomRepository.save(
+                                                DirectRoom.create(exchangeRequest)));
         return DirectRoomDto.from(room);
     }
 }

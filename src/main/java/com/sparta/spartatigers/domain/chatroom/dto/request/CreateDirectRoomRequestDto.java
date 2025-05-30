@@ -1,13 +1,16 @@
 package com.sparta.spartatigers.domain.chatroom.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class CreateDirectRoomRequestDto {
 
+    @NotNull(message = "교환 요청 id를 입력해 주세요.")
     private Long exchangeRequestId;
 }

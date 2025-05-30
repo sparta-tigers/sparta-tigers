@@ -29,6 +29,7 @@ public enum ExceptionCode {
     // 채팅방
 
     // 교환 요청
+    EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니동"),
 
     // 아이템
 
