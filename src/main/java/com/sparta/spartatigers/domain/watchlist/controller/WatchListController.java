@@ -8,5 +8,4 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/watchlist")
-public class WatchListController {
-}
+public class WatchListController {}

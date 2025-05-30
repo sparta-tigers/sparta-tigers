@@ -7,15 +7,15 @@ import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDt
 import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 
 public interface AlarmService {
-	public AlarmRegisterDto createAlarm();
+    public AlarmRegisterDto createAlarm();
 
-	public AlarmResponseDto findMyAlarms();
+    public AlarmResponseDto findMyAlarms();
 
-	public TeamNameResponseDto findTeamNames();
+    public TeamNameResponseDto findTeamNames();
 
-	public MatchScheduleResponseDto findMatchSchedules();
+    public MatchScheduleResponseDto findMatchSchedules();
 
-	public void deleteAlarms();
+    public void deleteAlarms();
 
-	public AlarmUpdateDto updateAlarm();
+    public AlarmUpdateDto updateAlarm();
 }
