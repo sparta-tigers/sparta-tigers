@@ -20,5 +20,4 @@ public class LiveBoardMessage {
 	private String content; // 내용
 	private LocalDateTime sentAt = LocalDateTime.now();
 
-
 }

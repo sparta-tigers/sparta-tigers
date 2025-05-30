@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketHandler extends TextWebSocketHandler {
 
 	private final Map<String, LiveBoardUser> user = new ConcurrentHashMap<>();
-	private final Map<String, WebSocketSession> session = new ConcurrentHashMap<>();
+	private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
@@ -37,7 +37,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			.build();
 
 		// map에 저장
-		this.user.put(session.getId(), sessionUser);
+		user.put(session.getId(), sessionUser);
+		sessions.put(session.getId(), session);
 
 		// 전체 접속자 수 카운트
 
@@ -50,6 +51,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
 		// 직렬화
 		String json = objectMapper.writeValueAsString(message);
 
+		// 유저 정보 가져오기
+
+
 		// 현재 사용자와 roomId가 같은 유저들 찾기
 		String senderSessionId = session.getId();
 		String roomId = user.get(senderSessionId).getRoomId();
@@ -57,7 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 		// 접속중인 모든 유저에게 브로드캐스트
 		for (Map.Entry<String, LiveBoardUser> all : user.entrySet()) {
 			if (roomId.equals(all.getValue().getRoomId())) {
-				WebSocketSession targetSession = this.session.get(all.getKey());
+				WebSocketSession targetSession = this.sessions.get(all.getKey());
 				if (targetSession.isOpen()) {
 					targetSession.sendMessage(new TextMessage(json));
 				}
