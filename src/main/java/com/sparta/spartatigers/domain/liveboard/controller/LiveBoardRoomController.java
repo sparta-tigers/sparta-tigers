@@ -16,10 +16,10 @@ import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
 @RequestMapping("/api/liveboard")
 public class LiveBoardRoomController {
 
-    private final LiveBoardRoomService service;
+    private final LiveBoardRoomService liveBoardRoomService;
 
     @GetMapping("/rooms")
     public List<LiveBoardRoomResponseDto> getRooms() {
-        return service.getAllRooms();
+        return liveBoardRoomService.getAllRooms();
     }
 }
