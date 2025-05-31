@@ -2,6 +2,7 @@ package com.sparta.spartatigers.domain.liveboard.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,7 @@ import com.sparta.spartatigers.domain.match.model.entity.Match;
 public class LiveBoardRoomService {
 
     private final LiveBoardRoomRepository roomRepository;
-    private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기
+    // private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
 	public List<LiveBoardRoomResponseDto> getAllRooms() {
 		return roomRepository.findAll().stream()
@@ -32,11 +33,14 @@ public class LiveBoardRoomService {
 			.collect(Collectors.toList());
 	}
 
+
     public void createTodayLiveBoard() {
     	LocalDateTime start = LocalDate.now().atStartOfDay();
     	LocalDateTime end = start.plusDays(1);
 
-    	List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
+		List<Match> matches = new ArrayList<>();
+
+    	// List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
 
     	for (Match match : matches.stream().toList()) {
     		String roomId = "ROOM_"+ match.getId();
