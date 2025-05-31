@@ -25,13 +25,7 @@ public class LiveBoardRoomService {
 
     public List<LiveBoardRoomResponseDto> getAllRooms() {
         return roomRepository.findAll().stream()
-                .map(
-                        room ->
-                                new LiveBoardRoomResponseDto(
-                                        room.getRoomId(),
-                                        room.getMatch().getHomeTeam().getName(),
-                                        room.getMatch().getAwayTeam().getName(),
-                                        room.isClosed()))
+                .map(LiveBoardRoomResponseDto::of)
                 .collect(Collectors.toList());
     }
 
@@ -39,11 +33,11 @@ public class LiveBoardRoomService {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
 
-        List<Match> matches = new ArrayList<>();
+        List<Match> matches = new ArrayList<>(); // 임시예요
 
         // List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
 
-        for (Match match : matches.stream().toList()) {
+        for (Match match : matches) {
             String roomId = "ROOM_" + match.getId();
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
 
