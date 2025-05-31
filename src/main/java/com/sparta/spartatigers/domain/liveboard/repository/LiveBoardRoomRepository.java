@@ -6,6 +6,5 @@ import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 
 public interface LiveBoardRoomRepository extends JpaRepository<LiveBoardRoom, Long> {
 
-	LiveBoardRoom findByRoomId(String roomId);
-
+    LiveBoardRoom findByRoomId(String roomId);
 }

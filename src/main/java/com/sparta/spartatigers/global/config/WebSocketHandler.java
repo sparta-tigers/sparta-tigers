@@ -11,15 +11,14 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardUser;
+import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -28,10 +27,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final Map<String, LiveBoardUser> user = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-	private final LiveBoardRoomRepository liveBoardRoomRepository;
+    private final LiveBoardRoomRepository liveBoardRoomRepository;
 
-
-	@Override
+    @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
         // 사용자 저장
@@ -54,9 +52,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sessions.put(session.getId(), session);
 
         // 전체 접속자 수 카운트
-		LiveBoardRoom room = liveBoardRoomRepository.findByRoomId(sessionUser.getRoomId());
-		room.increaseCount();
-		liveBoardRoomRepository.save(room);
+        LiveBoardRoom room = liveBoardRoomRepository.findByRoomId(sessionUser.getRoomId());
+        room.increaseCount();
+        liveBoardRoomRepository.save(room);
     }
     ;
 
@@ -102,17 +100,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String sessionId = session.getId();
-		LiveBoardUser disconnectedUser = user.get(sessionId);
+        LiveBoardUser disconnectedUser = user.get(sessionId);
 
-		// 전체 접속자 수 카운트
-		String roomId = disconnectedUser.getRoomId();
-		LiveBoardRoom room = liveBoardRoomRepository.findByRoomId(roomId);
+        // 전체 접속자 수 카운트
+        String roomId = disconnectedUser.getRoomId();
+        LiveBoardRoom room = liveBoardRoomRepository.findByRoomId(roomId);
 
-		room.decreaseCount();
-		liveBoardRoomRepository.save(room);
+        room.decreaseCount();
+        liveBoardRoomRepository.save(room);
 
-		user.remove(sessionId);
-		sessions.remove(sessionId);
+        user.remove(sessionId);
+        sessions.remove(sessionId);
     }
     ;
 

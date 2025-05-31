@@ -34,7 +34,7 @@ public class LiveBoardRoom {
     private LocalDateTime closedAt;
     private boolean isClosed;
 
-	private int connectCount;
+    private int connectCount;
 
     public LiveBoardRoom(
             String roomId,
@@ -54,13 +54,13 @@ public class LiveBoardRoom {
         this.isClosed = true;
     }
 
-	public void increaseCount() {
-		this.connectCount++;
-	}
+    public void increaseCount() {
+        this.connectCount++;
+    }
 
-	public void decreaseCount() {
-		if(this.connectCount >0) {
-			this.connectCount--;
-		}
-	}
+    public void decreaseCount() {
+        if (this.connectCount > 0) {
+            this.connectCount--;
+        }
+    }
 }
