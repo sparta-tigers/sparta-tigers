@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 @Getter
 @AllArgsConstructor
 public class LiveBoardMessage {

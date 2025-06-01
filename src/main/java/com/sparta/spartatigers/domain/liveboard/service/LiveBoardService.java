@@ -69,7 +69,6 @@ public class LiveBoardService {
                             .title(title)
                             .openAt(roomOpen)
                             .closedAt(roomClose)
-                            .isClosed(false)
                             .connectCount(0)
                             .build();
 
