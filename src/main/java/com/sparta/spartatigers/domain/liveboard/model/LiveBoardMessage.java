@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자
@@ -16,4 +15,8 @@ public class LiveBoardMessage {
     private String senderNickname;
     private String content; // 내용
     private LocalDateTime sentAt = LocalDateTime.now();
+
+	public LiveBoardMessage() {
+		this.sentAt = LocalDateTime.now();
+	}
 }
