@@ -20,12 +20,12 @@ public class LiveBoardRoom {
     private String title;
     private LocalDateTime openAt;
     private LocalDateTime closedAt;
-    private boolean isClosed;
+    // private boolean isClosed;
     private int connectCount;
 
-    public void close() {
-        this.isClosed = true;
-    }
+    // public void close() {
+    //     this.isClosed = true;
+    // }
 
     public void increaseCount() {
         this.connectCount++;
