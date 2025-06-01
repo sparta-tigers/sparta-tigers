@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Getter
 @AllArgsConstructor
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE) // ✅ 타입 정보 사용 안 함
 public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자

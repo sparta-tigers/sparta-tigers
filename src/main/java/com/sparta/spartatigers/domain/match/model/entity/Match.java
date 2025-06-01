@@ -23,7 +23,6 @@ import com.sparta.spartatigers.domain.team.model.entity.Team;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public class Match extends BaseEntity {
 
     @Column private LocalDateTime matchTime;
@@ -37,7 +36,7 @@ public class Match extends BaseEntity {
     private Team awayTeam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stadium_id", nullable = true)
+    @JoinColumn(name = "stadium_id", nullable = false)
     private Stadium stadium;
 
     @Column

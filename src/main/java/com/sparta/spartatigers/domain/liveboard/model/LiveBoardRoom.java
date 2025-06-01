@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class LiveBoardRoom {
 
     private String roomId; // 채팅방 접속 구별용? url에 필요할지도?

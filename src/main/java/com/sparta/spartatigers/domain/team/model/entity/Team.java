@@ -16,7 +16,6 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public class Team extends BaseEntity {
 
     @Column private String name;
