@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +11,7 @@ import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.ErrorResponse;
 
 @Slf4j
-@RestControllerAdvice
+// @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // validation 예외 핸들러

@@ -14,19 +14,20 @@ import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 @RequiredArgsConstructor
 public class LiveBoardMessageController {
 
-	private final RedisMessagePublisher redisPublisher;
+    private final RedisMessagePublisher redisPublisher;
     private final LiveBoardService liveBoardService;
 
     @MessageMapping("/chat/message")
     public void sendMessage(LiveBoardMessage message) {
         String roomId = message.getRoomId();
 
-		ChannelTopic topic = liveBoardService.getTopic(roomId);
-		if(topic == null) {
-			liveBoardService.enterRoom(roomId);
-			topic = liveBoardService.getTopic(roomId);
-		}
+        ChannelTopic topic = liveBoardService.getTopic(roomId);
+        if (topic == null) {
+            liveBoardService.enterRoom(roomId);
+            topic = liveBoardService.getTopic(roomId);
+        }
 
-		redisPublisher.publish(topic, message);
+        liveBoardService.updateConnectCount(message);
+        redisPublisher.publish(topic, message);
     }
 }

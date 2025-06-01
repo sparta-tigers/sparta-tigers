@@ -1,6 +1,10 @@
 package com.sparta.spartatigers.global.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,6 +14,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * WebSocket Handler를 등록하기 위한 설정 클래스 EnableWebSocket -> WebSocket 사용하도록 지원
@@ -49,4 +55,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     // 추후 참고할 만한 코드: https://modutaxi-tech.tistory.com/6
+
+    private final ObjectMapper objectMapper;
+
+    @Override
+    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+
+        converter.setObjectMapper(objectMapper); // 👈 ObjectMapper 주입
+        converter.setSerializedPayloadClass(String.class); // 👈 payload는 String으로 받는다 선언
+
+        messageConverters.add(converter);
+        return false; // 기본 컨버터는 사용하지 않음
+    }
 }

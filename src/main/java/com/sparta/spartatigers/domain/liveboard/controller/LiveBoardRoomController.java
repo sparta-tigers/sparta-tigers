@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
-import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 
 @RestController
@@ -20,7 +19,7 @@ public class LiveBoardRoomController {
     private final LiveBoardService liveBoardService;
 
     @GetMapping("/rooms")
-    public List<LiveBoardRoom> getRooms() {
+    public List<LiveBoardRoomResponseDto> getRooms() {
         return liveBoardService.findAllRoom();
     }
 }

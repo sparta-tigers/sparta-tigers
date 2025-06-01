@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.team.model.entity.Stadium;
@@ -22,6 +23,7 @@ import com.sparta.spartatigers.domain.team.model.entity.Team;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Match extends BaseEntity {
 
     @Column private LocalDateTime matchTime;
@@ -35,7 +37,7 @@ public class Match extends BaseEntity {
     private Team awayTeam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stadium_id", nullable = false)
+    @JoinColumn(name = "stadium_id", nullable = true)
     private Stadium stadium;
 
     @Column
