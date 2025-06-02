@@ -4,16 +4,19 @@ import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자
     private String senderId;
     private String senderNickname;
     private String content; // 내용
-    private LocalDateTime sentAt = LocalDateTime.now();
+    private LocalDateTime sentAt;
+    private MessageType type;
+
+    public LiveBoardMessage() {
+        this.sentAt = LocalDateTime.now();
+    }
 }
