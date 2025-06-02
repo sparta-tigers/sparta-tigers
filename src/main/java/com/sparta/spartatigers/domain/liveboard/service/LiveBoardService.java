@@ -44,11 +44,6 @@ public class LiveBoardService {
         return roomRepository.findAllRoom().stream().map(LiveBoardRoomResponseDto::of).toList();
     }
 
-    // 채팅방 단건 조회
-    public LiveBoardRoom findRoomById(String roomId) {
-        return roomRepository.findRoomById(roomId);
-    }
-
     // 채널 토픽 반환 (publish시 사용)
     public ChannelTopic getTopic(String roomId) {
         return topics.get(roomId);

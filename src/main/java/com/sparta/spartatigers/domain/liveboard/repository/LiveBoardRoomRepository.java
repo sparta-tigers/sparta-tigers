@@ -13,12 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class LiveBoardRoomRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
     private HashOperations<String, String, LiveBoardRoom> opsHash;
 
     private static final String LIVEBOARD_ROOMS = "liveboard:rooms";
@@ -35,7 +38,9 @@ public class LiveBoardRoomRepository {
     }
 
     public LiveBoardRoom findRoomById(String roomId) {
-        return opsHash.get(LIVEBOARD_ROOMS, roomId);
+        Object object = opsHash.get(LIVEBOARD_ROOMS, roomId);
+        LiveBoardRoom room = objectMapper.convertValue(object, LiveBoardRoom.class);
+        return room;
     }
 
     public List<LiveBoardRoom> findAllRoom() {

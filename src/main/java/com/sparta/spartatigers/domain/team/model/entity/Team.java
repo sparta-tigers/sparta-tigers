@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 
@@ -15,6 +16,7 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Team extends BaseEntity {
 
     @Column private String name;
