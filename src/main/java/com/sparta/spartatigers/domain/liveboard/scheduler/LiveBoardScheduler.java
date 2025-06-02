@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
-import com.sparta.spartatigers.domain.team.model.entity.Team;
 import com.sparta.spartatigers.domain.team.repository.TeamRepository;
 
 @Slf4j
@@ -48,7 +47,7 @@ public class LiveBoardScheduler {
         // // ✅ 1. Team 저장
         // Team homeTeam = teamRepository.save(Team.builder().name("한화").build());
         // Team awayTeam = teamRepository.save(Team.builder().name("기아").build());
-		//
+        //
         // // ✅ 2. 저장된 Team으로 Match 생성
         // Match dummyMatch =
         //         Match.builder()
@@ -57,10 +56,10 @@ public class LiveBoardScheduler {
         //                 .awayTeam(awayTeam) // ✔️ 여기!
         //                 .stadium(null)
         //                 .build();
-		//
+        //
         // // ✅ 3. Match 저장
         // Match savedMatch = matchRepository.save(dummyMatch);
-		//
+        //
         // // ✅ 4. Redis용 채팅방 생성
         // List<Match> todayMatches = List.of(savedMatch); // ✔️ savedMatch 써야 roomId 가능
         // liveBoardService.createTodayRoom(todayMatches);
