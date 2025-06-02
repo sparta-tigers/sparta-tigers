@@ -5,29 +5,26 @@ import java.time.LocalTime;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.Getter;
 
 @Getter
 public class AlarmResponseDto {
-	@NotBlank
-	private String homeTeam;
-	@NotBlank
-	private String awayTeam;
-	@NotBlank
-	private String stadiumName;
-	private LocalDateTime reservationTime;
-	private LocalDateTime preReservationTime;
-	private LocalTime alarmTime;
-	private LocalTime preAlarmTime;
+    @NotBlank private String homeTeam;
+    @NotBlank private String awayTeam;
+    @NotBlank private String stadiumName;
+    private LocalDateTime reservationTime;
+    private LocalDateTime preReservationTime;
+    private LocalTime alarmTime;
+    private LocalTime preAlarmTime;
 
-	@AssertTrue(message = "reservationTime 또는 preReservationTime 중 하나는 필수입니다.")
-	public boolean isAtLeastOneSetReservation() {
-		return reservationTime != null || preReservationTime != null;
-	}
+    @AssertTrue(message = "reservationTime 또는 preReservationTime 중 하나는 필수입니다.")
+    public boolean isAtLeastOneSetReservation() {
+        return reservationTime != null || preReservationTime != null;
+    }
 
-	@AssertTrue(message = "alarm 또는 preAlarm 중 하나는 필수입니다.")
-	public boolean isAtLeastOneSetAlarm() {
-		return alarmTime != null || preAlarmTime != null;
-	}
-
+    @AssertTrue(message = "alarm 또는 preAlarm 중 하나는 필수입니다.")
+    public boolean isAtLeastOneSetAlarm() {
+        return alarmTime != null || preAlarmTime != null;
+    }
 }

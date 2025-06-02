@@ -9,5 +9,4 @@ public class SpartaTigersApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpartaTigersApplication.class, args);
     }
-
 }
