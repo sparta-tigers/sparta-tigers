@@ -49,4 +49,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     // 추후 참고할 만한 코드: https://modutaxi-tech.tistory.com/6
+
 }
