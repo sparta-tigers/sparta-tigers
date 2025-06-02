@@ -56,13 +56,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         ResponseCookie cookie =
                 ResponseCookie.from("access_token", token)
                         .httpOnly(true)
-                        .secure(true)
-                        .sameSite("Strict")
+                        .secure(false)
+                        .sameSite("Lax")
                         .path("/")
                         .maxAge(Duration.ofMinutes(15))
                         .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, String.valueOf(cookie));
         response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
     }
 }
