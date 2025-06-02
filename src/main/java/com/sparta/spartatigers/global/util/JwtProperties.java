@@ -1,9 +1,10 @@
 package com.sparta.spartatigers.global.util;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 @ConfigurationProperties(prefix = "jwt")

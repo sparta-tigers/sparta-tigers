@@ -1,14 +1,16 @@
 package com.sparta.spartatigers.global.util;
 
+import java.util.Date;
+
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -20,8 +22,11 @@ public class JwtUtil {
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
-                .signWith(Keys.hmacShaKeyFor((jwtProperties.getSecretKey().getBytes())), SignatureAlgorithm.HS256)
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
+                .signWith(
+                        Keys.hmacShaKeyFor((jwtProperties.getSecretKey().getBytes())),
+                        SignatureAlgorithm.HS256)
                 .compact();
     }
 

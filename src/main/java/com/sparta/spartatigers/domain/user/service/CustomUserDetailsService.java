@@ -1,11 +1,13 @@
 package com.sparta.spartatigers.domain.user.service;
 
-import com.sparta.spartatigers.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+
+import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

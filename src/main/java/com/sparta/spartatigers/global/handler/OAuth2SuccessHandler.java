@@ -1,14 +1,13 @@
 package com.sparta.spartatigers.global.handler;
 
-import com.sparta.spartatigers.domain.user.model.entity.User;
-import com.sparta.spartatigers.domain.user.repository.UserRepository;
-import com.sparta.spartatigers.global.util.JwtUtil;
-import jakarta.servlet.FilterChain;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -16,9 +15,12 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.domain.user.repository.UserRepository;
+import com.sparta.spartatigers.global.util.JwtUtil;
 
 @Component
 @Log4j2
@@ -26,10 +28,14 @@ import java.util.Map;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+            throws IOException, ServletException {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        Map<String, Object> kakaoAccount =
+                (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
         String email = (String) kakaoAccount.get("email");
@@ -47,13 +53,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(newUser);
         }
 
-        ResponseCookie cookie = ResponseCookie.from("access_token", token)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(Duration.ofMinutes(15))
-                .build();
+        ResponseCookie cookie =
+                ResponseCookie.from("access_token", token)
+                        .httpOnly(true)
+                        .secure(true)
+                        .sameSite("Strict")
+                        .path("/")
+                        .maxAge(Duration.ofMinutes(15))
+                        .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);

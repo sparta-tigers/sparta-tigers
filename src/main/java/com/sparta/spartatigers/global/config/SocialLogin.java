@@ -1,26 +1,26 @@
-//package com.sparta.spartatigers.global.config;
+// package com.sparta.spartatigers.global.config;
 //
-//import com.sparta.spartatigers.domain.user.dto.AuthResponseDto;
-//import com.sparta.spartatigers.domain.user.dto.CodeResDto;
-//import com.sparta.spartatigers.domain.user.model.entity.User;
-//import com.sparta.spartatigers.domain.user.repository.UserRepository;
-//import com.sparta.spartatigers.global.exception.ExceptionCode;
-//import com.sparta.spartatigers.global.exception.ServerException;
-//import com.sparta.spartatigers.global.util.JwtUtil;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.http.*;
-//import org.springframework.stereotype.Component;
-//import org.springframework.util.LinkedMultiValueMap;
-//import org.springframework.util.MultiValueMap;
-//import org.springframework.web.client.RestTemplate;
+// import com.sparta.spartatigers.domain.user.dto.AuthResponseDto;
+// import com.sparta.spartatigers.domain.user.dto.CodeResDto;
+// import com.sparta.spartatigers.domain.user.model.entity.User;
+// import com.sparta.spartatigers.domain.user.repository.UserRepository;
+// import com.sparta.spartatigers.global.exception.ExceptionCode;
+// import com.sparta.spartatigers.global.exception.ServerException;
+// import com.sparta.spartatigers.global.util.JwtUtil;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.http.*;
+// import org.springframework.stereotype.Component;
+// import org.springframework.util.LinkedMultiValueMap;
+// import org.springframework.util.MultiValueMap;
+// import org.springframework.web.client.RestTemplate;
 //
-//import java.util.HashMap;
-//import java.util.Map;
+// import java.util.HashMap;
+// import java.util.Map;
 //
-//@Component
-//@RequiredArgsConstructor
-//public class SocialLogin {
+// @Component
+// @RequiredArgsConstructor
+// public class SocialLogin {
 //        private final JwtUtil jwtUtil;
 //        private final UserRepository userRepository;
 //
@@ -42,7 +42,8 @@
 //
 //        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 //
-//        ResponseEntity<Map> response = restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, Map.class);
+//        ResponseEntity<Map> response =
+// restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, Map.class);
 //
 //        String accessToken = (String) response.getBody().get("access_token");
 //
@@ -87,4 +88,4 @@
 //
 //        return null;
 //    }
-//}
+// }

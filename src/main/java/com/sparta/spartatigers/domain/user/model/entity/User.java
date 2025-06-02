@@ -2,10 +2,11 @@ package com.sparta.spartatigers.domain.user.model.entity;
 
 import java.time.LocalDateTime;
 
-import com.sparta.spartatigers.domain.common.entity.BaseEntity;
-
 import jakarta.persistence.*;
+
 import lombok.*;
+
+import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 
 @Entity(name = "users")
 @Getter
@@ -13,36 +14,34 @@ import lombok.*;
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-	@Column
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Column
-	private String email;
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column
-	private String nickname;
+    @Column private String email;
 
-	@Column
-	private String path;
+    @Column private String nickname;
 
-	@Enumerated(EnumType.STRING)
-	private Role roles;
+    @Column private String path;
 
-	@Column
-	private LocalDateTime deletedAt;
+    @Enumerated(EnumType.STRING)
+    private Role roles;
 
-	public User(String email, String nickname, String path) {
-		this.email = email;
-		this.nickname = nickname;
-		this.path = path;
-		this.roles = Role.USER;
-	}
+    @Column private LocalDateTime deletedAt;
 
-	public void deleted() {
-		this.deletedAt = LocalDateTime.now();
-	}
+    public User(String email, String nickname, String path) {
+        this.email = email;
+        this.nickname = nickname;
+        this.path = path;
+        this.roles = Role.USER;
+    }
 
-	public enum Role {
-		ADMIN, USER
-	}
+    public void deleted() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public enum Role {
+        ADMIN,
+        USER
+    }
 }
