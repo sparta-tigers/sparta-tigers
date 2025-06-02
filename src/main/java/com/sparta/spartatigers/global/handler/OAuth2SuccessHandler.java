@@ -1,15 +1,12 @@
 package com.sparta.spartatigers.global.handler;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -53,16 +50,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(newUser);
         }
 
-        ResponseCookie cookie =
-                ResponseCookie.from("access_token", token)
-                        .httpOnly(true)
-                        .secure(false)
-                        .sameSite("Lax")
-                        .path("/")
-                        .maxAge(Duration.ofMinutes(15))
-                        .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, String.valueOf(cookie));
         response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
     }
 }

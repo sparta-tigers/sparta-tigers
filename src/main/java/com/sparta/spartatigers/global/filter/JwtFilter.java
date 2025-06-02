@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.global.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,13 +9,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
 import com.sparta.spartatigers.global.util.JwtUtil;
 
@@ -24,7 +28,7 @@ import io.jsonwebtoken.Claims;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -42,12 +46,17 @@ public class JwtFilter extends OncePerRequestFilter {
         Claims claims = jwtUtil.validateToken(token);
 
         if (claims != null) {
-            String username = claims.getSubject();
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String email = claims.getSubject();
+            String role = claims.get("role", String.class);
+
+            User user = customUserDetailsService.loadUserByUsername(email).getUser();
+            CustomUserPrincipal principal = new CustomUserPrincipal(user);
+
+            List<GrantedAuthority> authorities =
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         }

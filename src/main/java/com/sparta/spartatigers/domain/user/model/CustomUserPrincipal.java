@@ -25,12 +25,12 @@ public class CustomUserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "PASSWORD";
+        return null;
     }
 
     @Override
     public String getUsername() {
-        return "NICK";
+        return getUser().getEmail();
     }
 
     @Override
