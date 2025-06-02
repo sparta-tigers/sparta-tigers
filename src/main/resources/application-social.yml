@@ -1,0 +1,27 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 73de350af1d87d13f6b9f10b6106fa83
+            client-secret: vtKnLmDkxbFmlE4LdHMqLJjga7xFk2AG
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_image
+              - profile_nickname
+              - account_email
+            client-authentication-method: client_secret_post
+            client-name: kakao
+            provider: kakao
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+jwt:
+  secret-key: 7JWI64WV7ZWY7IS47JqU7Iqk7YyM66W07YOA7L2U65Sp7YG065+97J6F64uI64ukLg==
+  expiration-time: 3600000
