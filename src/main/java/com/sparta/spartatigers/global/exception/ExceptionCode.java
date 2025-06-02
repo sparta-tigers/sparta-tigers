@@ -17,7 +17,7 @@ public enum ExceptionCode {
     // 회원
     EMAIL_ALREADY_USED("이미 사용 중인 이메일입니다."),
     EMAIL_NOT_FOUND("이메일이 존재하지 않습니다."),
-    USER_NOT_FOUND("임시로 만든 유저낫빠운드~"),
+    USER_NOT_FOUND("유저가 존재하지 않습니다."),
     ALREADY_DELETED_USER("이미 탈퇴한 회원입니다."),
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다."),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다."),
