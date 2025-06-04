@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.chatroom.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +21,10 @@ public class DirectRoomService {
     private final DirectRoomRepository directRoomRepository;
 
     @Transactional
-    public DirectRoomDto createRoom(Long exchangeRequestId) {
+    public DirectRoomDto createRoom(Long exchangeRequestId, Long currentUserId) {
         ExchangeRequest exchangeRequest =
                 exchangeRequestRepository.findByIdOrElseThrow(exchangeRequestId);
+
         DirectRoom room =
                 directRoomRepository
                         .findByExchangeRequest(exchangeRequest)
@@ -29,6 +32,14 @@ public class DirectRoomService {
                                 () ->
                                         directRoomRepository.save(
                                                 DirectRoom.create(exchangeRequest)));
-        return DirectRoomDto.from(room);
+
+        return DirectRoomDto.from(room, currentUserId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DirectRoomDto> getRoomsForUser(Long userId, Pageable pageable) {
+        Page<DirectRoom> rooms =
+                directRoomRepository.findAllBySenderIdOrReceiverId(userId, userId, pageable);
+        return rooms.map(room -> DirectRoomDto.from(room, userId));
     }
 }
