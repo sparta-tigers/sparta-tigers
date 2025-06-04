@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
+import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -44,6 +45,17 @@ public class Item extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public static Item of(CreateItemRequestDto dto, User user) {
+        return new Item(
+                dto.category(),
+                dto.image(),
+                dto.seatInfo(),
+                dto.title(),
+                dto.description(),
+                Status.REGISTERED,
+                user);
+    }
 
     public enum Category {
         GOODS,

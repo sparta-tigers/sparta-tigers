@@ -22,7 +22,7 @@ public class ItemService {
 
         User user = principal.getUser();
 
-        Item item = request.toEntity(user);
+        Item item = Item.of(request, user);
 
         itemRepository.save(item);
     }
