@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.watchlist.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class WatchListRepository {}
+import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
+
+public interface WatchListRepository extends JpaRepository<WatchList, Long> {}

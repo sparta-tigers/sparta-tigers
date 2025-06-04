@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 
 @Entity(name = "watch_list")
 @NoArgsConstructor
@@ -33,6 +34,11 @@ public class WatchList extends BaseEntity {
     @JoinColumn(name = "match_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Match match;
+
+    public static WatchList from(Match match, CreateWatchListRequestDto dto) {
+        return new WatchList(
+                dto.getRecord().getContent(), dto.getRecord().getRate(), null, null, match);
+    }
 
     public void deleted() {
         this.deletedAt = LocalDateTime.now();
