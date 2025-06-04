@@ -27,13 +27,11 @@ public class WatchListService {
      */
     public CreateWatchListResponseDto create(CreateWatchListRequestDto request) {
         Match match = matchRepository.findByIdWithTeamsAndStadium(request.getMatch().getId());
-
         WatchList watchList = WatchList.from(match, request);
+
         watchListRepository.save(watchList);
 
-        MatchScheduleDto findMatch = MatchScheduleDto.of(match);
-
         return CreateWatchListResponseDto.from(
-                findMatch, CreateWatchListResponseDto.RecordDto.of(request));
+			MatchScheduleDto.of(match), CreateWatchListResponseDto.RecordDto.of(request));
     }
 }
