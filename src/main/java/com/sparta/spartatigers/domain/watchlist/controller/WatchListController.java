@@ -22,7 +22,7 @@ public class WatchListController {
     /**
      * 직관 기록 등록
      *
-     * @return null
+     * @return {@link CreateWatchListResponseDto}
      */
     @PostMapping
     public ApiResponse<CreateWatchListResponseDto> create(
