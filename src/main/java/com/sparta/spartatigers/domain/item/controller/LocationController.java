@@ -29,6 +29,6 @@ public class LocationController {
 
         locationService.createLocation(request, userPrincipal);
 
-        return ApiResponse.ok(null);
+        return ApiResponse.created(null);
     }
 }
