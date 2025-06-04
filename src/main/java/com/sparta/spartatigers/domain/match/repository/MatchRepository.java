@@ -1,14 +1,33 @@
 package com.sparta.spartatigers.domain.match.repository;
 
+import com.sparta.spartatigers.domain.match.model.entity.Match;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.sparta.spartatigers.domain.match.model.entity.Match;
+import org.springframework.data.jpa.repository.Query;
 
 public interface MatchRepository extends JpaRepository<Match, Long> {
 
-    // 날짜별 조회
-    List<Match> findAllByMatchTimeBetween(LocalDateTime start, LocalDateTime end);
+	// 날짜별 조회
+	@Query(
+		"""
+			SELECT m
+			FROM matches m
+			JOIN FETCH m.homeTeam
+			JOIN FETCH m.awayTeam
+			JOIN FETCH m.stadium
+			WHERE m.matchTime BETWEEN :start AND :end
+			""")
+	List<Match> findAllByMatchTimeBetween(LocalDateTime start, LocalDateTime end);
+
+	@Query(
+		"""
+			SELECT m
+			FROM matches m
+			JOIN FETCH m.homeTeam
+			JOIN FETCH m.awayTeam
+			JOIN FETCH m.stadium
+			WHERE m.id = :id
+			""")
+	Match findByIdWithTeamsAndStadium(Long id);
 }
