@@ -12,6 +12,8 @@ import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +43,14 @@ public class DirectRoomService {
         Page<DirectRoom> rooms =
                 directRoomRepository.findAllBySenderIdOrReceiverId(userId, userId, pageable);
         return rooms.map(room -> DirectRoomDto.from(room, userId));
+    }
+
+    @Transactional
+    public void deleteRoom(Long directRoomId) {
+        DirectRoom room =
+                directRoomRepository
+                        .findById(directRoomId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.CHATROOM_NOT_FOUND));
+        directRoomRepository.delete(room);
     }
 }
