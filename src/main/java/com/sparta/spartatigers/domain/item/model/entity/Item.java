@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.item.model.entity;
 
+import java.util.stream.Stream;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,12 +13,17 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
+import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 @Entity(name = "items")
 @Getter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Item extends BaseEntity {
@@ -39,9 +46,28 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    public static Item of(CreateItemRequestDto dto, User user) {
+        return new Item(
+                dto.category(),
+                dto.image(),
+                dto.seatInfo(),
+                dto.title(),
+                dto.description(),
+                Status.REGISTERED,
+                user);
+    }
+
     public enum Category {
         GOODS,
-        TICKET
+        TICKET;
+
+        @JsonCreator
+        public static Category parsing(String inputValue) {
+            return Stream.of(Category.values())
+                    .filter(category -> category.toString().equals(inputValue.toUpperCase()))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     public enum Status {
