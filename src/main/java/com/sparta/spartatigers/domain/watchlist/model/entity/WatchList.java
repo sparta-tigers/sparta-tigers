@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
@@ -16,6 +17,7 @@ import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 
+@Getter
 @Entity(name = "watch_list")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,9 +1,14 @@
 package com.sparta.spartatigers.domain.watchlist.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -11,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
 import com.sparta.spartatigers.global.response.ApiResponse;
 
@@ -31,5 +37,22 @@ public class WatchListController {
             @RequestBody CreateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.created(watchListService.create(request, principal));
+    }
+
+    /**
+     * 직관 기록 전체 조회
+     *
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto}
+     */
+    @GetMapping
+    public ApiResponse<Page<WatchListResponseDto>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.ok(watchListService.find(pageable));
     }
 }
