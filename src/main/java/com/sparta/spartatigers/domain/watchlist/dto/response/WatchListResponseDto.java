@@ -12,12 +12,13 @@ import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WatchListResponseDto {
-    private RecordDto recordDto;
-    private MatchScheduleDto matchScheduleDto;
+    private Long id;
+    private RecordDto record;
+    private MatchScheduleDto matchSchedule;
 
     public static WatchListResponseDto of(WatchList watchList) {
         MatchScheduleDto matchScheduleDto = MatchScheduleDto.of(watchList.getMatch());
         RecordDto recordDto = RecordDto.of(watchList);
-        return new WatchListResponseDto(recordDto, matchScheduleDto);
+        return new WatchListResponseDto(watchList.getId(), recordDto, matchScheduleDto);
     }
 }
