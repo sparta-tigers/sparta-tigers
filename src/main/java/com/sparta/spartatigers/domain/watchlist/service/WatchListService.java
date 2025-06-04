@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.domain.match.dto.MatchScheduleDto;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
+import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
@@ -23,9 +24,11 @@ public class WatchListService {
      * 직관 기록 등록 서비스
      *
      * @param request 유저 요청 객체
+	 * @param principal 유저 정보
      * @return {@link CreateWatchListResponseDto}
      */
-    public CreateWatchListResponseDto create(CreateWatchListRequestDto request) {
+    public CreateWatchListResponseDto create(
+            CreateWatchListRequestDto request, CustomUserPrincipal principal) {
         Match match = matchRepository.findByIdWithTeamsAndStadium(request.getMatch().getId());
         WatchList watchList = WatchList.from(match, request);
 
