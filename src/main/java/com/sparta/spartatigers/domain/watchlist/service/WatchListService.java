@@ -10,6 +10,7 @@ import com.sparta.spartatigers.domain.match.dto.MatchScheduleDto;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
@@ -37,8 +38,7 @@ public class WatchListService {
 
         watchListRepository.save(watchList);
 
-        return CreateWatchListResponseDto.from(
-                MatchScheduleDto.of(match), CreateWatchListResponseDto.RecordDto.of(request));
+        return CreateWatchListResponseDto.from(MatchScheduleDto.of(match), RecordDto.of(request));
     }
 
     public Page<WatchListResponseDto> find(Pageable pageable) {

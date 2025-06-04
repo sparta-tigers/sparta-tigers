@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.match.dto.MatchScheduleDto;
-import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
-import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
+import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 
 @Getter
 @NoArgsConstructor
@@ -18,22 +17,5 @@ public class CreateWatchListResponseDto {
 
     public static CreateWatchListResponseDto from(MatchScheduleDto match, RecordDto record) {
         return new CreateWatchListResponseDto(match, record);
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RecordDto {
-
-        private String content;
-        private int rate;
-
-        public static RecordDto of(CreateWatchListRequestDto dto) {
-            return new RecordDto(dto.getRecord().getContent(), dto.getRecord().getRate());
-        }
-
-        public static RecordDto of(WatchList watchList) {
-            return new RecordDto(watchList.getContents(), watchList.getRating());
-        }
     }
 }
