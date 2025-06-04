@@ -19,12 +19,12 @@ public class WatchListService {
     private final WatchListRepository watchListRepository;
     private final MatchRepository matchRepository;
 
-	/**
-	 * 직관 기록 등록 서비스
-	 *
-	 * @param request 유저 요청 객체
-	 * @return {@link CreateWatchListResponseDto}
-	 */
+    /**
+     * 직관 기록 등록 서비스
+     *
+     * @param request 유저 요청 객체
+     * @return {@link CreateWatchListResponseDto}
+     */
     public CreateWatchListResponseDto create(CreateWatchListRequestDto request) {
         Match match = matchRepository.findByIdWithTeamsAndStadium(request.getMatch().getId());
 
@@ -33,7 +33,7 @@ public class WatchListService {
 
         MatchScheduleDto findMatch = MatchScheduleDto.of(match);
 
-        return new CreateWatchListResponseDto(
+        return CreateWatchListResponseDto.from(
                 findMatch, CreateWatchListResponseDto.RecordDto.of(request));
     }
 }

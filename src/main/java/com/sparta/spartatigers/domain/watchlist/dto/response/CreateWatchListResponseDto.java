@@ -15,8 +15,8 @@ public class CreateWatchListResponseDto {
     private MatchScheduleDto match;
     private RecordDto record;
 
-    public static CreateWatchListResponseDto of() {
-        return new CreateWatchListResponseDto();
+    public static CreateWatchListResponseDto from(MatchScheduleDto match, RecordDto record) {
+        return new CreateWatchListResponseDto(match, record);
     }
 
     @Getter
