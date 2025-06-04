@@ -32,6 +32,6 @@ public class WatchListService {
         watchListRepository.save(watchList);
 
         return CreateWatchListResponseDto.from(
-			MatchScheduleDto.of(match), CreateWatchListResponseDto.RecordDto.of(request));
+                MatchScheduleDto.of(match), CreateWatchListResponseDto.RecordDto.of(request));
     }
 }
