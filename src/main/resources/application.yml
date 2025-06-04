@@ -2,10 +2,12 @@ spring.application.name: sparta-tigers
 spring.profiles.active: local
 
 spring:
+
   config:
     import:
       - db.yml
       - redis.yml
+      - application-social.yml
 
   # ?? ??? ?? ????
   web.resources.add-mappings: false
@@ -16,3 +18,4 @@ server:
     threads:
       max: 600
       min-spare: 100
+

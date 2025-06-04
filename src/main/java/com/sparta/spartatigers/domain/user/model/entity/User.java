@@ -2,15 +2,9 @@ package com.sparta.spartatigers.domain.user.model.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 
@@ -19,9 +13,10 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User extends BaseEntity {
-    @Column private String providerId;
 
-    @Column private String provider;
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column private String email;
 
@@ -33,6 +28,13 @@ public class User extends BaseEntity {
     private Role roles;
 
     @Column private LocalDateTime deletedAt;
+
+    public User(String email, String nickname, String path) {
+        this.email = email;
+        this.nickname = nickname;
+        this.path = path;
+        this.roles = Role.USER;
+    }
 
     public void deleted() {
         this.deletedAt = LocalDateTime.now();
