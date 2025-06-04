@@ -13,9 +13,7 @@ public record CreateItemRequestDto(
         String image,
         @NotBlank(message = "제목은 필수입니다.") String title,
         String seatInfo,
-        String description,
-        @NotNull(message = "위도는 필수입니다.") Double latitude,
-        @NotNull(message = "경도는 필수입니다.") Double longitude) {
+        String description) {
 
     public Item toEntity(User user) {
         return Item.builder()
