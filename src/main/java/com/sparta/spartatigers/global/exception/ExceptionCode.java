@@ -36,7 +36,7 @@ public enum ExceptionCode {
     ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
 
     // 직관 기록
-	WATCH_LIST_NOT_FOUN("직관 기록이 존재하지 않습니다."),
+    WATCH_LIST_NOT_FOUN("직관 기록이 존재하지 않습니다."),
 
     // 공통
     NOT_FOUND("not found ~~"),
