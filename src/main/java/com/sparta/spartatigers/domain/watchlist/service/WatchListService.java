@@ -96,4 +96,20 @@ public class WatchListService {
 
         return WatchListResponseDto.of(findWatchList);
     }
+
+	/**
+	 * 직관 기록 삭제
+	 *
+	 * @param watchListId 직관 기록 식별자
+	 * @param principal 유저 정보
+	 */
+    @Transactional
+    public void delete(Long watchListId, CustomUserPrincipal principal) {
+        WatchList findWatchList =
+                watchListRepository
+                        .findByIdWithMatchDetails(watchListId)
+                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+
+        watchListRepository.delete(findWatchList);
+    }
 }

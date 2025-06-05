@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,5 +88,20 @@ public class WatchListController {
             @RequestBody UpdateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(watchListService.update(watchListId, request, principal));
+    }
+
+    /**
+     * 직관 기록 삭제
+     *
+     * @param watchListId 직관 기록 식별자
+     * @param principal 유저 정보
+     * @return String
+     */
+    @DeleteMapping("/{watchListId}")
+    public ApiResponse<?> delete(
+            @PathVariable Long watchListId,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        watchListService.delete(watchListId, principal);
+        return ApiResponse.ok("삭제 완료");
     }
 }
