@@ -5,10 +5,11 @@ import java.time.LocalDateTime;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Category;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
+import com.sparta.spartatigers.domain.user.dto.UserResponseDto;
 
 public record ReadItemResponseDto(
         Long id,
-        UserDto user,
+        UserResponseDto user,
         Category category,
         String title,
         Status status,
@@ -18,7 +19,7 @@ public record ReadItemResponseDto(
 
         return new ReadItemResponseDto(
                 item.getId(),
-                UserDto.from(item.getUser()),
+                UserResponseDto.from(item.getUser()),
                 item.getCategory(),
                 item.getTitle(),
                 item.getStatus(),
