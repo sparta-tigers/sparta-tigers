@@ -33,10 +33,13 @@ public enum ExceptionCode {
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
 
     // 교환 요청
-    EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니동"),
+    EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니다."),
+    EXCHANGE_REQUEST_DUPLICATED("이미 교환 요청을 보냈습니다."),
 
     // 아이템
     ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
+    CANNOT_REQUEST_OWN_ITEM("자신의 아이템에 대해 교환 요청을 할 수 없습니다."),
+    RECEIVER_NOT_OWNER("해당 아이템의 소유자에게만 요청을 보낼 수 있습니다."),
 
     // 직관 기록
     WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다."),

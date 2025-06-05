@@ -18,7 +18,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @RequiredArgsConstructor
-public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
+public class ItemQueryRepositoryImpl implements ItemQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final QItem item = QItem.item;

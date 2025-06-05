@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 @Entity(name = "exchange_request")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ExchangeRequest extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,6 +35,11 @@ public class ExchangeRequest extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ExchangeStatus status;
+
+    public static ExchangeRequest of(Item item, User sender, User receiver) {
+
+        return new ExchangeRequest(item, sender, receiver, ExchangeStatus.PENDING);
+    }
 
     public enum ExchangeStatus {
         PENDING,
