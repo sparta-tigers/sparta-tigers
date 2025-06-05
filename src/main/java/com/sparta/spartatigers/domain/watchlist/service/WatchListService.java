@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.watchlist.service;
 
+import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class WatchListService {
 
         watchListRepository.save(watchList);
 
-        return CreateWatchListResponseDto.from(match, request);
+        return CreateWatchListResponseDto.from(match, RecordDto.of(request));
     }
 
     /**
@@ -52,7 +53,7 @@ public class WatchListService {
      */
     @Transactional(readOnly = true)
     public Page<WatchListResponseDto> findAll(Pageable pageable, CustomUserPrincipal principal) {
-        Long userId = principal.getUserId(principal);
+        Long userId = CustomUserPrincipal.getUserId(principal);
         Page<WatchList> all = watchListRepository.findAllByUserIdWithMatchDetails(userId, pageable);
 
         return all.map(WatchListResponseDto::of);
@@ -67,7 +68,7 @@ public class WatchListService {
      */
     @Transactional(readOnly = true)
     public WatchListResponseDto findOne(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = principal.getUserId(principal);
+        Long userId = CustomUserPrincipal.getUserId(principal);
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -85,7 +86,7 @@ public class WatchListService {
     @Transactional
     public WatchListResponseDto update(
             Long watchListId, UpdateWatchListRequestDto request, CustomUserPrincipal principal) {
-        Long userId = principal.getUserId(principal);
+        Long userId = CustomUserPrincipal.getUserId(principal);
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -102,7 +103,7 @@ public class WatchListService {
      */
     @Transactional
     public void delete(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = principal.getUserId(principal);
+        Long userId = CustomUserPrincipal.getUserId(principal);
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -118,7 +119,7 @@ public class WatchListService {
      */
     public Page<WatchListResponseDto> search(
             Pageable pageable, SearchWatchListRequestDto request, CustomUserPrincipal principal) {
-        Long userId = principal.getUserId(principal);
+        Long userId = CustomUserPrincipal.getUserId(principal);
         Page<WatchList> all =
                 watchListRepository.findAllByKeyword(
                         userId, request.getTeamName(), request.getStadiumName(), pageable);
