@@ -56,10 +56,6 @@ public class WatchListService {
         Long userId = principal.getUserId(principal);
         Page<WatchList> all = watchListRepository.findAllByUserIdWithMatchDetails(userId, pageable);
 
-        if (all.isEmpty()) {
-            return Page.empty();
-        }
-
         return all.map(WatchListResponseDto::of);
     }
 
