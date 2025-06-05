@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +41,7 @@ public class WatchListController {
     }
 
     /**
-     * 직관 기록 전체 조회
+     * 직관 기록 다건 조회
      *
      * @param page 페이지 번호
      * @param size 페이지 크기
@@ -48,11 +49,25 @@ public class WatchListController {
      * @return {@link WatchListResponseDto}
      */
     @GetMapping
-    public ApiResponse<Page<WatchListResponseDto>> getAll(
+    public ApiResponse<Page<WatchListResponseDto>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(watchListService.find(pageable));
+        return ApiResponse.ok(watchListService.findAll(pageable, principal));
+    }
+
+    /**
+     * 직관 기록 단건 조회
+     *
+     * @param watchListId 직관 기록 식별자
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto}
+     */
+    @GetMapping("/{watchListId}")
+    public ApiResponse<?> findOne(
+            @PathVariable Long watchListId,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(watchListService.findOne(watchListId, principal));
     }
 }

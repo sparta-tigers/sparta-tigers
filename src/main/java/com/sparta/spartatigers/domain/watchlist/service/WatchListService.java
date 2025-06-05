@@ -3,6 +3,7 @@ package com.sparta.spartatigers.domain.watchlist.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,11 +42,36 @@ public class WatchListService {
         return CreateWatchListResponseDto.from(MatchScheduleDto.of(match), RecordDto.of(request));
     }
 
-    public Page<WatchListResponseDto> find(Pageable pageable) {
-        Page<WatchList> all = watchListRepository.findAllByMatchId(pageable, 1L);
+    /**
+     * 직관 기록 다건 조회 서비스
+     *
+     * @param pageable 페이지 정보
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto} 페이지
+     */
+    @Transactional(readOnly = true)
+    public Page<WatchListResponseDto> findAll(Pageable pageable, CustomUserPrincipal principal) {
+        Page<WatchList> all = watchListRepository.findAllWithMatchDetails(pageable);
         if (all.isEmpty()) {
             return Page.empty();
         }
         return all.map(WatchListResponseDto::of);
+    }
+
+    /**
+     * 직관 기록 단건 조회 서비스
+     *
+     * @param watchListId 직관 기록 식별자
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto}
+     */
+    @Transactional(readOnly = true)
+    public WatchListResponseDto findOne(Long watchListId, CustomUserPrincipal principal) {
+        WatchList findWatchList =
+                watchListRepository
+                        .findByIdWithMatchDetails(watchListId)
+                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+
+        return WatchListResponseDto.of(findWatchList);
     }
 }
