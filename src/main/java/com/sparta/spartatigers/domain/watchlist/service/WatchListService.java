@@ -11,6 +11,7 @@ import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
@@ -106,5 +107,22 @@ public class WatchListService {
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
         watchListRepository.delete(findWatchList);
+    }
+
+    /**
+     * 직관 기록 검색 서비스
+     *
+     * @param request 검색 요청 객체
+     * @param principal 유저 정보
+     * @return {@link Page<WatchListResponseDto>}
+     */
+    public Page<WatchListResponseDto> search(
+            Pageable pageable, SearchWatchListRequestDto request, CustomUserPrincipal principal) {
+        Long userId = principal.getUserId(principal);
+        Page<WatchList> all =
+                watchListRepository.findAllByKeyword(
+                        userId, request.getTeamName(), request.getStadiumName(), pageable);
+
+        return all.map(WatchListResponseDto::of);
     }
 }

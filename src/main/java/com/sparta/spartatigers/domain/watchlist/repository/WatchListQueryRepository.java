@@ -26,4 +26,16 @@ public interface WatchListQueryRepository {
      * @return {@link Optional<WatchList>}
      */
     Optional<WatchList> findByIdWithMatchDetails(Long watchListId, Long userId);
+
+    /**
+     * 팀명, 구장명을 검색하여 작성한 직관 기록 목록을 페이지로 가져오는 메서드
+     *
+     * @param userId 유저 식별자
+     * @param teamName 팀명
+     * @param stadiumName 구장명
+     * @param pageable 페이지 정보
+     * @return {@link Page<WatchList>}
+     */
+    Page<WatchList> findAllByKeyword(
+            Long userId, String teamName, String stadiumName, Pageable pageable);
 }

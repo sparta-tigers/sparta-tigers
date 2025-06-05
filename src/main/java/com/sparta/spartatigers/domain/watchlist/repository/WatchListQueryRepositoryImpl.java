@@ -61,6 +61,32 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
         return Optional.ofNullable(result);
     }
 
+    @Override
+    public Page<WatchList> findAllByKeyword(
+            Long userId, String teamName, String stadiumName, Pageable pageable) {
+        List<WatchList> results =
+                baseQueryWithMatchDetails()
+                        .where(
+                                isUserOwner(userId),
+                                containsTeamName(teamName),
+                                containsStadiumName(stadiumName))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
+
+        Long total =
+                queryFactory
+                        .select(watchList.count())
+                        .from(watchList)
+                        .where(
+                                isUserOwner(userId),
+                                containsTeamName(teamName),
+                                containsStadiumName(stadiumName))
+                        .fetchOne();
+
+        return new PageImpl<>(results, pageable, total != null ? total : 0);
+    }
+
     /** 공통 조인 + fetchJoin 처리 메서드 */
     private JPAQuery<WatchList> baseQueryWithMatchDetails() {
         return queryFactory
@@ -81,5 +107,25 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
 
     private BooleanExpression hasWatchListId(Long watchListId) {
         return watchList.id.eq(watchListId);
+    }
+
+    private BooleanExpression containsTeamName(String teamName) {
+        if (teamName == null || teamName.isBlank()) {
+            return null;
+        }
+        // 해당 기록의 홈/어웨이 팀명 모두 조건 검색
+        return watchList
+                .match
+                .awayTeam
+                .name
+                .eq(teamName)
+                .or(watchList.match.homeTeam.name.containsIgnoreCase(teamName));
+    }
+
+    private BooleanExpression containsStadiumName(String stadiumName) {
+        if (stadiumName == null || stadiumName.isBlank()) {
+            return null;
+        }
+        return watchList.match.stadium.name.containsIgnoreCase(stadiumName);
     }
 }

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
@@ -103,5 +104,24 @@ public class WatchListController {
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         watchListService.delete(watchListId, principal);
         return ApiResponse.ok("삭제 완료");
+    }
+
+    /**
+     * 직관 기록 검색
+     *
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @param request 요청 DTO {@link SearchWatchListRequestDto}
+     * @param principal 유저 정보
+     * @return {@link Page<WatchListResponseDto>}
+     */
+    @GetMapping("/search")
+    public ApiResponse<?> search(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestBody SearchWatchListRequestDto request,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.ok(watchListService.search(pageable, request, principal));
     }
 }
