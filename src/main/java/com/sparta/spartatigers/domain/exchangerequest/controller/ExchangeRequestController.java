@@ -14,6 +14,7 @@ import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeReques
 import com.sparta.spartatigers.domain.exchangerequest.service.ExchangeRequestService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
+import com.sparta.spartatigers.global.response.MessageCode;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +30,6 @@ public class ExchangeRequestController {
 
         exchangeRequestService.createExchangeRequest(request, principal);
 
-        return ApiResponse.created("교환 요청을 성공적으로 보냈습니다.");
+        return ApiResponse.created(MessageCode.EXCHANGE_REQUEST_SUCCESS.getMessage());
     }
 }
