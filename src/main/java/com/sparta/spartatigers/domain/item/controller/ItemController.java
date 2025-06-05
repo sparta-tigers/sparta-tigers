@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
 import com.sparta.spartatigers.domain.item.service.ItemService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
@@ -45,6 +47,14 @@ public class ItemController {
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
 
         Page<ReadItemResponseDto> response = itemService.findAllItems(userPrincipal, pageable);
+
+        return ApiResponse.ok(response);
+    }
+
+    @GetMapping("/{itemId}")
+    public ApiResponse<ReadItemDetailResponseDto> findItemById(@PathVariable Long itemId) {
+
+        ReadItemDetailResponseDto response = itemService.findItemById(itemId);
 
         return ApiResponse.ok(response);
     }
