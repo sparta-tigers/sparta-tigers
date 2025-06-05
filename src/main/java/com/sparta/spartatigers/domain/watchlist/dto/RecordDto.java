@@ -13,7 +13,7 @@ import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 public class RecordDto {
 
     private String content;
-    private int rate;
+    private Integer rate;
 
     public static RecordDto of(CreateWatchListRequestDto dto) {
         return new RecordDto(dto.getRecord().getContent(), dto.getRecord().getRate());

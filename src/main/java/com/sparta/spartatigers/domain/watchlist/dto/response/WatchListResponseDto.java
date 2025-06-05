@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.watchlist.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +17,16 @@ public class WatchListResponseDto {
     private Long id;
     private RecordDto record;
     private MatchScheduleDto match;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static WatchListResponseDto of(WatchList watchList) {
         MatchScheduleDto matchScheduleDto = MatchScheduleDto.of(watchList.getMatch());
         return new WatchListResponseDto(
-                watchList.getId(), RecordDto.of(watchList), matchScheduleDto);
+                watchList.getId(),
+                RecordDto.of(watchList),
+                matchScheduleDto,
+                watchList.getCreatedAt(),
+                watchList.getUpdatedAt());
     }
 }

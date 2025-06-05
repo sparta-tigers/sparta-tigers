@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
@@ -69,5 +71,21 @@ public class WatchListController {
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(watchListService.findOne(watchListId, principal));
+    }
+
+    /**
+     * 직관 기록 수정
+     *
+     * @param watchListId 직관 기록 식별자
+     * @param request 요청 DTO {@link UpdateWatchListRequestDto}
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto}
+     */
+    @PatchMapping("/{watchListId}")
+    public ApiResponse<?> update(
+            @PathVariable Long watchListId,
+            @RequestBody UpdateWatchListRequestDto request,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(watchListService.update(watchListId, request, principal));
     }
 }

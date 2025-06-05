@@ -13,6 +13,7 @@ import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
@@ -71,6 +72,27 @@ public class WatchListService {
                 watchListRepository
                         .findByIdWithMatchDetails(watchListId)
                         .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+
+        return WatchListResponseDto.of(findWatchList);
+    }
+
+    /**
+     * 직관 기록 수정 서비스
+     *
+     * @param watchListId 직관 기록 식별자
+     * @param request 요청 DTO
+     * @param principal 유저 정보
+     * @return {@link WatchListResponseDto}
+     */
+    @Transactional
+    public WatchListResponseDto update(
+            Long watchListId, UpdateWatchListRequestDto request, CustomUserPrincipal principal) {
+        WatchList findWatchList =
+                watchListRepository
+                        .findByIdWithMatchDetails(watchListId)
+                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+
+        findWatchList.update(request.getRecord().getContent(), request.getRecord().getRate());
 
         return WatchListResponseDto.of(findWatchList);
     }

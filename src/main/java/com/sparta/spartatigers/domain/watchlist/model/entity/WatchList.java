@@ -37,12 +37,32 @@ public class WatchList extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Match match;
 
+    public WatchList(String contents, int rating, User user, Match match) {
+        this.contents = contents;
+        this.rating = rating;
+        this.user = user;
+        this.match = match;
+    }
+
     public static WatchList from(Match match, CreateWatchListRequestDto dto) {
         return new WatchList(
                 dto.getRecord().getContent(), dto.getRecord().getRate(), null, null, match);
     }
 
+    public static WatchList of(WatchList watchList) {
+        return new WatchList(
+                watchList.getContents(),
+                watchList.getRating(),
+                watchList.getUser(),
+                watchList.getMatch());
+    }
+
     public void deleted() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void update(String content, Integer rating) {
+        if (content != null) this.contents = content;
+        if (rating != null) this.rating = rating;
     }
 }
