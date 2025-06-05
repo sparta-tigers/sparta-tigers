@@ -7,11 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.match.dto.MatchScheduleDto;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
-import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
