@@ -11,6 +11,6 @@ public interface WatchListRepository
 
     default WatchList findDetailByIdAndOwnerOrThrow(Long watchListId, Long userId) {
         return findByIdWithMatchDetails(watchListId, userId)
-                .orElseThrow(() -> new InvalidRequestException(ExceptionCode.WATCH_LIST_NOT_FOUN));
+                .orElseThrow(() -> new InvalidRequestException(ExceptionCode.WATCH_LIST_NOT_FOUND));
     }
 }
