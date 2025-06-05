@@ -22,6 +22,9 @@ public enum ExceptionCode {
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다."),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다."),
 
+    // 경기
+    MATCH_NOT_FOUND("경기가 존재하지 않습니다."),
+
     // 라이브 보드
 
     // 알람
@@ -36,6 +39,7 @@ public enum ExceptionCode {
     ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
 
     // 직관 기록
+    WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다."),
 
     // 공통
     NOT_FOUND("not found ~~"),
