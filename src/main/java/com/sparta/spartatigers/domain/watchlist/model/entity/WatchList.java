@@ -44,9 +44,9 @@ public class WatchList extends BaseEntity {
         this.match = match;
     }
 
-    public static WatchList from(Match match, CreateWatchListRequestDto dto) {
+    public static WatchList from(Match match, CreateWatchListRequestDto dto, User user) {
         return new WatchList(
-                dto.getRecord().getContent(), dto.getRecord().getRate(), null, null, match);
+                dto.getRecord().getContent(), dto.getRecord().getRate(), null, user, match);
     }
 
     public static WatchList of(WatchList watchList) {

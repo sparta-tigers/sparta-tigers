@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 
@@ -19,8 +20,10 @@ public interface WatchListRepository extends JpaRepository<WatchList, Long> {
 		JOIN FETCH w.match.awayTeam at
 		JOIN FETCH w.match.homeTeam ht
 		JOIN FETCH w.match.stadium s
+		WHERE w.user.id = :userId
 		""")
-    Page<WatchList> findAllWithMatchDetails(Pageable pageable);
+    Page<WatchList> findAllByUserIdWithMatchDetails(
+            @Param("userId") Long userId, Pageable pageable);
 
     @Query(
             """
@@ -30,7 +33,8 @@ public interface WatchListRepository extends JpaRepository<WatchList, Long> {
 		JOIN FETCH w.match.awayTeam at
 		JOIN FETCH w.match.homeTeam ht
 		JOIN FETCH w.match.stadium s
-		WHERE w.id = :id
+		WHERE w.id = :watchListId AND w.user.id = :userId
 		""")
-    Optional<WatchList> findByIdWithMatchDetails(Long id);
+    Optional<WatchList> findByIdWithMatchDetails(
+            @Param("watchListId") Long watchListId, @Param("userId") Long userId);
 }
