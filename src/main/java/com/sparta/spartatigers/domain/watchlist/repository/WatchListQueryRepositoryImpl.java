@@ -17,6 +17,7 @@ import com.sparta.spartatigers.domain.watchlist.model.entity.QWatchList;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
@@ -34,16 +35,7 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
     @Override
     public Page<WatchList> findAllByUserIdWithMatchDetails(Long userId, Pageable pageable) {
         List<WatchList> results =
-                queryFactory
-                        .selectFrom(watchList)
-                        .join(watchList.match, match)
-                        .fetchJoin()
-                        .join(match.homeTeam, homeTeam)
-                        .fetchJoin()
-                        .join(match.awayTeam, awayTeam)
-                        .fetchJoin()
-                        .join(match.stadium, stadium)
-                        .fetchJoin()
+                baseQueryWithMatchDetails()
                         .where(isUserOwner(userId))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
@@ -62,20 +54,25 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
     @Override
     public Optional<WatchList> findByIdWithMatchDetails(Long watchListId, Long userId) {
         WatchList result =
-                queryFactory
-                        .selectFrom(watchList)
-                        .join(watchList.match, match)
-                        .fetchJoin()
-                        .join(match.homeTeam, homeTeam)
-                        .fetchJoin()
-                        .join(match.awayTeam, awayTeam)
-                        .fetchJoin()
-                        .join(match.stadium, stadium)
-                        .fetchJoin()
+                baseQueryWithMatchDetails()
                         .where(isUserOwner(userId), hasWatchListId(watchListId))
                         .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+    /** 공통 조인 + fetchJoin 처리 메서드 */
+    private JPAQuery<WatchList> baseQueryWithMatchDetails() {
+        return queryFactory
+                .selectFrom(watchList)
+                .join(watchList.match, match)
+                .fetchJoin()
+                .join(match.homeTeam, homeTeam)
+                .fetchJoin()
+                .join(match.awayTeam, awayTeam)
+                .fetchJoin()
+                .join(match.stadium, stadium)
+                .fetchJoin();
     }
 
     private BooleanExpression isUserOwner(Long userId) {

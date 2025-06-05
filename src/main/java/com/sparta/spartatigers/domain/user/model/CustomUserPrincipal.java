@@ -53,7 +53,7 @@ public class CustomUserPrincipal implements UserDetails {
         return true;
     }
 
-	public Long getUserId(CustomUserPrincipal principal){
-		return principal.getUser().getId();
-	}
+    public Long getUserId(CustomUserPrincipal principal) {
+        return principal.getUser().getId();
+    }
 }
