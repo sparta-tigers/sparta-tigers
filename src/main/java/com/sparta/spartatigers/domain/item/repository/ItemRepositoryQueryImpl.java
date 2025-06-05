@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.item.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,6 +44,18 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
         long count = (total == null) ? 0L : total;
 
         return new PageImpl<>(itemList, pageable, count);
+    }
+
+    @Override
+    public Optional<Item> findItemById(Long itemId, Status status) {
+
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(item)
+                        .where(itemStatusEq(status), item.id.eq(itemId))
+                        .join(item.user, user)
+                        .fetchJoin()
+                        .fetchOne());
     }
 
     private BooleanExpression itemStatusEq(Status status) {

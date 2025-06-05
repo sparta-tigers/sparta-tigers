@@ -33,6 +33,7 @@ public enum ExceptionCode {
     EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니동"),
 
     // 아이템
+    ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
 
     // 직관 기록
 
