@@ -10,7 +10,7 @@ import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
 
-public interface ItemRepositoryQuery {
+public interface ItemQueryRepository {
 
     Page<Item> findAllByStatus(Status status, Pageable pageable);
 

@@ -9,7 +9,7 @@ import com.sparta.spartatigers.domain.user.model.entity.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @RequiredArgsConstructor
-public class ExchangeRequestRepositoryQueryImpl implements ExchangeRequestRepositoryQuery {
+public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final QExchangeRequest exchangeRequest = QExchangeRequest.exchangeRequest;
