@@ -18,6 +18,8 @@ import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResp
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 import com.sparta.spartatigers.domain.watchlist.repository.WatchListRepository;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,9 @@ public class WatchListService {
     public CreateWatchListResponseDto create(
             CreateWatchListRequestDto request, CustomUserPrincipal principal) {
         Match match = matchRepository.findByIdWithTeamsAndStadium(request.getMatch().getId());
+        if (match == null) {
+            throw new InvalidRequestException(ExceptionCode.MATCH_NOT_FOUND);
+        }
         WatchList watchList = WatchList.from(match, request, principal.getUser());
 
         watchListRepository.save(watchList);
