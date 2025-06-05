@@ -27,6 +27,7 @@ public enum ExceptionCode {
     // 알람
 
     // 채팅방
+    CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
 
     // 교환 요청
     EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니동"),
