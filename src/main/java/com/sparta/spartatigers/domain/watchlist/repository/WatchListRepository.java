@@ -37,4 +37,10 @@ public interface WatchListRepository extends JpaRepository<WatchList, Long> {
 		""")
     Optional<WatchList> findByIdWithMatchDetails(
             @Param("watchListId") Long watchListId, @Param("userId") Long userId);
+
+    default WatchList findByIdOrElseThrow(
+            @Param("watchListId") Long watchListId, @Param("userId") Long userId) {
+        return findByIdWithMatchDetails(watchListId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+    }
 }

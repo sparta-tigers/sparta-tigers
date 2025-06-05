@@ -73,10 +73,7 @@ public class WatchListService {
     @Transactional(readOnly = true)
     public WatchListResponseDto findOne(Long watchListId, CustomUserPrincipal principal) {
         Long userId = getUserId(principal);
-        WatchList findWatchList =
-                watchListRepository
-                        .findByIdWithMatchDetails(watchListId, userId)
-                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+        WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         return WatchListResponseDto.of(findWatchList);
     }
@@ -93,10 +90,7 @@ public class WatchListService {
     public WatchListResponseDto update(
             Long watchListId, UpdateWatchListRequestDto request, CustomUserPrincipal principal) {
         Long userId = getUserId(principal);
-        WatchList findWatchList =
-                watchListRepository
-                        .findByIdWithMatchDetails(watchListId, userId)
-                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+        WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         findWatchList.update(request.getRecord().getContent(), request.getRecord().getRate());
 
@@ -112,10 +106,7 @@ public class WatchListService {
     @Transactional
     public void delete(Long watchListId, CustomUserPrincipal principal) {
         Long userId = getUserId(principal);
-        WatchList findWatchList =
-                watchListRepository
-                        .findByIdWithMatchDetails(watchListId, userId)
-                        .orElseThrow(() -> new IllegalArgumentException("기록 식별자가 존재하지 않습니다."));
+        WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         watchListRepository.delete(findWatchList);
     }
