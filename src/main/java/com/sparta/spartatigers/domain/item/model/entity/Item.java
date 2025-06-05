@@ -18,6 +18,8 @@ import lombok.experimental.SuperBuilder;
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
@@ -55,6 +57,20 @@ public class Item extends BaseEntity {
                 dto.description(),
                 Status.REGISTERED,
                 user);
+    }
+
+    public void validateSenderIsNotOwner(User sender) {
+
+        if (this.user.getId().equals(sender.getId())) {
+            throw new ServerException(ExceptionCode.CANNOT_REQUEST_OWN_ITEM);
+        }
+    }
+
+    public void validateReceiverIsOwner(User receiver) {
+
+        if (!this.user.getId().equals(receiver.getId())) {
+            throw new ServerException(ExceptionCode.RECEIVER_NOT_OWNER);
+        }
     }
 
     public enum Category {

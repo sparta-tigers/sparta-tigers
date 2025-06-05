@@ -6,7 +6,8 @@ import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeReque
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
 
-public interface ExchangeRequestRepository extends JpaRepository<ExchangeRequest, Long> {
+public interface ExchangeRequestRepository
+        extends JpaRepository<ExchangeRequest, Long>, ExchangeRequestRepositoryQuery {
 
     default ExchangeRequest findByIdOrElseThrow(Long id) {
         return findById(id)
