@@ -16,8 +16,6 @@ import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor
@@ -51,10 +49,7 @@ public class ItemService {
 
     public ReadItemDetailResponseDto findItemById(Long itemId) {
 
-        Item item =
-                itemRepository
-                        .findItemById(itemId, Status.REGISTERED)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.ITEM_NOT_FOUND));
+        Item item = itemRepository.findItemByIdOrElseThrow(itemId);
 
         return ReadItemDetailResponseDto.from(item);
     }

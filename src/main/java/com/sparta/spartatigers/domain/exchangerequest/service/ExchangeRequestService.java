@@ -9,7 +9,6 @@ import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeReques
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
-import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
@@ -30,7 +29,7 @@ public class ExchangeRequestService {
 
         User sender = principal.getUser();
         User receiver = getReceiver(request.receiverId());
-        Item requestItem = getRequestItem(request.itemId());
+        Item requestItem = itemRepository.findItemByIdOrElseThrow(request.itemId());
 
         requestItem.validateSenderIsNotOwner(sender);
         requestItem.validateReceiverIsOwner(receiver);
@@ -47,13 +46,6 @@ public class ExchangeRequestService {
         return userRepository
                 .findById(receiverId)
                 .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
-    }
-
-    private Item getRequestItem(Long itemId) {
-
-        return itemRepository
-                .findItemById(itemId, Status.REGISTERED)
-                .orElseThrow(() -> new ServerException(ExceptionCode.ITEM_NOT_FOUND));
     }
 
     private void checkDuplicateExchangeRequest(Long senderId, Long receiverId, Long itemId) {
