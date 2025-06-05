@@ -1,7 +1,5 @@
 package com.sparta.spartatigers.domain.watchlist.model.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,7 +25,7 @@ public class WatchList extends BaseEntity {
 
     @Column private int rating;
 
-    @Column private LocalDateTime deletedAt;
+    //    @Column private LocalDateTime deletedAt;
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,16 +35,8 @@ public class WatchList extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Match match;
 
-    public WatchList(String contents, int rating, User user, Match match) {
-        this.contents = contents;
-        this.rating = rating;
-        this.user = user;
-        this.match = match;
-    }
-
     public static WatchList from(Match match, CreateWatchListRequestDto dto, User user) {
-        return new WatchList(
-                dto.getRecord().getContent(), dto.getRecord().getRate(), null, user, match);
+        return new WatchList(dto.getRecord().getContent(), dto.getRecord().getRate(), user, match);
     }
 
     public static WatchList of(WatchList watchList) {
@@ -57,9 +47,9 @@ public class WatchList extends BaseEntity {
                 watchList.getMatch());
     }
 
-    public void deleted() {
-        this.deletedAt = LocalDateTime.now();
-    }
+    //    public void deleted() {
+    //        this.deletedAt = LocalDateTime.now();
+    //    }
 
     public void update(String content, Integer rating) {
         if (content != null) this.contents = content;

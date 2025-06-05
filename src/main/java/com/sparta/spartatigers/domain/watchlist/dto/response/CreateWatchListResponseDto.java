@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import com.sparta.spartatigers.domain.match.dto.MatchScheduleDto;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
-import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 
 @Getter
 @NoArgsConstructor

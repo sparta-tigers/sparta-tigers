@@ -1,6 +1,5 @@
 package com.sparta.spartatigers.domain.watchlist.service;
 
-import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;

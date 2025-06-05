@@ -1,10 +1,10 @@
 package com.sparta.spartatigers.domain.watchlist.repository;
 
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 public interface WatchListRepository
         extends JpaRepository<WatchList, Long>, WatchListQueryRepository {
