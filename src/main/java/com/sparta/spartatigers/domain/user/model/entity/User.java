@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.user.model.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
 
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
