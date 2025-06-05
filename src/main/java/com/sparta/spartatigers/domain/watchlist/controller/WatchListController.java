@@ -115,7 +115,7 @@ public class WatchListController {
      * @param principal 유저 정보
      * @return {@link Page<WatchListResponseDto>}
      */
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ApiResponse<?> search(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
