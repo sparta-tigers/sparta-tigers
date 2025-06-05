@@ -53,7 +53,7 @@ public class WatchListService {
      */
     @Transactional(readOnly = true)
     public Page<WatchListResponseDto> findAll(Pageable pageable, CustomUserPrincipal principal) {
-        Long userId = principal.getUser().getId();
+        Long userId = principal.getUserId(principal);
         Page<WatchList> all = watchListRepository.findAllByUserIdWithMatchDetails(userId, pageable);
 
         if (all.isEmpty()) {
@@ -72,7 +72,7 @@ public class WatchListService {
      */
     @Transactional(readOnly = true)
     public WatchListResponseDto findOne(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = getUserId(principal);
+        Long userId = principal.getUserId(principal);
         WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         return WatchListResponseDto.of(findWatchList);
@@ -89,7 +89,7 @@ public class WatchListService {
     @Transactional
     public WatchListResponseDto update(
             Long watchListId, UpdateWatchListRequestDto request, CustomUserPrincipal principal) {
-        Long userId = getUserId(principal);
+        Long userId = principal.getUserId(principal);
         WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         findWatchList.update(request.getRecord().getContent(), request.getRecord().getRate());
@@ -105,13 +105,9 @@ public class WatchListService {
      */
     @Transactional
     public void delete(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = getUserId(principal);
+        Long userId = principal.getUserId(principal);
         WatchList findWatchList = watchListRepository.findByIdOrElseThrow(watchListId, userId);
 
         watchListRepository.delete(findWatchList);
-    }
-
-    private Long getUserId(CustomUserPrincipal principal) {
-        return principal.getUser().getId();
     }
 }
