@@ -51,8 +51,12 @@ public class DirectRoomController {
     }
 
     @DeleteMapping("/{directRoomId}")
-    public ApiResponse<String> deleteDirectRoom(@PathVariable Long directRoomId) {
-        directRoomService.deleteRoom(directRoomId);
+    public ApiResponse<String> deleteDirectRoom(
+            @PathVariable Long directRoomId,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+
+        Long currentUserId = userPrincipal.getUser().getId();
+        directRoomService.deleteRoom(directRoomId, currentUserId);
         return ApiResponse.ok("채팅방이 정상적으로 삭제되었습니다!");
     }
 }

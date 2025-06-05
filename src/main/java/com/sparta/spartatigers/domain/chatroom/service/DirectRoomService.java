@@ -46,11 +46,19 @@ public class DirectRoomService {
     }
 
     @Transactional
-    public void deleteRoom(Long directRoomId) {
+    public void deleteRoom(Long directRoomId, Long currentUserId) {
         DirectRoom room =
                 directRoomRepository
                         .findById(directRoomId)
                         .orElseThrow(() -> new ServerException(ExceptionCode.CHATROOM_NOT_FOUND));
+
+        boolean isSender = room.getSender().getId().equals(currentUserId);
+        boolean isReceiver = room.getReceiver().getId().equals(currentUserId);
+
+        if (!isSender && !isReceiver) {
+            throw new ServerException(ExceptionCode.FORBIDDEN_REQUEST); // 403 권한 없음
+        }
+
         directRoomRepository.delete(room);
     }
 }
