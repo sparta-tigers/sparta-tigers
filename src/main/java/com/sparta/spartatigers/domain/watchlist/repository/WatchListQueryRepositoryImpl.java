@@ -27,10 +27,10 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     private static final QWatchList watchList = QWatchList.watchList;
-	private static final QMatch match = QMatch.match;
-	private static final QTeam homeTeam = new QTeam("homeTeam");
-	private static final QTeam awayTeam = new QTeam("awayTeam");
-	private static final QStadium stadium = QStadium.stadium;
+    private static final QMatch match = QMatch.match;
+    private static final QTeam homeTeam = new QTeam("homeTeam");
+    private static final QTeam awayTeam = new QTeam("awayTeam");
+    private static final QStadium stadium = QStadium.stadium;
 
     @Override
     public Page<WatchList> findAllByUserIdWithMatchDetails(Long userId, Pageable pageable) {

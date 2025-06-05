@@ -117,7 +117,7 @@ public class WatchListService {
      * @param principal 유저 정보
      * @return {@link Page<WatchListResponseDto>}
      */
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<WatchListResponseDto> search(
             Pageable pageable, SearchWatchListRequestDto request, CustomUserPrincipal principal) {
         Long userId = CustomUserPrincipal.getUserId(principal);
