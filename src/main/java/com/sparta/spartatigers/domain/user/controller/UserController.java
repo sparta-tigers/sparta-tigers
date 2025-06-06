@@ -21,6 +21,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserInfoResponseDto> getUserInfo(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+
         UserInfoResponseDto userInfoResponseDto = userService.getUserInfo(userPrincipal);
         return ResponseEntity.ok(userInfoResponseDto);
     }
