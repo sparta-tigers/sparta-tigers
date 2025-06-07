@@ -1,11 +1,19 @@
 package com.sparta.spartatigers.domain.exchangerequest.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.QExchangeRequest;
 import com.sparta.spartatigers.domain.item.model.entity.QItem;
 import com.sparta.spartatigers.domain.user.model.entity.QUser;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @RequiredArgsConstructor
@@ -27,12 +35,54 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
                         .join(exchangeRequest.sender, sender)
                         .join(exchangeRequest.receiver, receiver)
                         .join(exchangeRequest.item, item)
-                        .where(
-                                sender.id.eq(senderId),
-                                receiver.id.eq(receiverId),
-                                item.id.eq(itemId))
+                        .where(senderIdEq(senderId), receiverIdEq(receiverId), itemIdEq(itemId))
                         .fetchFirst();
 
         return result != null;
+    }
+
+    @Override
+    public Page<ExchangeRequest> findAllSendRequest(Long senderId, Pageable pageable) {
+
+        List<ExchangeRequest> exchangeRequestList =
+                queryFactory
+                        .selectFrom(exchangeRequest)
+                        .join(exchangeRequest.sender, sender)
+                        .fetchJoin()
+                        .join(exchangeRequest.receiver, receiver)
+                        .fetchJoin()
+                        .join(exchangeRequest.item, item)
+                        .fetchJoin()
+                        .where(senderIdEq(senderId))
+                        .orderBy(exchangeRequest.createdAt.desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
+
+        Long total =
+                queryFactory
+                        .select(exchangeRequest.count())
+                        .from(exchangeRequest)
+                        .where(senderIdEq(senderId))
+                        .fetchOne();
+
+        long count = (total == null) ? 0L : total;
+
+        return new PageImpl<>(exchangeRequestList, pageable, count);
+    }
+
+    private BooleanExpression senderIdEq(Long senderId) {
+
+        return sender.id.eq(senderId);
+    }
+
+    private BooleanExpression receiverIdEq(Long receiverId) {
+
+        return receiver.id.eq(receiverId);
+    }
+
+    private BooleanExpression itemIdEq(Long itemId) {
+
+        return item.id.eq(itemId);
     }
 }
