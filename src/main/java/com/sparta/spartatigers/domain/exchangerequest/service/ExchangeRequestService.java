@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeRequestDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.request.UpdateExchangeRequestDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.ReceiveRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.SendRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
@@ -67,6 +68,20 @@ public class ExchangeRequestService {
                 exchangeRequestRepository.findAllReceiveRequest(user.getId(), pageable);
 
         return exchangeRequestList.map(ReceiveRequestResponseDto::from);
+    }
+
+    @Transactional
+    public void updateRequestStatus(
+            Long exchangeRequestId,
+            UpdateExchangeRequestDto request,
+            CustomUserPrincipal principal) {
+
+        User user = principal.getUser();
+
+        ExchangeRequest exchangeRequest =
+                exchangeRequestRepository.findExchangeRequestByIdOrElseThrow(exchangeRequestId);
+        exchangeRequest.validateReceiverIsOwner(user);
+        exchangeRequest.updateStatus(request.status());
     }
 
     private User getReceiver(Long receiverId) {

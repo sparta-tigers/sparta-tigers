@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.exchangerequest.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
+import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest.ExchangeStatus;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.QExchangeRequest;
 import com.sparta.spartatigers.domain.item.model.entity.QItem;
 import com.sparta.spartatigers.domain.user.model.entity.QUser;
@@ -101,6 +103,25 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
         return new PageImpl<>(exchangeRequestList, pageable, count);
     }
 
+    @Override
+    public Optional<ExchangeRequest> findExchangeRequestById(
+            Long exchangeRequestId, ExchangeStatus status) {
+
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(exchangeRequest)
+                        .where(
+                                exchangeRequestIdEq(exchangeRequestId),
+                                exchangeRequestStatusEq(status))
+                        .join(exchangeRequest.sender, sender)
+                        .fetchJoin()
+                        .join(exchangeRequest.receiver, receiver)
+                        .fetchJoin()
+                        .join(exchangeRequest.item, item)
+                        .fetchJoin()
+                        .fetchOne());
+    }
+
     private BooleanExpression senderIdEq(Long senderId) {
 
         return sender.id.eq(senderId);
@@ -114,5 +135,15 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
     private BooleanExpression itemIdEq(Long itemId) {
 
         return item.id.eq(itemId);
+    }
+
+    private BooleanExpression exchangeRequestIdEq(Long exchangeRequestId) {
+
+        return exchangeRequest.id.eq(exchangeRequestId);
+    }
+
+    private BooleanExpression exchangeRequestStatusEq(ExchangeStatus status) {
+
+        return exchangeRequest.status.eq(status);
     }
 }

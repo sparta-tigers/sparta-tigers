@@ -37,6 +37,7 @@ public enum ExceptionCode {
     ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
     CANNOT_REQUEST_OWN_ITEM("자신의 아이템에 대해 교환 요청을 할 수 없습니다."),
     RECEIVER_NOT_OWNER("해당 아이템의 소유자에게만 요청을 보낼 수 있습니다."),
+    RECEIVER_FORBIDDEN("요청을 받은 사용자만 요청을 수정할 수 있습니다."),
 
     // 직관 기록
 

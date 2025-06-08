@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeRequestDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.request.UpdateExchangeRequestDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.ReceiveRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.SendRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.service.ExchangeRequestService;
@@ -60,5 +63,16 @@ public class ExchangeRequestController {
                 exchangeRequestService.findAllReceiveRequest(principal, pageable);
 
         return ApiResponse.ok(response);
+    }
+
+    @PatchMapping("/{exchangeRequestId}")
+    public ApiResponse<String> updateRequestStatus(
+            @PathVariable Long exchangeRequestId,
+            @Valid @RequestBody UpdateExchangeRequestDto request,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        exchangeRequestService.updateRequestStatus(exchangeRequestId, request, principal);
+
+        return ApiResponse.ok(MessageCode.UPDATE_EXCHANGE_REQUEST_SUCCESS.getMessage());
     }
 }
