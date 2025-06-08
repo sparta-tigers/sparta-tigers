@@ -71,6 +71,36 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
         return new PageImpl<>(exchangeRequestList, pageable, count);
     }
 
+    @Override
+    public Page<ExchangeRequest> findAllReceiveRequest(Long receiverId, Pageable pageable) {
+
+        List<ExchangeRequest> exchangeRequestList =
+                queryFactory
+                        .selectFrom(exchangeRequest)
+                        .join(exchangeRequest.sender, sender)
+                        .fetchJoin()
+                        .join(exchangeRequest.receiver, receiver)
+                        .fetchJoin()
+                        .join(exchangeRequest.item, item)
+                        .fetchJoin()
+                        .where(receiverIdEq(receiverId))
+                        .orderBy(exchangeRequest.createdAt.desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
+
+        Long total =
+                queryFactory
+                        .select(exchangeRequest.count())
+                        .from(exchangeRequest)
+                        .where(receiverIdEq(receiverId))
+                        .fetchOne();
+
+        long count = (total == null) ? 0L : total;
+
+        return new PageImpl<>(exchangeRequestList, pageable, count);
+    }
+
     private BooleanExpression senderIdEq(Long senderId) {
 
         return sender.id.eq(senderId);

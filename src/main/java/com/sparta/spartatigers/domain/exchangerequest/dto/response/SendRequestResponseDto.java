@@ -7,7 +7,7 @@ import com.sparta.spartatigers.domain.item.model.entity.Item.Category;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.user.dto.UserResponseDto;
 
-public record ExchangeRequestResponseDto(
+public record SendRequestResponseDto(
         Long exchangeRequestId,
         UserResponseDto receiver,
         Category category,
@@ -15,9 +15,9 @@ public record ExchangeRequestResponseDto(
         Status status,
         LocalDateTime createdAt) {
 
-    public static ExchangeRequestResponseDto from(ExchangeRequest exchangeRequest) {
+    public static SendRequestResponseDto from(ExchangeRequest exchangeRequest) {
 
-        return new ExchangeRequestResponseDto(
+        return new SendRequestResponseDto(
                 exchangeRequest.getId(),
                 UserResponseDto.from(exchangeRequest.getReceiver()),
                 exchangeRequest.getItem().getCategory(),

@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeRequestDto;
-import com.sparta.spartatigers.domain.exchangerequest.dto.response.ExchangeRequestResponseDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.response.ReceiveRequestResponseDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.response.SendRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
@@ -45,7 +46,7 @@ public class ExchangeRequestService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ExchangeRequestResponseDto> findAllSendRequest(
+    public Page<SendRequestResponseDto> findAllSendRequest(
             CustomUserPrincipal principal, Pageable pageable) {
 
         User user = principal.getUser();
@@ -53,7 +54,19 @@ public class ExchangeRequestService {
         Page<ExchangeRequest> exchangeRequestList =
                 exchangeRequestRepository.findAllSendRequest(user.getId(), pageable);
 
-        return exchangeRequestList.map(ExchangeRequestResponseDto::from);
+        return exchangeRequestList.map(SendRequestResponseDto::from);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReceiveRequestResponseDto> findAllReceiveRequest(
+            CustomUserPrincipal principal, Pageable pageable) {
+
+        User user = principal.getUser();
+
+        Page<ExchangeRequest> exchangeRequestList =
+                exchangeRequestRepository.findAllReceiveRequest(user.getId(), pageable);
+
+        return exchangeRequestList.map(ReceiveRequestResponseDto::from);
     }
 
     private User getReceiver(Long receiverId) {

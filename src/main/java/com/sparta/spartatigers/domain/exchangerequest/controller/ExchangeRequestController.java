@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeRequestDto;
-import com.sparta.spartatigers.domain.exchangerequest.dto.response.ExchangeRequestResponseDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.response.ReceiveRequestResponseDto;
+import com.sparta.spartatigers.domain.exchangerequest.dto.response.SendRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.service.ExchangeRequestService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
@@ -40,12 +41,23 @@ public class ExchangeRequestController {
     }
 
     @GetMapping("/send")
-    public ApiResponse<Page<ExchangeRequestResponseDto>> findAllSendRequest(
+    public ApiResponse<Page<SendRequestResponseDto>> findAllSendRequest(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
 
-        Page<ExchangeRequestResponseDto> response =
+        Page<SendRequestResponseDto> response =
                 exchangeRequestService.findAllSendRequest(principal, pageable);
+
+        return ApiResponse.ok(response);
+    }
+
+    @GetMapping("/receive")
+    public ApiResponse<Page<ReceiveRequestResponseDto>> findAllReceiveRequest(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
+
+        Page<ReceiveRequestResponseDto> response =
+                exchangeRequestService.findAllReceiveRequest(principal, pageable);
 
         return ApiResponse.ok(response);
     }
