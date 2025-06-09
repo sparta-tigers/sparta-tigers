@@ -38,6 +38,8 @@ dependencies {
     // 웹 애플리케이션 (REST API 포함)
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     // WebSocket (실시간 통신)
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.5'
+    // Redisson (Redis 분산락)
 
     // === 데이터베이스 드라이버 ===
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -103,3 +105,5 @@ clean {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
