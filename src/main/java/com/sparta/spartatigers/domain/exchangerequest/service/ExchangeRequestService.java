@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.service.DirectRoomService;
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.ExchangeRequestDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.request.UpdateExchangeRequestDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.ReceiveRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.dto.response.SendRequestResponseDto;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
+import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest.ExchangeStatus;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
@@ -28,6 +30,7 @@ public class ExchangeRequestService {
     private final ExchangeRequestRepository exchangeRequestRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final DirectRoomService directRoomService;
 
     @Transactional
     public void createExchangeRequest(ExchangeRequestDto request, CustomUserPrincipal principal) {
@@ -82,6 +85,10 @@ public class ExchangeRequestService {
                 exchangeRequestRepository.findExchangeRequestByIdOrElseThrow(exchangeRequestId);
         exchangeRequest.validateReceiverIsOwner(user);
         exchangeRequest.updateStatus(request.status());
+
+        if (exchangeRequest.getStatus() == ExchangeStatus.ACCEPTED) {
+            directRoomService.createRoom(exchangeRequestId, user.getId());
+        }
     }
 
     private User getReceiver(Long receiverId) {
