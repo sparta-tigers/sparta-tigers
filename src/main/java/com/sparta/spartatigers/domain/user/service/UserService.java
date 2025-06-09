@@ -43,6 +43,11 @@ public class UserService {
                         .orElseThrow(
                                 () -> new InvalidRequestException(ExceptionCode.TEAM_NOT_FOUND));
 
+        boolean exists = favTeamRepository.existsByUserAndTeam(user, team);
+        if (exists) {
+            throw new InvalidRequestException(ExceptionCode.DUPLICATE_FAVORITE_TEAM);
+        }
+
         FavoriteTeam favoriteTeam = FavoriteTeam.from(user, team);
         favTeamRepository.save(favoriteTeam);
 

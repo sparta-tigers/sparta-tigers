@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +15,9 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.team.model.entity.Team;
 
 @Entity(name = "favorite_team")
+@Table(
+        name = "favorite_team",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "team_id"})})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
