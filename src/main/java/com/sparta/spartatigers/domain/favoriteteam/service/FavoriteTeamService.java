@@ -56,4 +56,14 @@ public class FavoriteTeamService {
         findFavoriteTeam.update(newTeam);
         return FavTeamResponseDto.of(findFavoriteTeam);
     }
+
+    @Transactional
+    public Void delete(CustomUserPrincipal principal) {
+        Long userId = CustomUserPrincipal.getUserId(principal);
+        FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
+
+        favTeamRepository.delete(findFavoriteTeam);
+
+        return null;
+    }
 }

@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.favoriteteam.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +39,10 @@ public class FavoriteTeamController {
             @RequestBody AddFavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(favoriteTeamService.update(request, principal));
+    }
+
+    @DeleteMapping("/fav")
+    public ApiResponse<?> delete(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(favoriteTeamService.delete(principal));
     }
 }
