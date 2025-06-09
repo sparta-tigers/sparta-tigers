@@ -20,9 +20,9 @@ public class FavoriteTeamController {
     private final FavoriteTeamService favoriteTeamService;
 
     @PostMapping("/fav")
-    public ApiResponse<?> addFavoriteTeam(
+    public ApiResponse<?> add(
             @RequestBody AddFavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.created(favoriteTeamService.addFavoriteTeam(request, principal));
+        return ApiResponse.created(favoriteTeamService.add(request, principal));
     }
 }

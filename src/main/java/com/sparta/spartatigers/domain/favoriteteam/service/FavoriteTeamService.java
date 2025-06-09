@@ -23,7 +23,7 @@ public class FavoriteTeamService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    public AddFavTeamResponseDto addFavoriteTeam(
+    public AddFavTeamResponseDto add(
             AddFavTeamRequestDto request, CustomUserPrincipal principal) {
         User user = principal.getUser();
         Team team =
