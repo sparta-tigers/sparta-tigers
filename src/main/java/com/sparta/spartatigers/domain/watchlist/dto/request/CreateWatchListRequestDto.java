@@ -14,4 +14,5 @@ public class CreateWatchListRequestDto {
 
     private MatchDto match;
     private RecordDto record;
+    private String seat;
 }
