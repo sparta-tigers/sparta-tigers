@@ -1,17 +1,20 @@
 package com.sparta.spartatigers.domain.favoriteteam.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.favoriteteam.dto.request.AddFavTeamRequestDto;
-import com.sparta.spartatigers.domain.favoriteteam.dto.response.AddFavTeamResponseDto;
+import com.sparta.spartatigers.domain.favoriteteam.dto.response.FavTeamResponseDto;
+import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 import com.sparta.spartatigers.domain.favoriteteam.repository.FavoriteTeamRepository;
 import com.sparta.spartatigers.domain.team.model.entity.Team;
 import com.sparta.spartatigers.domain.team.repository.TeamRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
-import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
@@ -23,8 +26,7 @@ public class FavoriteTeamService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    public AddFavTeamResponseDto add(
-            AddFavTeamRequestDto request, CustomUserPrincipal principal) {
+    public FavTeamResponseDto add(AddFavTeamRequestDto request, CustomUserPrincipal principal) {
         User user = principal.getUser();
         Team team =
                 teamRepository
@@ -40,6 +42,14 @@ public class FavoriteTeamService {
         FavoriteTeam favoriteTeam = FavoriteTeam.from(user, team);
         favTeamRepository.save(favoriteTeam);
 
-        return AddFavTeamResponseDto.of(favoriteTeam);
+        return FavTeamResponseDto.of(favoriteTeam);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FavTeamResponseDto> get(CustomUserPrincipal principal) {
+        Long userId = CustomUserPrincipal.getUserId(principal);
+        List<FavoriteTeam> findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
+
+        return findFavoriteTeam.stream().map(FavTeamResponseDto::of).collect(Collectors.toList());
     }
 }

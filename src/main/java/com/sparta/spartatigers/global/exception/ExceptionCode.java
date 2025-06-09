@@ -45,6 +45,7 @@ public enum ExceptionCode {
     TEAM_NOT_FOUND("팀이 존재하지 않습니다."),
 
     // 응원 팀
+    FAVORITE_TEAM_NOT_FOUND("응원하는 팀이 없습니다."),
     DUPLICATE_FAVORITE_TEAM("이미 응원하는 팀입니다."),
 
     // 공통
