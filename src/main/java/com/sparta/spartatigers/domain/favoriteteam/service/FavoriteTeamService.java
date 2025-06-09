@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.favoriteteam.dto.request.AddFavTeamRequestDto;
+import com.sparta.spartatigers.domain.favoriteteam.dto.request.FavTeamRequestDto;
 import com.sparta.spartatigers.domain.favoriteteam.dto.response.FavTeamResponseDto;
 import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 import com.sparta.spartatigers.domain.favoriteteam.repository.FavoriteTeamRepository;
@@ -23,7 +23,7 @@ public class FavoriteTeamService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    public FavTeamResponseDto add(AddFavTeamRequestDto request, CustomUserPrincipal principal) {
+    public FavTeamResponseDto add(FavTeamRequestDto request, CustomUserPrincipal principal) {
         User user = principal.getUser();
         // 한 명의 유저는 한 팀만 응원하는 팀에 등록할 수 있음
         boolean exists = favTeamRepository.existsByUser(user);
@@ -47,7 +47,7 @@ public class FavoriteTeamService {
     }
 
     @Transactional
-    public FavTeamResponseDto update(AddFavTeamRequestDto request, CustomUserPrincipal principal) {
+    public FavTeamResponseDto update(FavTeamRequestDto request, CustomUserPrincipal principal) {
         Long userId = CustomUserPrincipal.getUserId(principal);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 

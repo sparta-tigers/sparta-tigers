@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.favoriteteam.dto.request.AddFavTeamRequestDto;
+import com.sparta.spartatigers.domain.favoriteteam.dto.request.FavTeamRequestDto;
 import com.sparta.spartatigers.domain.favoriteteam.service.FavoriteTeamService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
@@ -24,7 +24,7 @@ public class FavoriteTeamController {
 
     @PostMapping("/fav")
     public ApiResponse<?> add(
-            @RequestBody AddFavTeamRequestDto request,
+            @RequestBody FavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.created(favoriteTeamService.add(request, principal));
     }
@@ -36,7 +36,7 @@ public class FavoriteTeamController {
 
     @PatchMapping("/fav")
     public ApiResponse<?> update(
-            @RequestBody AddFavTeamRequestDto request,
+            @RequestBody FavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(favoriteTeamService.update(request, principal));
     }

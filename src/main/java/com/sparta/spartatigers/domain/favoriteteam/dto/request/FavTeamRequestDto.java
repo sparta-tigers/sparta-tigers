@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddFavTeamRequestDto {
+public class FavTeamRequestDto {
 
     private Long teamId;
 }
