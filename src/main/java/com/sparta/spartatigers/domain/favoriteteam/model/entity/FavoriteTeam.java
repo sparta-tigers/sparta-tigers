@@ -18,7 +18,7 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 @Entity(name = "favorite_team")
 @Table(
         name = "favorite_team",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "team_id"})})
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id"})})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

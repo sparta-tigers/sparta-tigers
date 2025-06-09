@@ -1,8 +1,5 @@
 package com.sparta.spartatigers.domain.favoriteteam.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,16 +25,17 @@ public class FavoriteTeamService {
     @Transactional
     public FavTeamResponseDto add(AddFavTeamRequestDto request, CustomUserPrincipal principal) {
         User user = principal.getUser();
+        // 한 명의 유저는 한 팀만 응원하는 팀에 등록할 수 있음
+        boolean exists = favTeamRepository.existsByUser(user);
+        if (exists) {
+            throw new InvalidRequestException(ExceptionCode.ALREADY_EXISTS_FAVORITE_TEAM);
+        }
+
         Team team =
                 teamRepository
                         .findById(request.getTeamId())
                         .orElseThrow(
                                 () -> new InvalidRequestException(ExceptionCode.TEAM_NOT_FOUND));
-
-        boolean exists = favTeamRepository.existsByUserAndTeam(user, team);
-        if (exists) {
-            throw new InvalidRequestException(ExceptionCode.DUPLICATE_FAVORITE_TEAM);
-        }
 
         FavoriteTeam favoriteTeam = FavoriteTeam.from(user, team);
         favTeamRepository.save(favoriteTeam);
@@ -46,10 +44,10 @@ public class FavoriteTeamService {
     }
 
     @Transactional(readOnly = true)
-    public List<FavTeamResponseDto> get(CustomUserPrincipal principal) {
+    public FavTeamResponseDto get(CustomUserPrincipal principal) {
         Long userId = CustomUserPrincipal.getUserId(principal);
-        List<FavoriteTeam> findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
+        FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
-        return findFavoriteTeam.stream().map(FavTeamResponseDto::of).collect(Collectors.toList());
+        return FavTeamResponseDto.of(findFavoriteTeam);
     }
 }
