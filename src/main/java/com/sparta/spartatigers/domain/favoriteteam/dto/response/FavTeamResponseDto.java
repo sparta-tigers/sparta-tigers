@@ -10,15 +10,15 @@ import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddFavTeamResponseDto {
+public class FavTeamResponseDto {
 
     private Long userId;
     private Long teamId;
     private String teamName;
     private Code teamCode;
 
-    public static AddFavTeamResponseDto of(FavoriteTeam favoriteTeam) {
-        return new AddFavTeamResponseDto(
+    public static FavTeamResponseDto of(FavoriteTeam favoriteTeam) {
+        return new FavTeamResponseDto(
                 favoriteTeam.getUser().getId(),
                 favoriteTeam.getTeam().getId(),
                 favoriteTeam.getTeam().getName(),
