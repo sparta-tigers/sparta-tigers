@@ -12,4 +12,10 @@ import com.sparta.spartatigers.domain.alarm.service.AlarmServiceImpl;
 @RequestMapping("/api/alarms")
 public class AlarmController {
     private AlarmServiceImpl alarmService;
+
+    //    @GetMapping
+    //    public ResponseEntity<List<AlarmResponseDto>> getAllAlarms(
+    //            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+    //        return ResponseEntity.ok(alarmService.findMyAlarms(userPrincipal.getUser().getId()));
+    //    }
 }

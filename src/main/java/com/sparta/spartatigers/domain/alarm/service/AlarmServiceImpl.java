@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.alarm.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmResponseDto findMyAlarms() {
+    public List<AlarmResponseDto> findMyAlarms(Long id) {
         return null;
     }
 
