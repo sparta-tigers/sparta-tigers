@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.exchangerequest.model.entity;
 
+import java.util.stream.Stream;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,6 +18,8 @@ import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 @Entity(name = "exchange_request")
 @Getter
@@ -57,6 +61,16 @@ public class ExchangeRequest extends BaseEntity {
     public enum ExchangeStatus {
         PENDING,
         ACCEPTED,
-        REJECTED
+        REJECTED;
+
+        @JsonCreator
+        public static ExchangeStatus parsing(String inputValue) {
+            return Stream.of(ExchangeStatus.values())
+                    .filter(
+                            exchangeStatus ->
+                                    exchangeStatus.toString().equals(inputValue.toUpperCase()))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 }
