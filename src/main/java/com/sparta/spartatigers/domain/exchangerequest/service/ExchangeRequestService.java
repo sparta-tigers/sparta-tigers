@@ -91,6 +91,19 @@ public class ExchangeRequestService {
         }
     }
 
+    @Transactional
+    public void completeExchange(Long exchangeRequestId, CustomUserPrincipal principal) {
+
+        User user = principal.getUser();
+
+        ExchangeRequest exchangeRequest =
+                exchangeRequestRepository.findAcceptedRequestByIdOrElseThrow(exchangeRequestId);
+        exchangeRequest.validateReceiverIsOwner(user);
+
+        Item item = itemRepository.findItemByIdOrElseThrow(exchangeRequest.getItem().getId());
+        item.complete();
+    }
+
     private User getReceiver(Long receiverId) {
 
         return userRepository

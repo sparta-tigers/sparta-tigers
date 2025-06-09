@@ -20,6 +20,7 @@ public enum MessageCode {
     // 교환 요청
     EXCHANGE_REQUEST_SUCCESS("교환 요청을 성공적으로 보냈습니다."),
     UPDATE_EXCHANGE_REQUEST_SUCCESS("교환 요청 상태 변경을 성공했습니다."),
+    COMPLETE_EXCHANGE_SUCCESS("교환을 성공적으로 완료했습니다."),
 
 // 아이템
 

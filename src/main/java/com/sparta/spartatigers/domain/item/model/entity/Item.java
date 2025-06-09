@@ -73,6 +73,10 @@ public class Item extends BaseEntity {
         }
     }
 
+    public void complete() {
+        this.status = Status.COMPLETED;
+    }
+
     public enum Category {
         GOODS,
         TICKET;

@@ -75,4 +75,14 @@ public class ExchangeRequestController {
 
         return ApiResponse.ok(MessageCode.UPDATE_EXCHANGE_REQUEST_SUCCESS.getMessage());
     }
+
+    @PatchMapping("/{exchangeRequestId}/complete")
+    public ApiResponse<String> completeExchange(
+            @PathVariable Long exchangeRequestId,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        exchangeRequestService.completeExchange(exchangeRequestId, principal);
+
+        return ApiResponse.ok(MessageCode.COMPLETE_EXCHANGE_SUCCESS.getMessage());
+    }
 }

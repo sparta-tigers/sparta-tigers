@@ -25,4 +25,9 @@ public interface ExchangeRequestQueryRepository {
         return findExchangeRequestById(exchangeRequestId, ExchangeStatus.PENDING)
                 .orElseThrow(() -> new ServerException(ExceptionCode.EXCHANGE_REQUEST_NOT_FOUND));
     }
+
+    default ExchangeRequest findAcceptedRequestByIdOrElseThrow(Long exchangeRequestId) {
+        return findExchangeRequestById(exchangeRequestId, ExchangeStatus.ACCEPTED)
+                .orElseThrow(() -> new ServerException(ExceptionCode.EXCHANGE_REQUEST_NOT_FOUND));
+    }
 }
