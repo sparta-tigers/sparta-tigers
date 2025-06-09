@@ -23,6 +23,6 @@ public record SendRequestResponseDto(
                 exchangeRequest.getItem().getCategory(),
                 exchangeRequest.getItem().getTitle(),
                 exchangeRequest.getItem().getStatus(),
-                exchangeRequest.getItem().getCreatedAt());
+                exchangeRequest.getCreatedAt());
     }
 }
