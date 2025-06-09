@@ -142,12 +142,12 @@ public class WatchListService {
         return all.map(WatchListResponseDto::of);
     }
 
-	/**
-	 * 응원하는 팀에 한정하여 직관 통계 데이터를 제공하는 서비스
-	 *
-	 * @param principal 유저 정보
-	 * @return {@link StatsResponseDto}
-	 */
+    /**
+     * 응원하는 팀에 한정하여 직관 통계 데이터를 제공하는 서비스
+     *
+     * @param principal 유저 정보
+     * @return {@link StatsResponseDto}
+     */
     @Transactional(readOnly = true)
     public StatsResponseDto getStats(CustomUserPrincipal principal) {
         Long userId = CustomUserPrincipal.getUserId(principal);
