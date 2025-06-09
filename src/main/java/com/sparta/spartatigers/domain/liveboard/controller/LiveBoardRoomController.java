@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
+import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/liveboard")
 public class LiveBoardRoomController {
 
-    private final LiveBoardRoomService liveBoardRoomService;
+    private final LiveBoardService liveBoardService;
 
     @GetMapping("/rooms")
     public List<LiveBoardRoomResponseDto> getRooms() {
-        return liveBoardRoomService.getAllRooms();
+        return liveBoardService.findAllRoom();
     }
 }

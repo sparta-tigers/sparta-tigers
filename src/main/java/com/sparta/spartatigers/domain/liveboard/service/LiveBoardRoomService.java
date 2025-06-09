@@ -24,7 +24,7 @@ public class LiveBoardRoomService {
     // private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
     public List<LiveBoardRoomResponseDto> getAllRooms() {
-        return roomRepository.findAll().stream()
+        return roomRepository.findAllRoom().stream()
                 .map(LiveBoardRoomResponseDto::of)
                 .collect(Collectors.toList());
     }
@@ -46,9 +46,17 @@ public class LiveBoardRoomService {
             LocalDateTime roomClose =
                     match.getMatchTime().plusHours(4).plusMinutes(30); // 경기 4시간으로 일단 잡아둠..
 
-            LiveBoardRoom room = new LiveBoardRoom(roomId, match, title, roomStart, roomClose);
+            // TODO 사용하는 코드가 없어서 일단 실행이 안되가지고 변경 수린님 확인후 수정 부탁드려요! - (jungmin)
+            LiveBoardRoom room =
+                    LiveBoardRoom.builder()
+                            .roomId(roomId)
+                            .matchId(match.getId())
+                            .title(title)
+                            .openAt(roomStart)
+                            .closedAt(roomClose)
+                            .build();
 
-            roomRepository.save(room);
+            roomRepository.saveRoom(room);
         }
     }
 }

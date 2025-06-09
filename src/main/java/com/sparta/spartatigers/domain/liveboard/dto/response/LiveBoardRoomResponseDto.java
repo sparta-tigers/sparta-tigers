@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.liveboard.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,15 +11,12 @@ import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 @AllArgsConstructor
 public class LiveBoardRoomResponseDto {
     private String roomId;
-    private String homeTeam;
-    private String awayTeam;
-    private boolean isClosed;
+    private String title;
+    private LocalDateTime startedAt;
+    private int connectCount;
 
     public static LiveBoardRoomResponseDto of(LiveBoardRoom room) {
         return new LiveBoardRoomResponseDto(
-                room.getRoomId(),
-                room.getMatch().getHomeTeam().getName(),
-                room.getMatch().getAwayTeam().getName(),
-                room.isClosed());
+                room.getRoomId(), room.getTitle(), room.getOpenAt(), room.getConnectCount());
     }
 }

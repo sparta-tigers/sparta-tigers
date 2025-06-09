@@ -44,7 +44,7 @@ dependencies {
     // MySQL JDBC 드라이버
 
     // === 개발 편의성 ===
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // 자동 재시작, 라이브 리로드 등 개발 편의 기능
 
     // === Lombok ===
