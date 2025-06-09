@@ -41,6 +41,9 @@ public enum ExceptionCode {
     // 직관 기록
     WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다."),
 
+    // 팀
+    TEAM_NOT_FOUND("팀이 존재하지 않습니다."),
+
     // 공통
     NOT_FOUND("not found ~~"),
     NOT_VALID_EXCEPTION("validation 예외 발생"),
