@@ -50,4 +50,19 @@ public class FavoriteTeamService {
 
         return FavTeamResponseDto.of(findFavoriteTeam);
     }
+
+    @Transactional
+    public FavTeamResponseDto update(AddFavTeamRequestDto request, CustomUserPrincipal principal) {
+        Long userId = CustomUserPrincipal.getUserId(principal);
+        FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
+
+        Team newTeam =
+                teamRepository
+                        .findById(request.getTeamId())
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.TEAM_NOT_FOUND));
+
+        findFavoriteTeam.update(newTeam);
+        return FavTeamResponseDto.of(findFavoriteTeam);
+    }
 }

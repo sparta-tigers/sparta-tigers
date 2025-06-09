@@ -2,6 +2,7 @@ package com.sparta.spartatigers.domain.favoriteteam.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,5 +31,12 @@ public class FavoriteTeamController {
     @GetMapping("/fav")
     public ApiResponse<?> get(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(favoriteTeamService.get(principal));
+    }
+
+    @PatchMapping("/fav")
+    public ApiResponse<?> update(
+            @RequestBody AddFavTeamRequestDto request,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(favoriteTeamService.update(request, principal));
     }
 }

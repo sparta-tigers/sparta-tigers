@@ -39,4 +39,8 @@ public class FavoriteTeam extends BaseEntity {
     public static FavoriteTeam from(User user, Team team) {
         return new FavoriteTeam(user, team);
     }
+
+    public void update(Team team) {
+        this.team = team;
+    }
 }
