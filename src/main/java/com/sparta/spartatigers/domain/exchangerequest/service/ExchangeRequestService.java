@@ -101,6 +101,8 @@ public class ExchangeRequestService {
         exchangeRequest.validateReceiverIsOwner(user);
 
         Item item = itemRepository.findItemByIdOrElseThrow(exchangeRequest.getItem().getId());
+        // 현재 교환 완료는 Item의 상태(COMPLETED)로 관리
+        // ExchangeRequest는 (ACCEPTED) 상태까지만 관리
         item.complete();
     }
 
