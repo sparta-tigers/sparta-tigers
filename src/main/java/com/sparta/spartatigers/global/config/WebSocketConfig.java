@@ -9,6 +9,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.config.UserHandshakeInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 
 /**
@@ -28,7 +29,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler())
+                .addInterceptors(new UserHandshakeInterceptor()) // 인터셉터 등록
+                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler()) // 커스텀 핸드쉐이크 핸들러
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
