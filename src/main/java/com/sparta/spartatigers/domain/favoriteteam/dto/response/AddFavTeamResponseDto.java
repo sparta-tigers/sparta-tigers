@@ -1,11 +1,11 @@
-package com.sparta.spartatigers.domain.user.dto.response;
+package com.sparta.spartatigers.domain.favoriteteam.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.team.model.entity.Team.Code;
-import com.sparta.spartatigers.domain.user.model.entity.FavoriteTeam;
+import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 
 @Getter
 @NoArgsConstructor

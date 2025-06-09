@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.user.dto.request;
+package com.sparta.spartatigers.domain.favoriteteam.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

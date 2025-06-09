@@ -1,5 +1,6 @@
-package com.sparta.spartatigers.domain.user.model.entity;
+package com.sparta.spartatigers.domain.favoriteteam.model.entity;
 
+import com.sparta.spartatigers.domain.user.model.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
