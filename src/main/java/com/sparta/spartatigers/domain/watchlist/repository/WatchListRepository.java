@@ -26,6 +26,7 @@ public interface WatchListRepository
 		JOIN FETCH w.user
 		JOIN FETCH w.match.homeTeam
 		JOIN FETCH w.match.awayTeam
+		WHERE w.user = :user
 		""")
     List<WatchList> findAllByUser(User user);
 }

@@ -13,7 +13,7 @@ public class StatsResponseDto {
 
     private int total;
     private double winRate;
-    private String mostVisitStadium;
+    private String mostVisitedStadium;
     private String bestWinRateStadium;
     private int win, draw, lose;
 
