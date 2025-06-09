@@ -30,12 +30,7 @@ public class FavoriteTeamService {
         if (exists) {
             throw new InvalidRequestException(ExceptionCode.ALREADY_EXISTS_FAVORITE_TEAM);
         }
-
-        Team team =
-                teamRepository
-                        .findById(request.getTeamId())
-                        .orElseThrow(
-                                () -> new InvalidRequestException(ExceptionCode.TEAM_NOT_FOUND));
+        Team team = teamRepository.findByIdOrElseThrow(request.getTeamId());
 
         FavoriteTeam favoriteTeam = FavoriteTeam.from(user, team);
         favTeamRepository.save(favoriteTeam);
@@ -56,11 +51,7 @@ public class FavoriteTeamService {
         Long userId = CustomUserPrincipal.getUserId(principal);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
-        Team newTeam =
-                teamRepository
-                        .findById(request.getTeamId())
-                        .orElseThrow(
-                                () -> new InvalidRequestException(ExceptionCode.TEAM_NOT_FOUND));
+        Team newTeam = teamRepository.findByIdOrElseThrow(request.getTeamId());
 
         findFavoriteTeam.update(newTeam);
         return FavTeamResponseDto.of(findFavoriteTeam);
