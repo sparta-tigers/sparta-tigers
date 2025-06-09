@@ -19,7 +19,7 @@ public interface WatchListRepository
     }
 
     @Query(
-		"""
+            """
 		SELECT w
 		FROM watch_list w
 		JOIN FETCH w.match
