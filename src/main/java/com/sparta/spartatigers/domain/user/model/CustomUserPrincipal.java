@@ -66,6 +66,10 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
         return true;
     }
 
+    public static Long getUserId(CustomUserPrincipal principal) {
+        return principal.getUser().getId();
+    }
+
     @Override
     public String getName() {
         return String.valueOf(user.getId());

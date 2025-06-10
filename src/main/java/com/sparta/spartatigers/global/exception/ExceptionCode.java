@@ -29,13 +29,27 @@ public enum ExceptionCode {
     // 알람
 
     // 채팅방
+    CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
 
     // 교환 요청
-    EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니동"),
+    EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니다."),
+    EXCHANGE_REQUEST_DUPLICATED("이미 교환 요청을 보냈습니다."),
 
     // 아이템
+    ITEM_NOT_FOUND("아이템을 찾을 수 없습니다."),
+    CANNOT_REQUEST_OWN_ITEM("자신의 아이템에 대해 교환 요청을 할 수 없습니다."),
+    RECEIVER_NOT_OWNER("해당 아이템의 소유자에게만 요청을 보낼 수 있습니다."),
+    RECEIVER_FORBIDDEN("요청을 받은 사용자만 요청을 수정할 수 있습니다."),
 
     // 직관 기록
+    WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다."),
+
+    // 팀
+    TEAM_NOT_FOUND("팀이 존재하지 않습니다."),
+
+    // 응원 팀
+    FAVORITE_TEAM_NOT_FOUND("응원하는 팀이 없습니다."),
+    ALREADY_EXISTS_FAVORITE_TEAM("이미 응원하는 팀이 있습니다."),
 
     // 공통
     NOT_FOUND("not found ~~"),
