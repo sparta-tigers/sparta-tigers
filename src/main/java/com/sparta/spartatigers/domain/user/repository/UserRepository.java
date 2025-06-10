@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByProviderId(String providerId);
 
     Optional<User> findByProviderId(String providerId);
+
     boolean existsByEmail(String email);
 
     default User findByIdOrElseThrow(Long userId) {
