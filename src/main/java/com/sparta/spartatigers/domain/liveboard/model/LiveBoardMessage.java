@@ -14,7 +14,6 @@ public class LiveBoardMessage {
     private String senderNickname;
     private String content; // 내용
     private LocalDateTime sentAt;
-    private MessageType type;
 
     public LiveBoardMessage() {
         this.sentAt = LocalDateTime.now();
