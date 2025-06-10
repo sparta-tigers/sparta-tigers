@@ -6,13 +6,15 @@ import java.time.LocalTime;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class AlarmResponseDto {
     @NotBlank private String homeTeam;
     @NotBlank private String awayTeam;
-    @NotBlank private String stadiumName;
+    @NotBlank private String stadium;
     private LocalDateTime reservationTime;
     private LocalDateTime preReservationTime;
     private LocalTime alarmTime;
