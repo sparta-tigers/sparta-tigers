@@ -32,6 +32,7 @@ import com.sparta.spartatigers.global.util.JwtUtil;
 @EnableMethodSecurity(prePostEnabled = true) // preAuthorize 설정시
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtUtil jwtUtil;
     private final CustomOAuth2UserDetailsService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -44,11 +45,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(
-                        auth ->
-                                auth.requestMatchers("/auth/**", "/oauth2/**", "/login/**")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                        auth -> auth.requestMatchers("/*").permitAll().anyRequest().authenticated())
                 .oauth2Login(
                         oauth ->
                                 oauth.userInfoEndpoint(
