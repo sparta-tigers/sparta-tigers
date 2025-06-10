@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.dto.request.CreateDirectRoomRequestDto;
-import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomDto;
+import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomResponseDto;
 import com.sparta.spartatigers.domain.chatroom.service.DirectRoomService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
@@ -31,22 +31,23 @@ public class DirectRoomController {
     private final DirectRoomService directRoomService;
 
     @PostMapping
-    public ApiResponse<DirectRoomDto> createDirectRoom(
+    public ApiResponse<DirectRoomResponseDto> createDirectRoom(
             @Valid @RequestBody CreateDirectRoomRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
         Long userId = userPrincipal.getUser().getId();
-        DirectRoomDto directRoomDto =
+        DirectRoomResponseDto directRoomDto =
                 directRoomService.createRoom(request.getExchangeRequestId(), userId);
         return ApiResponse.created(directRoomDto);
     }
 
     @GetMapping
-    public ApiResponse<Page<DirectRoomDto>> getDirectRooms(
+    public ApiResponse<Page<DirectRoomResponseDto>> getDirectRooms(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC)
                     Pageable pageable) {
         Long currentUserId = userPrincipal.getUser().getId();
-        Page<DirectRoomDto> rooms = directRoomService.getRoomsForUser(currentUserId, pageable);
+        Page<DirectRoomResponseDto> rooms =
+                directRoomService.getRoomsForUser(currentUserId, pageable);
         return ApiResponse.ok(rooms);
     }
 

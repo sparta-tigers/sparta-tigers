@@ -32,6 +32,7 @@ import com.sparta.spartatigers.global.util.JwtUtil;
 @EnableMethodSecurity(prePostEnabled = true) // preAuthorize 설정시
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtUtil jwtUtil;
     private final CustomOAuth2UserDetailsService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -44,15 +45,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(
-                        auth ->
-                                auth.requestMatchers(
-                                                "/auth/**",
-                                                "/oauth2/**",
-                                                "/login/**",
-                                                "/api/alarms/**")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                        auth -> auth.requestMatchers("/*").permitAll().anyRequest().authenticated())
                 .oauth2Login(
                         oauth ->
                                 oauth.userInfoEndpoint(
@@ -66,7 +59,7 @@ public class SecurityConfig {
 
         http.logout(
                 logout ->
-                        logout.logoutUrl("/api/users/logout")
+                        logout.logoutUrl("/api/users/logout") // 클라이언트가 이 경로로 POST하면 로그아웃 수행
                                 .invalidateHttpSession(true)
                                 .deleteCookies("JSESSIONID")
                                 .permitAll());
