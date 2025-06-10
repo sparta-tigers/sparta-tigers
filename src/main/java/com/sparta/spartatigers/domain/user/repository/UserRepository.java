@@ -9,5 +9,7 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
-    boolean existsByEmail(String email);
+    boolean existsByProviderId(String providerId);
+
+    Optional<User> findByProviderId(String providerId);
 }

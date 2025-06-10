@@ -19,6 +19,8 @@ public class User extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column private String providerId;
+
     @Column private String email;
 
     @Column private String nickname;
@@ -30,8 +32,9 @@ public class User extends BaseEntity implements Serializable {
 
     @Column private LocalDateTime deletedAt;
 
-    public User(String email, String nickname, String path) {
+    public User(String email, String providerId, String nickname, String path) {
         this.email = email;
+        this.providerId = providerId;
         this.nickname = nickname;
         this.path = path;
         this.roles = Role.USER;

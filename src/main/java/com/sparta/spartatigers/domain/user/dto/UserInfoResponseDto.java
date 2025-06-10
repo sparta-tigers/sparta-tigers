@@ -8,6 +8,7 @@ import lombok.Getter;
 public class UserInfoResponseDto {
     private final Long id;
     private final String email;
+    private final String providerId;
     private final String nickname;
     private final String profilePath;
     private final String role;

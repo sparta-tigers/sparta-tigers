@@ -13,6 +13,7 @@ public class UserService {
         return new UserInfoResponseDto(
                 user.getId(),
                 user.getEmail(),
+                user.getProviderId(),
                 user.getNickname(),
                 user.getPath(),
                 user.getRoles().name());
