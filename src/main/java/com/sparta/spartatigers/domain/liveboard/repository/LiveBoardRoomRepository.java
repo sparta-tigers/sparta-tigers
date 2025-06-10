@@ -32,9 +32,7 @@ public class LiveBoardRoomRepository {
     }
 
     public void saveRoom(LiveBoardRoom room) {
-        log.info("[🔄] Redis 저장 시도: {}", room.getRoomId());
         opsHash.put(LIVEBOARD_ROOMS, room.getRoomId(), room);
-        log.info("[✅] Redis 저장 성공: {}", room.getRoomId());
     }
 
     public LiveBoardRoom findRoomById(String roomId) {

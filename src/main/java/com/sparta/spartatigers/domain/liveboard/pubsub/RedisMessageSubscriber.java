@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class RedisMessageSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String,String> redisTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
 
     @Override
@@ -32,7 +32,7 @@ public class RedisMessageSubscriber implements MessageListener {
                     objectMapper.readValue(publishMessage, LiveBoardMessage.class);
 
             messagingTemplate.convertAndSend(
-                    "/server/chat/room/" + liveBoardMessage.getRoomId(), liveBoardMessage);
+                    "/server/liveboard/room/" + liveBoardMessage.getRoomId(), liveBoardMessage);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

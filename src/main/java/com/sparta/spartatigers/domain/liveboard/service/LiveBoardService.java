@@ -4,21 +4,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
-import com.sparta.spartatigers.domain.liveboard.model.MessageType;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LiveBoardService {
@@ -26,6 +30,7 @@ public class LiveBoardService {
     private final LiveBoardRoomRepository roomRepository;
     private final RedisMessageSubscriber redisSubscriber;
     private final RedisMessageListenerContainer redisMessageListener;
+    private final RedissonClient redissonClient;
     // private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
     private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
@@ -71,15 +76,17 @@ public class LiveBoardService {
         }
     }
 
-    // 채팅방 접속자 수 증감 처리
-    public void updateConnectCount(LiveBoardMessage message) {
-        String roomId = message.getRoomId();
-        LiveBoardRoom room = roomRepository.findRoomById(roomId);
-        if (message.getType() == MessageType.ENTER) {
-            room.increaseCount();
-        } else if (message.getType() == MessageType.QUIT) {
-            room.decreaseCount();
-        }
-        roomRepository.saveRoom(room);
-    }
+	public void increaseConnectCount(String roomId) {
+		LiveBoardRoom room = roomRepository.findRoomById(roomId);
+		room.increaseCount();
+		roomRepository.saveRoom(room);
+	}
+
+	public void decreaseConnectCount(String roomId) {
+		LiveBoardRoom room = roomRepository.findRoomById(roomId);
+		room.decreaseCount();
+		roomRepository.saveRoom(room);
+	}
+
+
 }
