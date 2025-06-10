@@ -17,17 +17,14 @@ public class LiveBoardMessageController {
     private final RedisMessagePublisher redisPublisher;
     private final LiveBoardService liveBoardService;
 
-    @MessageMapping("/chat/message")
+    @MessageMapping("/liveboard/message")
     public void sendMessage(LiveBoardMessage message) {
         String roomId = message.getRoomId();
-
         ChannelTopic topic = liveBoardService.getTopic(roomId);
         if (topic == null) {
             liveBoardService.enterRoom(roomId);
             topic = liveBoardService.getTopic(roomId);
         }
-
-        liveBoardService.updateConnectCount(message);
         redisPublisher.publish(topic, message);
     }
 }

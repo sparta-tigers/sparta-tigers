@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
-import com.sparta.spartatigers.domain.liveboard.model.MessageType;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
@@ -77,49 +76,17 @@ public class LiveBoardService {
         }
     }
 
-    // // 채팅방 접속자 수 증감 처리 (락 없이)
-    // public void updateConnectCountWithOutLock(LiveBoardMessage message) {
-    //     String roomId = message.getRoomId();
-    //     LiveBoardRoom room = roomRepository.findRoomById(roomId);
-    //     int before = room.getConnectCount();
-	//
-    //     if (message.getType() == MessageType.ENTER) {
-    //         room.increaseCount();
-    //     } else if (message.getType() == MessageType.QUIT) {
-    //         room.decreaseCount();
-    //     }
-    //     roomRepository.saveRoom(room);
-	//
-    // }
+	public void increaseConnectCount(String roomId) {
+		LiveBoardRoom room = roomRepository.findRoomById(roomId);
+		room.increaseCount();
+		roomRepository.saveRoom(room);
+	}
 
-    // 채팅방 접속자 수 증감 처리 (Redisson 락 사용)
-    public void updateConnectCount(LiveBoardMessage message) {
-        String roomId = message.getRoomId();
-        String lockKey = "lock:liveboard:room:" + roomId;
-        RLock lock = redissonClient.getLock(lockKey);
+	public void decreaseConnectCount(String roomId) {
+		LiveBoardRoom room = roomRepository.findRoomById(roomId);
+		room.decreaseCount();
+		roomRepository.saveRoom(room);
+	}
 
-        try {
-            boolean available = lock.tryLock(5, 5, TimeUnit.SECONDS);
-            if (!available) {
-                throw new RuntimeException("락 획득 실패 : " + roomId);
-            }
-            LiveBoardRoom room = roomRepository.findRoomById(roomId);
 
-            if (message.getType() == MessageType.ENTER) {
-                room.increaseCount();
-            } else if (message.getType() == MessageType.QUIT) {
-                room.decreaseCount();
-            }
-            roomRepository.saveRoom(room);
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("락 획득 실패", e);
-
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
-    }
 }
