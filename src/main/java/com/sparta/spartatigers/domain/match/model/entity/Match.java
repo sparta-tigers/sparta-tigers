@@ -52,6 +52,7 @@ public class Match extends BaseEntity {
         HOME_WIN,
         AWAY_WIN,
         DRAW,
-        CANCEL
+        CANCEL,
+        NOT_PLAYED
     }
 }
