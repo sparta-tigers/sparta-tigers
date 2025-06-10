@@ -22,9 +22,8 @@ public enum ExceptionCode {
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다."),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다."),
 
-    // 경기
-    MATCH_NOT_FOUND("경기가 존재하지 않습니다."),
-
+    // 매치
+    MATCH_NOT_FOUND("경기 일정을 찾을 수 없습니다."),
     // 라이브 보드
 
     // 알람
