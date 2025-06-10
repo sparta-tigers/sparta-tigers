@@ -11,6 +11,10 @@ import com.sparta.spartatigers.global.exception.InvalidRequestException;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    boolean existsByProviderId(String providerId);
+
+    Optional<User> findByProviderId(String providerId);
+
     boolean existsByEmail(String email);
 
     default User findByIdOrElseThrow(Long userId) {
