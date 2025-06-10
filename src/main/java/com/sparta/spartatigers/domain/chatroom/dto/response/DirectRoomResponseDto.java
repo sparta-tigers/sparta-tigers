@@ -7,12 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
-import com.sparta.spartatigers.domain.user.model.entity.User;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DirectRoomDto {
+public class DirectRoomResponseDto {
 
     private Long directRoomId;
     private Long exchangeRequestId;
@@ -23,34 +22,13 @@ public class DirectRoomDto {
     private LocalDateTime completedAt;
     private LocalDateTime createdAt;
 
-    public DirectRoomDto(
-            Long directRoomId,
-            Long exchangeRequestId,
-            Long receiverId,
-            String receiverNickname,
-            boolean isCompleted,
-            LocalDateTime completedAt,
-            LocalDateTime createdAt) {
-        this.directRoomId = directRoomId;
-        this.exchangeRequestId = exchangeRequestId;
-        this.receiverId = receiverId;
-        this.receiverNickname = receiverNickname;
-        this.isCompleted = isCompleted;
-        this.completedAt = completedAt;
-        this.createdAt = createdAt;
-    }
-
-    public static DirectRoomDto from(DirectRoom room, Long currentUserId) {
-        User opponent =
-                room.getSender().getId().equals(currentUserId)
-                        ? room.getReceiver()
-                        : room.getSender();
-
-        return new DirectRoomDto(
+    public static DirectRoomResponseDto from(DirectRoom room) {
+        return new DirectRoomResponseDto(
                 room.getId(),
                 room.getExchangeRequest().getId(),
-                opponent.getId(),
-                opponent.getNickname(),
+                room.getSender().getId(),
+                room.getReceiver().getId(),
+                room.getReceiver().getNickname(),
                 room.isCompleted(),
                 room.getCompletedAt(),
                 room.getCreatedAt());
