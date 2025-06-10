@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.watchlist.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,14 +9,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
+import com.sparta.spartatigers.domain.favoriteteam.repository.FavoriteTeamRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
+import com.sparta.spartatigers.domain.team.model.entity.Team;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
-import com.sparta.spartatigers.domain.watchlist.dto.RecordDto;
+import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.StatsResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
 import com.sparta.spartatigers.domain.watchlist.repository.WatchListRepository;
@@ -27,6 +34,8 @@ public class WatchListService {
 
     private final WatchListRepository watchListRepository;
     private final MatchRepository matchRepository;
+    private final FavoriteTeamRepository favoriteTeamRepository;
+    private final UserRepository userRepository;
 
     /**
      * 직관 기록 등록 서비스
@@ -46,7 +55,7 @@ public class WatchListService {
 
         watchListRepository.save(watchList);
 
-        return CreateWatchListResponseDto.from(match, RecordDto.of(request));
+        return CreateWatchListResponseDto.of(watchList);
     }
 
     /**
@@ -131,5 +140,29 @@ public class WatchListService {
                         userId, request.getTeamName(), request.getStadiumName(), pageable);
 
         return all.map(WatchListResponseDto::of);
+    }
+
+    /**
+     * 응원하는 팀에 한정하여 직관 통계 데이터를 제공하는 서비스
+     *
+     * @param principal 유저 정보
+     * @return {@link StatsResponseDto}
+     */
+    @Transactional(readOnly = true)
+    public StatsResponseDto getStats(CustomUserPrincipal principal) {
+        Long userId = CustomUserPrincipal.getUserId(principal);
+
+        User user = userRepository.findByIdOrElseThrow(userId);
+        FavoriteTeam favoriteTeam = favoriteTeamRepository.findByUserIdOrElseThrow(userId);
+        Team myTeam = favoriteTeam.getTeam();
+
+        List<WatchList> watchLists = watchListRepository.findAllByUser(user);
+
+        StatsAccumulator accumulator = new StatsAccumulator(myTeam);
+        for (WatchList wl : watchLists) {
+            accumulator.accumulate(wl);
+        }
+
+        return StatsResponseDto.of(accumulator);
     }
 }

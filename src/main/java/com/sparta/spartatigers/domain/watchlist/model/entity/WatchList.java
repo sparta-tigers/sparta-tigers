@@ -25,6 +25,8 @@ public class WatchList extends BaseEntity {
 
     @Column private int rating;
 
+    @Column private String seat;
+
     //    @Column private LocalDateTime deletedAt;
 
     @JoinColumn(name = "user_id")
@@ -36,13 +38,19 @@ public class WatchList extends BaseEntity {
     private Match match;
 
     public static WatchList from(Match match, CreateWatchListRequestDto dto, User user) {
-        return new WatchList(dto.getRecord().getContent(), dto.getRecord().getRate(), user, match);
+        return new WatchList(
+                dto.getRecord().getContent(),
+                dto.getRecord().getRate(),
+                dto.getSeat(),
+                user,
+                match);
     }
 
     public static WatchList of(WatchList watchList) {
         return new WatchList(
                 watchList.getContents(),
                 watchList.getRating(),
+                watchList.getSeat(),
                 watchList.getUser(),
                 watchList.getMatch());
     }

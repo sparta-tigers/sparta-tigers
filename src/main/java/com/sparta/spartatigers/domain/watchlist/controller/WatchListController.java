@@ -124,4 +124,9 @@ public class WatchListController {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.ok(watchListService.search(pageable, request, principal));
     }
+
+    @GetMapping("/stats")
+    public ApiResponse<?> getStats(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(watchListService.getStats(principal));
+    }
 }
