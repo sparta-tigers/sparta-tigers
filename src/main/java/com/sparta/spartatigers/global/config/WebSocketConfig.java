@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.global.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -11,6 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
+import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 
 /**
@@ -23,7 +25,8 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-	private final LiveBoardInterceptor liveBoardInterceptor;
+    private final LiveBoardService liveBoardService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
@@ -54,8 +57,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     // 추후 참고할 만한 코드: https://modutaxi-tech.tistory.com/6
 
-	@Override
-	public void configureClientInboundChannel(ChannelRegistration registration) {
-		registration.interceptors(liveBoardInterceptor);
-	}
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new LiveBoardInterceptor(liveBoardService, redisTemplate));
+    }
 }

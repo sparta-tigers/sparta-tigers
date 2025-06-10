@@ -6,57 +6,53 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.stereotype.Component;
-
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
+
 @RequiredArgsConstructor
 public class LiveBoardInterceptor implements ChannelInterceptor {
 
-	private final LiveBoardService liveBoardService;
-	private final RedisTemplate<String, String> redisTemplate;
+    private final LiveBoardService liveBoardService;
+    private final RedisTemplate<String, String> redisTemplate;
 
-	@Override
-	public Message<?> preSend(Message<?> message, MessageChannel channel) {
-		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
-		StompCommand command = accessor.getCommand();
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor =
+                StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
+        StompCommand command = accessor.getCommand();
 
-		// 채팅방 구독시
-		if (StompCommand.SUBSCRIBE.equals(command)){
-			String destination = accessor.getDestination(); // url
-			String sessionId = accessor.getSessionId(); // 세션 id
+        // 채팅방 구독시
+        if (StompCommand.SUBSCRIBE.equals(command)) {
+            String destination = accessor.getDestination(); // url
+            String sessionId = accessor.getSessionId(); // 세션 id
 
-			if(destination != null && destination.startsWith("/server/liveboard/room/")) {
-				String enterRoomId = destination.substring("/server/liveboard/room/".length());
-				String lastRoomId = redisTemplate.opsForValue().get(sessionId);
+            if (destination != null && destination.startsWith("/server/liveboard/room/")) {
+                String enterRoomId = destination.substring("/server/liveboard/room/".length());
+                String lastRoomId = redisTemplate.opsForValue().get(sessionId);
 
-				// 다른 채팅방에서 넘어온 경우
-				if (lastRoomId != null && !lastRoomId.equals(enterRoomId)) {
-					liveBoardService.decreaseConnectCount(lastRoomId);
-				}
+                // 다른 채팅방에서 넘어온 경우
+                if (lastRoomId != null && !lastRoomId.equals(enterRoomId)) {
+                    liveBoardService.decreaseConnectCount(lastRoomId);
+                }
 
-				// 새로 입장한 채팅방 접속자 수 증가
-				liveBoardService.increaseConnectCount(enterRoomId);
-				redisTemplate.opsForValue().set(sessionId, enterRoomId);
-			}
-		}
+                // 새로 입장한 채팅방 접속자 수 증가
+                liveBoardService.increaseConnectCount(enterRoomId);
+                redisTemplate.opsForValue().set(sessionId, enterRoomId);
+            }
+        }
 
-		// 웹소켓 연결 종료시
-		if(StompCommand.DISCONNECT.equals(command)){
-			String sessionId = accessor.getSessionId();
-			String roomId = redisTemplate.opsForValue().get(sessionId);
+        // 웹소켓 연결 종료시
+        if (StompCommand.DISCONNECT.equals(command)) {
+            String sessionId = accessor.getSessionId();
+            String roomId = redisTemplate.opsForValue().get(sessionId);
 
-			if (roomId != null) {
-				liveBoardService.decreaseConnectCount(roomId);
-				redisTemplate.delete(sessionId);
-			}
-		}
-		return message;
-	}
-
-
-
+            if (roomId != null) {
+                liveBoardService.decreaseConnectCount(roomId);
+                redisTemplate.delete(sessionId);
+            }
+        }
+        return message;
+    }
 }
