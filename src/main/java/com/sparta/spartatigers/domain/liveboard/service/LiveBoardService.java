@@ -4,23 +4,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
-import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -28,20 +28,26 @@ import com.sparta.spartatigers.domain.match.model.entity.Match;
 public class LiveBoardService {
 
     private final LiveBoardRoomRepository roomRepository;
-    private final RedisMessageSubscriber redisSubscriber;
     private final RedisMessageListenerContainer redisMessageListener;
-    private final RedissonClient redissonClient;
+    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, String> redisTemplate;
     // private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
     private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
 
-    // 채팅방 입장
-    public void enterRoom(String roomId) {
+    public void registerRoomTopic(String roomId, SimpMessageSendingOperations messagingTemplate) {
         if (!topics.containsKey(roomId)) {
             ChannelTopic topic = new ChannelTopic(roomId);
-            redisMessageListener.addMessageListener(redisSubscriber, topic);
+            RedisMessageSubscriber subscriber =
+                    new RedisMessageSubscriber(objectMapper, redisTemplate, messagingTemplate);
+            redisMessageListener.addMessageListener(subscriber, topic);
             topics.put(roomId, topic);
         }
+    }
+
+    // 입장할 때 호출하면 됨
+    public void enterRoom(String roomId, SimpMessageSendingOperations messagingTemplate) {
+        registerRoomTopic(roomId, messagingTemplate);
     }
 
     // 채팅방 전체 조회
@@ -76,17 +82,15 @@ public class LiveBoardService {
         }
     }
 
-	public void increaseConnectCount(String roomId) {
-		LiveBoardRoom room = roomRepository.findRoomById(roomId);
-		room.increaseCount();
-		roomRepository.saveRoom(room);
-	}
+    public void increaseConnectCount(String roomId) {
+        LiveBoardRoom room = roomRepository.findRoomById(roomId);
+        room.increaseCount();
+        roomRepository.saveRoom(room);
+    }
 
-	public void decreaseConnectCount(String roomId) {
-		LiveBoardRoom room = roomRepository.findRoomById(roomId);
-		room.decreaseCount();
-		roomRepository.saveRoom(room);
-	}
-
-
+    public void decreaseConnectCount(String roomId) {
+        LiveBoardRoom room = roomRepository.findRoomById(roomId);
+        room.decreaseCount();
+        roomRepository.saveRoom(room);
+    }
 }

@@ -23,7 +23,7 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-	private final LiveBoardInterceptor liveBoardInterceptor;
+    private final LiveBoardInterceptor liveBoardInterceptor;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
@@ -54,8 +54,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     // 추후 참고할 만한 코드: https://modutaxi-tech.tistory.com/6
 
-	@Override
-	public void configureClientInboundChannel(ChannelRegistration registration) {
-		registration.interceptors(liveBoardInterceptor);
-	}
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(liveBoardInterceptor);
+    }
 }
