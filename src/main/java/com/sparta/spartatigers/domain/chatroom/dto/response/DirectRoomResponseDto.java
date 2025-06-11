@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
-import com.sparta.spartatigers.domain.user.model.entity.User;
 
 @Getter
 @AllArgsConstructor
@@ -23,18 +22,13 @@ public class DirectRoomResponseDto {
     private LocalDateTime completedAt;
     private LocalDateTime createdAt;
 
-    public static DirectRoomResponseDto from(DirectRoom room, Long currentUserId) {
-        User opponent =
-                room.getSender().getId().equals(currentUserId)
-                        ? room.getReceiver()
-                        : room.getSender();
-
+    public static DirectRoomResponseDto from(DirectRoom room) {
         return new DirectRoomResponseDto(
                 room.getId(),
                 room.getExchangeRequest().getId(),
                 room.getSender().getId(),
-                opponent.getId(),
-                opponent.getNickname(),
+                room.getReceiver().getId(),
+                room.getReceiver().getNickname(),
                 room.isCompleted(),
                 room.getCompletedAt(),
                 room.getCreatedAt());

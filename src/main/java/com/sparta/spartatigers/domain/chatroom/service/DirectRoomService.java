@@ -12,6 +12,7 @@ import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
+import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
 
@@ -27,22 +28,32 @@ public class DirectRoomService {
         ExchangeRequest exchangeRequest =
                 exchangeRequestRepository.findByIdOrElseThrow(exchangeRequestId);
 
+        // 권한 확인: 요청한 사람이 교환 요청의 sender 또는 receiver여야 함
+        if (!exchangeRequest.getSender().getId().equals(currentUserId)
+                && !exchangeRequest.getReceiver().getId().equals(currentUserId)) {
+            throw new ServerException(ExceptionCode.UNAUTHORIZED);
+        }
+
+        // sender/receiver는 교환 요청 그대로
+        User sender = exchangeRequest.getSender();
+        User receiver = exchangeRequest.getReceiver();
+
         DirectRoom room =
                 directRoomRepository
                         .findByExchangeRequest(exchangeRequest)
                         .orElseGet(
                                 () ->
                                         directRoomRepository.save(
-                                                DirectRoom.create(exchangeRequest)));
+                                                DirectRoom.create(
+                                                        exchangeRequest, sender, receiver)));
 
-        return DirectRoomResponseDto.from(room, currentUserId);
+        return DirectRoomResponseDto.from(room);
     }
 
-    @Transactional(readOnly = true)
-    public Page<DirectRoomResponseDto> getRoomsForUser(Long userId, Pageable pageable) {
-        Page<DirectRoom> rooms =
-                directRoomRepository.findAllBySenderIdOrReceiverId(userId, userId, pageable);
-        return rooms.map(room -> DirectRoomResponseDto.from(room, userId));
+    public Page<DirectRoomResponseDto> getRoomsForUser(Long currentUserId, Pageable pageable) {
+        return directRoomRepository
+                .findBySenderIdOrReceiverIdWithUsers(currentUserId, pageable)
+                .map(DirectRoomResponseDto::from);
     }
 
     @Transactional

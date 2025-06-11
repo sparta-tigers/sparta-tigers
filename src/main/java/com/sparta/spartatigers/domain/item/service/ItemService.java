@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
@@ -44,5 +45,13 @@ public class ItemService {
         Page<Item> itemList = itemRepository.findAllByStatus(Status.REGISTERED, pageable);
 
         return itemList.map(ReadItemResponseDto::from);
+    }
+
+    @Transactional(readOnly = true)
+    public ReadItemDetailResponseDto findItemById(Long itemId) {
+
+        Item item = itemRepository.findItemByIdOrElseThrow(itemId);
+
+        return ReadItemDetailResponseDto.from(item);
     }
 }

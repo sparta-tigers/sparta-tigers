@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.global.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
 import com.sparta.spartatigers.domain.chatroom.config.UserHandshakeInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 
@@ -21,6 +23,8 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final LiveBoardInterceptor liveBoardInterceptor;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
@@ -42,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // @MessageMapping(liveboard.)
+        // @MessageMapping("/liveboard.")
         // @MessageMapping("/dm.")
         // js ex) stompClinet.subscribe('/topic/chat/')
         registry.enableSimpleBroker("/server");
@@ -52,4 +56,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     // 추후 참고할 만한 코드: https://modutaxi-tech.tistory.com/6
 
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(liveBoardInterceptor);
+    }
 }
