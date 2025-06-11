@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebSocket JWT 테스트 클라이언트</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>WebSocket JWT 테스트</h2>
+<label
+>WebSocket URL:
+  <input
+      type="text"
+      id="ws-url"
+      value="http://localhost:8080/ws"
+      size="50" /></label
+><br />
+<label>JWT: <input type="text" id="jwt" size="80" /></label><br />
+<label
+>Subscribe 주소:
+  <input type="text" id="sub-dest" value="/server/test" size="50" /></label
+><br />
+<label
+>Send 주소:
+  <input type="text" id="send-dest" value="/client/test" size="50" /></label
+><br />
+<label
+>보낼 메시지:
+  <input type="text" id="message" value="테스트 메시지" size="50" /></label
+><br />
+<button onclick="connect()">연결</button>
+<button onclick="sendMessage()">메시지 보내기</button>
+<pre id="output"></pre>
+
+<script>
+  let socket = new SockJS("http://localhost:8080/ws");
+  let stompClient = Stomp.over(socket);
+
+  function log(msg) {
+    document.getElementById("output").textContent += msg + "\n";
+  }
+
+  function connect() {
+    const url = document.getElementById("ws-url").value;
+    const jwt = document.getElementById("jwt").value;
+    const socket = new SockJS(url);
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect(
+        { Authorization: "Bearer " + jwt },
+        (frame) => {
+          log("[✅ 연결 성공] " + frame);
+          const subDest = document.getElementById("sub-dest").value;
+          stompClient.subscribe(subDest, (msg) => {
+            log("[📩 수신] " + msg.body);
+          });
+        },
+        (error) => {
+          log("[❌ 연결 실패] " + error);
+        }
+    );
+  }
+
+  function sendMessage() {
+    const dest = document.getElementById("send-dest").value;
+    const message = document.getElementById("message").value;
+    if (stompClient && stompClient.connected) {
+      stompClient.send(dest, {}, JSON.stringify({ message }));
+      log("[📤 전송] " + message);
+    } else {
+      log("[⚠️ 오류] WebSocket이 연결되어 있지 않습니다.");
+    }
+  }
+</script>
+</body>
+</html>

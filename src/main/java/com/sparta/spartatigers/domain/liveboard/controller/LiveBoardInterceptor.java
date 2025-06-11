@@ -1,20 +1,20 @@
-package com.sparta.spartatigers.domain.liveboard.controller;
+ package com.sparta.spartatigers.domain.liveboard.controller;
 
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.stereotype.Component;
+ import org.springframework.data.redis.core.RedisTemplate;
+ import org.springframework.messaging.Message;
+ import org.springframework.messaging.MessageChannel;
+ import org.springframework.messaging.simp.stomp.StompCommand;
+ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+ import org.springframework.messaging.support.ChannelInterceptor;
+ import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
+ import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
+ import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
 
-@Component
-@RequiredArgsConstructor
-public class LiveBoardInterceptor implements ChannelInterceptor {
+ @Component
+ @RequiredArgsConstructor
+ public class LiveBoardInterceptor implements ChannelInterceptor {
 
     private final LiveBoardService liveBoardService;
     private final RedisTemplate<String, String> redisTemplate;
@@ -57,4 +57,4 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
         }
         return message;
     }
-}
+ }
