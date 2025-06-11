@@ -1,6 +1,6 @@
 package com.sparta.spartatigers.domain.chatroom.pubsub;
 
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class RedisDirectMessagePublisher {
 
-    private final RedisTemplate<String, String> redisStringTemplate;
+    private final StringRedisTemplate redisStringTemplate;
     private final ObjectMapper objectMapper;
 
     public void publish(String topic, ChatMessageRequest message) {
