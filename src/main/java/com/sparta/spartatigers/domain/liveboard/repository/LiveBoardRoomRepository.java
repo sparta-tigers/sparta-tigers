@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.liveboard.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;

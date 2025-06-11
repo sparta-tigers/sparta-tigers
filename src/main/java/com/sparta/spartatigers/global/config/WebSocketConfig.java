@@ -10,7 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
+import com.sparta.spartatigers.domain.liveboard.interceptor.LiveBoardInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 
 /**

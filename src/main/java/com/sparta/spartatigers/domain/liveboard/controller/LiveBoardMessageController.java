@@ -9,23 +9,23 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessagePublisher;
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
+import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRedisService;
 
 @Controller
 @RequiredArgsConstructor
 public class LiveBoardMessageController {
 
     private final RedisMessagePublisher redisPublisher;
-    private final LiveBoardService liveBoardService;
+    private final LiveBoardRedisService liveBoardRedisService;
     private final SimpMessageSendingOperations messagingTemplate;
 
     @MessageMapping("/liveboard/message")
     public void sendMessage(LiveBoardMessage message) {
         String roomId = message.getRoomId();
-        ChannelTopic topic = liveBoardService.getTopic(roomId);
+        ChannelTopic topic = liveBoardRedisService.getTopic(roomId);
         if (topic == null) {
-            liveBoardService.enterRoom(roomId, messagingTemplate);
-            topic = liveBoardService.getTopic(roomId);
+            liveBoardRedisService.enterRoom(roomId, messagingTemplate);
+            topic = liveBoardRedisService.getTopic(roomId);
         }
         redisPublisher.publish(topic, message);
     }
