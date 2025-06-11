@@ -21,25 +21,23 @@ public class LiveBoardRoomController {
 
     private final LiveBoardRoomService liveBoardRoomService;
 
-	@PostMapping
-	public List<LiveBoardRoomResponseDto> createTodayRoom() {
-		return liveBoardRoomService.createTodayRoom();
-	}
+    @PostMapping
+    public List<LiveBoardRoomResponseDto> createTodayRoom() {
+        return liveBoardRoomService.createTodayRoom();
+    }
 
     @GetMapping("/all")
     public List<LiveBoardRoomResponseDto> getAllRooms() {
         return liveBoardRoomService.findAllRooms();
     }
 
-	@GetMapping("/today")
-	public List<LiveBoardRoomResponseDto> getTodayRooms() {
-		return liveBoardRoomService.findTodayRooms();
-	}
+    @GetMapping("/today")
+    public List<LiveBoardRoomResponseDto> getTodayRooms() {
+        return liveBoardRoomService.findTodayRooms();
+    }
 
-	@DeleteMapping("/{roomId}")
-	public void deleteRoom(
-		@PathVariable String roomId
-	) {
-		liveBoardRoomService.deleteRoom(roomId);
-	}
+    @DeleteMapping("/{roomId}")
+    public void deleteRoom(@PathVariable String roomId) {
+        liveBoardRoomService.deleteRoom(roomId);
+    }
 }

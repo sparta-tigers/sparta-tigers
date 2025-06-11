@@ -26,21 +26,19 @@ public class LiveBoardRoomService {
     // 라이브 보드룸 생성
     public List<LiveBoardRoomResponseDto> createTodayRoom() {
 
-		// 오늘 경기 일정 찾기
-		LocalDateTime start = LocalDate.now().atStartOfDay();
+        // 오늘 경기 일정 찾기
+        LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
         List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
-		List<LiveBoardRoomResponseDto> todayRoomList = new ArrayList<>();
+        List<LiveBoardRoomResponseDto> todayRoomList = new ArrayList<>();
 
-		// 라이브 보드룸 생성 후 저장
+        // 라이브 보드룸 생성 후 저장
         for (Match match : matches) {
             String roomId = "ROOM_" + match.getId();
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
 
-            // 채팅방 운영시간 TODO: 끝나는시간?
-            LocalDateTime roomStart = match.getMatchTime().minusMinutes(30);
-            LocalDateTime roomClose =
-                    match.getMatchTime().plusHours(4).plusMinutes(30);
+            // 경기 시간
+            LocalDateTime roomStart = match.getMatchTime();
 
             LiveBoardRoom room =
                     LiveBoardRoom.builder()
@@ -48,48 +46,46 @@ public class LiveBoardRoomService {
                             .matchId(match.getId())
                             .title(title)
                             .openAt(roomStart)
-                            .closedAt(roomClose)
                             .connectCount(0)
                             .build();
 
             roomRepository.saveRoom(room);
-			todayRoomList.add(LiveBoardRoomResponseDto.of(room));
+            todayRoomList.add(LiveBoardRoomResponseDto.of(room));
         }
-		return todayRoomList;
+        return todayRoomList;
     }
 
-	// 라이브 보드룸 전체 조회
-	public List<LiveBoardRoomResponseDto> findAllRooms() {
-		return roomRepository.findAllRoom().stream()
-			.map(LiveBoardRoomResponseDto::of)
-			.collect(Collectors.toList());
-	}
+    // 라이브 보드룸 전체 조회
+    public List<LiveBoardRoomResponseDto> findAllRooms() {
+        return roomRepository.findAllRoom().stream()
+                .map(LiveBoardRoomResponseDto::of)
+                .collect(Collectors.toList());
+    }
 
-	// 오늘의 라이브 보드룸 조회
-	public List<LiveBoardRoomResponseDto> findTodayRooms() {
-		LocalDateTime start = LocalDate.now().atStartOfDay();
-		LocalDateTime end = start.plusDays(1);
+    // 오늘의 라이브 보드룸 조회
+    public List<LiveBoardRoomResponseDto> findTodayRooms() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
 
-		return roomRepository.findAllRoom().stream()
-		.filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
-		.map(LiveBoardRoomResponseDto::of)
-		.toList();
-	}
+        return roomRepository.findAllRoom().stream()
+                .filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
+                .map(LiveBoardRoomResponseDto::of)
+                .toList();
+    }
 
-	// 라이브 보드룸 삭제
-	public void deleteRoom(String roomId) {
-		roomRepository.deleteRoom(roomId);
-	}
+    // 라이브 보드룸 삭제
+    public void deleteRoom(String roomId) {
+        roomRepository.deleteRoom(roomId);
+    }
 
-
-	// 라이브 보드룸 접속자 수 증가
+    // 라이브 보드룸 접속자 수 증가
     public void increaseConnectCount(String roomId) {
         LiveBoardRoom room = roomRepository.findRoomById(roomId);
         room.increaseCount();
         roomRepository.saveRoom(room);
     }
 
-	// 라이브 보드룸 접속자 수 감소
+    // 라이브 보드룸 접속자 수 감소
     public void decreaseConnectCount(String roomId) {
         LiveBoardRoom room = roomRepository.findRoomById(roomId);
         room.decreaseCount();
