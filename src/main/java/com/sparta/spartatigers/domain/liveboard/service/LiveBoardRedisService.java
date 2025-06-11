@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
+import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessagePublisher;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
-import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,6 +26,8 @@ public class LiveBoardRedisService {
     private final RedisMessageListenerContainer redisMessageListener;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final RedisMessagePublisher redisPublisher;
 
     private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
 
@@ -38,8 +41,7 @@ public class LiveBoardRedisService {
         }
     }
 
-    // 입장할 때 호출하면 됨
-    public void enterRoom(String roomId, SimpMessageSendingOperations messagingTemplate) {
+    public void initRoomTopic(String roomId, SimpMessageSendingOperations messagingTemplate) {
         registerRoomTopic(roomId, messagingTemplate);
     }
 
@@ -48,4 +50,14 @@ public class LiveBoardRedisService {
         return topics.get(roomId);
     }
 
+    // stomp 메세지 전송
+    public void handleMessage(LiveBoardMessage message) {
+        String roomId = message.getRoomId();
+        ChannelTopic topic = getTopic(roomId);
+        if (topic == null) {
+            initRoomTopic(roomId, messagingTemplate);
+            topic = getTopic(roomId);
+        }
+        redisPublisher.publish(topic, message);
+    }
 }
