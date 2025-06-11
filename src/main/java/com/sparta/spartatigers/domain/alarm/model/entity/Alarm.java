@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 
 @Entity(name = "alarms")
@@ -34,4 +35,29 @@ public class Alarm {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id", nullable = false)
+    private Match match;
+
+    public static Alarm of(User user, Match match, Integer minutes, Integer preMinutes) {
+        LocalDateTime matchStartTime = match.getMatchTime();
+        LocalDateTime normalAlarmTime = null;
+        LocalDateTime preAlarmTime = null;
+
+        if (minutes != null) {
+            normalAlarmTime = matchStartTime.minusMinutes(minutes);
+        }
+
+        if (preMinutes != null) {
+            preAlarmTime = matchStartTime.minusMinutes(preMinutes);
+        }
+
+        Alarm alarm = new Alarm();
+        alarm.user = user;
+        alarm.match = match;
+        alarm.normalAlarmTime = normalAlarmTime;
+        alarm.preAlarmTime = preAlarmTime;
+        return alarm;
+    }
 }

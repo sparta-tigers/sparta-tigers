@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
@@ -22,17 +23,17 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        String accessToken = userRequest.getAccessToken().getTokenValue();
-        System.out.println("Access Token = " + accessToken);
-        OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
-        Map<String, Object> kakaoAccount =
-                (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+        Map<String, Object> attributes = oAuth2User.getAttributes();
 
+        String providerId = String.valueOf(attributes.get("id"));
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         String email = (String) kakaoAccount.get("email");
         String nickname = (String) profile.get("nickname");
         String path = (String) profile.get("profile_image_url");
 
+        log.info("provider{}", providerId);
         log.info("email{}", email);
         log.info("nickname{}", nickname);
         log.info("profileImage{}", path);
@@ -40,12 +41,12 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         // 사용자 정보 DB에 저장 or 조회
         User user =
                 userRepository
-                        .findByEmail(email)
+                        .findByProviderId(providerId)
                         .orElseGet(
                                 () -> {
-                                    User newUser = new User(email, nickname, path);
+                                    User newUser = new User(email, providerId, nickname, path);
                                     return userRepository.save(newUser);
                                 });
-        return oAuth2User;
+        return new CustomUserPrincipal(user, attributes);
     }
 }
