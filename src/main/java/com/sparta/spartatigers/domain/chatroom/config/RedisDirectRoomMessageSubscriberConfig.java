@@ -1,11 +1,9 @@
 package com.sparta.spartatigers.domain.chatroom.config;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import lombok.RequiredArgsConstructor;
@@ -21,20 +19,14 @@ public class RedisDirectRoomMessageSubscriberConfig {
     private final RedisConnectionFactory connectionFactory;
     private final RedisDirectMessageSubscriber subscriber;
 
-    @PostConstruct
-    public void init() {
-        log.info("RedisDirectRoomMessageSubscriberConfig initialized");
-    }
-
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer() {
-        log.info("Creating RedisMessageListenerContainer and adding listener...");
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
 
-        String topic = "directroom:1";
-        log.info("👉 Adding message listener for topic: {}", topic);
-        container.addMessageListener(subscriber, new ChannelTopic(topic));
+        // 모든 directroom:{id} 형식의 채널 구독
+        container.addMessageListener(subscriber, new PatternTopic("directroom:*"));
+        log.info("연결된 채팅방: directroom:*");
 
         return container;
     }
