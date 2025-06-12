@@ -10,6 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.config.StompAuthInterceptor;
 import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
 import com.sparta.spartatigers.domain.liveboard.interceptor.TokenChannelInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
@@ -26,6 +27,7 @@ import com.sparta.spartatigers.global.token.JwtHandshakeInterceptor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
+    private final StompAuthInterceptor stompAuthInterceptor;
     private final TokenChannelInterceptor tokenChannelInterceptor;
 
     /**
@@ -35,7 +37,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler())
+                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler()) // 커스텀 핸드쉐이크 핸들러
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new JwtHandshakeInterceptor())
                 .withSockJS();
@@ -60,6 +62,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(tokenChannelInterceptor);
+        registration.interceptors(liveBoardInterceptor, stompAuthInterceptor, tokenChannelInterceptor);
     }
 }
