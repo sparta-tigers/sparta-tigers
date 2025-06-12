@@ -35,6 +35,7 @@ public class RedisDirectMessageSubscriber implements MessageListener {
     private final UserRepository userRepository;
     private final DirectRoomRepository roomRepository;
     private final RedisUserSessionRegistry userSessionRegistry;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -42,8 +43,7 @@ public class RedisDirectMessageSubscriber implements MessageListener {
         try {
             // Redis에서 전달된 메시지를 UTF-8 문자열로 변환
             String body = new String(message.getBody(), StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> payload = mapper.readValue(body, Map.class);
+            Map<String, Object> payload = objectMapper.readValue(body, Map.class);
 
             Long senderId = Long.parseLong(payload.get("senderId").toString());
             Long roomId = Long.parseLong(payload.get("roomId").toString());
