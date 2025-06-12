@@ -14,7 +14,7 @@ import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
 public class LiveBoardStompController {
 
     private final LiveBoardRedisService liveBoardRedisService;
-	private final LiveBoardRoomService liveBoardRoomService;
+    private final LiveBoardRoomService liveBoardRoomService;
 
     // 채팅
     @MessageMapping("/liveboard/message")
@@ -26,13 +26,13 @@ public class LiveBoardStompController {
     @MessageMapping("/liveboard/enter")
     public void enterLiveBoard(LiveBoardMessage message) {
         liveBoardRedisService.handleMessage(message);
-		liveBoardRoomService.increaseConnectCount(message.getRoomId());
+        liveBoardRoomService.increaseConnectCount(message.getRoomId());
     }
 
     // 퇴장
     @MessageMapping("/liveboard/exit")
     public void exitLiveBoard(LiveBoardMessage message) {
         liveBoardRedisService.handleMessage(message);
-		liveBoardRoomService.decreaseConnectCount(message.getRoomId());
+        liveBoardRoomService.decreaseConnectCount(message.getRoomId());
     }
 }
