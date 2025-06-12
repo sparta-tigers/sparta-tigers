@@ -105,7 +105,7 @@ public class LiveBoardRoomService {
 
     // 라이브 보드룸 접속자 수 감소
     public void decreaseConnectCount(String roomId) {
-        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, 1);
+        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, -1);
     }
 
     // 라이브 보드룸 접속자 수 조회
