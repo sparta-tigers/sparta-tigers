@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.item.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,9 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 @RequiredArgsConstructor
 public class ItemService {
 
+    private static final double SEARCH_RADIUS_KM = 0.05;
     private final ItemRepository itemRepository;
+    private final LocationService locationService;
 
     @Transactional
     public CreateItemResponseDto createItem(
@@ -39,10 +43,13 @@ public class ItemService {
     public Page<ReadItemResponseDto> findAllItems(
             CustomUserPrincipal principal, Pageable pageable) {
 
-        User user = principal.getUser();
-        // TODO 프론트와 연결 후 실시간으로 로그인한 회원과 가까운 위치에 있는 글이 조회되도록 하기
+        Long userId = principal.getUser().getId();
 
-        Page<Item> itemList = itemRepository.findAllByStatus(Status.REGISTERED, pageable);
+        List<Long> nearByUserIds = locationService.findUsersNearBy(userId, SEARCH_RADIUS_KM);
+        nearByUserIds.add(userId);
+
+        Page<Item> itemList =
+                itemRepository.findAllByStatus(Status.REGISTERED, nearByUserIds, pageable);
 
         return itemList.map(ReadItemResponseDto::from);
     }

@@ -25,12 +25,16 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
     private final QUser user = QUser.user;
 
     @Override
-    public Page<Item> findAllByStatus(Status status, Pageable pageable) {
+    public Page<Item> findAllByStatus(Status status, List<Long> nearByUserIds, Pageable pageable) {
+
+        if (nearByUserIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
 
         List<Item> itemList =
                 queryFactory
                         .selectFrom(item)
-                        .where(itemStatusEq(status))
+                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
                         .join(item.user, user)
                         .fetchJoin()
                         .orderBy(item.createdAt.desc())
@@ -39,7 +43,11 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                         .fetch();
 
         Long total =
-                queryFactory.select(item.count()).from(item).where(itemStatusEq(status)).fetchOne();
+                queryFactory
+                        .select(item.count())
+                        .from(item)
+                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
+                        .fetchOne();
 
         long count = (total == null) ? 0L : total;
 
