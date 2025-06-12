@@ -21,7 +21,7 @@ import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,11 +53,16 @@ public class RedisDirectMessageSubscriber implements MessageListener {
                     roomRepository
                             .findById(roomId)
                             .orElseThrow(
-                                    () -> new ServerException(ExceptionCode.CHATROOM_NOT_FOUND));
+                                    () ->
+                                            new InvalidRequestException(
+                                                    ExceptionCode.CHATROOM_NOT_FOUND));
             User sender =
                     userRepository
                             .findById(senderId)
-                            .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                            .orElseThrow(
+                                    () ->
+                                            new InvalidRequestException(
+                                                    ExceptionCode.USER_NOT_FOUND));
 
             // 수신자 결정 (sender와 반대편 유저)
             User receiver =

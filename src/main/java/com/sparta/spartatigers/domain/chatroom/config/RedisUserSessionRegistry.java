@@ -20,16 +20,20 @@ public class RedisUserSessionRegistry {
     public void registerSession(Long userId, String sessionId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
 
+        // userId별로 세션ID를 Set에 추가
         redisTemplate.opsForSet().add(userKey, sessionId);
         redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
 
+        // 세션ID에 userId 해시에 등록
         redisTemplate.opsForHash().put(SESSION_USER_KEY, sessionId, userId.toString());
     }
 
     public void unregisterSession(Long userId, String sessionId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
 
+        // Set에서 세션ID 제거
         redisTemplate.opsForSet().remove(userKey, sessionId);
+        // 해시에서 세션ID 제거
         redisTemplate.opsForHash().delete(SESSION_USER_KEY, sessionId);
 
         // 세션이 모두 제거되면 키 자체 제거
@@ -40,6 +44,7 @@ public class RedisUserSessionRegistry {
 
     public boolean isUserConnected(Long userId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
+        // userKey가 Redis에 존재하는지 확인
         return Boolean.TRUE.equals(redisTemplate.hasKey(userKey));
     }
 

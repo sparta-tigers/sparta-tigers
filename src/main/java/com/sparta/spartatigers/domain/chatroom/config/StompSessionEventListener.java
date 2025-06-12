@@ -13,7 +13,7 @@ public class StompSessionEventListener {
 
     private final RedisUserSessionRegistry userSessionRegistry;
 
-    // STOMP DISCONNECT 시 호출
+    /** stomp disconnect시 호출 */
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());

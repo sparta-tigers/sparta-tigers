@@ -20,7 +20,7 @@ public class ChatMessageController {
     /**
      * 클라이언트가 "/directRoom/send" 경로로 메시지를 보내면 호출 인증 정보를 기반으로 보낸 사용자의 ID를 추출 해당 메시지를 Redis 채널에 발행
      *
-     * @param request 클라이언트가 전송한 채팅 메시지 요청 정보 (roomId, message 등 포함)
+     * @param request 클라이언트가 전송한 채팅 메시지 요청 정보
      * @param authentication 현재 인증된 사용자 정보를 담고 있는 객체
      * @throws IllegalStateException 지원되지 않는 Principal 타입일 경우 발생
      */
