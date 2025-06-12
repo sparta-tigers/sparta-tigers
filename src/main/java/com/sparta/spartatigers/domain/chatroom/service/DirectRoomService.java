@@ -14,7 +14,7 @@ import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeReque
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.InvalidRequestException;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class DirectRoomService {
         // 권한 확인: 요청한 사람이 교환 요청의 sender 또는 receiver여야 함
         if (!exchangeRequest.getSender().getId().equals(currentUserId)
                 && !exchangeRequest.getReceiver().getId().equals(currentUserId)) {
-            throw new InvalidRequestException(ExceptionCode.UNAUTHORIZED);
+            throw new ServerException(ExceptionCode.UNAUTHORIZED);
         }
 
         // sender/receiver는 교환 요청 그대로
@@ -61,16 +61,13 @@ public class DirectRoomService {
         DirectRoom room =
                 directRoomRepository
                         .findById(directRoomId)
-                        .orElseThrow(
-                                () ->
-                                        new InvalidRequestException(
-                                                ExceptionCode.CHATROOM_NOT_FOUND));
+                        .orElseThrow(() -> new ServerException(ExceptionCode.CHATROOM_NOT_FOUND));
 
         boolean isSender = room.getSender().getId().equals(currentUserId);
         boolean isReceiver = room.getReceiver().getId().equals(currentUserId);
 
         if (!isSender && !isReceiver) {
-            throw new InvalidRequestException(ExceptionCode.FORBIDDEN_REQUEST);
+            throw new ServerException(ExceptionCode.FORBIDDEN_REQUEST); // 403 권한 없음
         }
 
         directRoomRepository.delete(room);

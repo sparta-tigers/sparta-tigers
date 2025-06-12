@@ -25,7 +25,7 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                 StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
         StompCommand command = accessor.getCommand();
 
-		// 채팅방 구독시
+        // 채팅방 구독시
         if (StompCommand.SUBSCRIBE.equals(command)) {
             String destination = accessor.getDestination(); // url
             String sessionId = accessor.getSessionId(); // 세션 id
