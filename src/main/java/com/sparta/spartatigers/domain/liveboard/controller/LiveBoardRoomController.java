@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
+import com.sparta.spartatigers.global.response.ApiResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +23,8 @@ public class LiveBoardRoomController {
     private final LiveBoardRoomService liveBoardRoomService;
 
     @PostMapping
-    public List<LiveBoardRoomResponseDto> createTodayRoom() {
-        return liveBoardRoomService.createTodayRoom();
+    public ApiResponse<String> createTodayRoom() {
+        return ApiResponse.created(liveBoardRoomService.createTodayRoom());
     }
 
     @GetMapping("/all")
@@ -37,7 +38,7 @@ public class LiveBoardRoomController {
     }
 
     @DeleteMapping("/{roomId}")
-    public void deleteRoom(@PathVariable String roomId) {
-        liveBoardRoomService.deleteRoom(roomId);
+    public ApiResponse<String> deleteRoom(@PathVariable String roomId) {
+        return ApiResponse.ok(liveBoardRoomService.deleteRoom(roomId));
     }
 }

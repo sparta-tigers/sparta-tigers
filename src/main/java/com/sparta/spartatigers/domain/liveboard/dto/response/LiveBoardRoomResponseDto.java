@@ -10,6 +10,7 @@ import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 @Getter
 @AllArgsConstructor
 public class LiveBoardRoomResponseDto {
+
     private String roomId;
     private String title;
     private LocalDateTime startedAt;

@@ -17,5 +17,4 @@ public class LiveBoardRoom {
     private Long matchId;
     private String title;
     private LocalDateTime openAt;
-
 }
