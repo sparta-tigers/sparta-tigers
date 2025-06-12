@@ -11,12 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StompSessionEventListener {
 
-    private final UserSessionRegistry userSessionRegistry;
-
-    // STOMP CONNECT 시 호출 (또는 Interceptor preSend에서)
-    public void registerSession(Long userId, String sessionId) {
-        userSessionRegistry.registerSession(userId, sessionId);
-    }
+    private final RedisUserSessionRegistry userSessionRegistry;
 
     // STOMP DISCONNECT 시 호출
     @EventListener

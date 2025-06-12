@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.config.UserSessionRegistry;
+import com.sparta.spartatigers.domain.chatroom.config.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.dto.response.ChatMessageResponse;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectMessage;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
@@ -34,12 +34,13 @@ public class RedisDirectMessageSubscriber implements MessageListener {
     private final DirectMessageRepository messageRepository;
     private final UserRepository userRepository;
     private final DirectRoomRepository roomRepository;
-    private final UserSessionRegistry userSessionRegistry;
+    private final RedisUserSessionRegistry userSessionRegistry;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         log.info("onMessage 호출됨ㅎㅇ");
         try {
+            // Redis에서 전달된 메시지를 UTF-8 문자열로 변환
             String body = new String(message.getBody(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> payload = mapper.readValue(body, Map.class);
@@ -58,6 +59,7 @@ public class RedisDirectMessageSubscriber implements MessageListener {
                             .findById(senderId)
                             .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
 
+            // 수신자 결정 (sender와 반대편 유저)
             User receiver =
                     room.getSender().getId().equals(senderId)
                             ? room.getReceiver()
@@ -84,10 +86,10 @@ public class RedisDirectMessageSubscriber implements MessageListener {
                             savedMessage.getSentAt());
 
             messagingTemplate.convertAndSend("/server/directRoom/" + roomId, response);
-            log.info("📥 Redis 메시지 수신 처리 완료");
+            log.info("Redis 메시지 수신 처리 완료");
 
         } catch (Exception e) {
-            log.error("❌ RedisDirectMessageSubscriber 오류 발생", e);
+            log.error("RedisDirectMessageSubscriber 오류 발생", e);
         }
     }
 }
