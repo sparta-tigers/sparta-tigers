@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.liveboard.interceptor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -16,15 +17,17 @@ import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.token.JwtAuthenticationToken;
-import com.sparta.spartatigers.global.token.TokenProvider;
+import com.sparta.spartatigers.global.token.JwtProvider;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenChannelInterceptor implements ChannelInterceptor {
 
-    private final TokenProvider tokenProvider;
+    //    private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
+
+    @Autowired private JwtProvider jwtProvider;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -39,9 +42,10 @@ public class TokenChannelInterceptor implements ChannelInterceptor {
 
             String token = bearerToken.replace("Bearer ", "");
 
-            if (tokenProvider.validateToken(token)) {
-                Long userId = tokenProvider.getUserIdFromToken(token);
+            if (jwtProvider.validateToken(token)) {
+                Long userId = jwtProvider.getUserIdFromToken(token);
                 User user = userRepository.findByIdOrElseThrow(userId);
+                log.info("id: {}, name: {}", user.getId(), user.getNickname());
 
                 CustomUserPrincipal principal = new CustomUserPrincipal(user);
                 Authentication auth =

@@ -1,6 +1,5 @@
 package com.sparta.spartatigers.global.config;
 
-import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -11,8 +10,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
 import com.sparta.spartatigers.domain.liveboard.interceptor.TokenChannelInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
+import com.sparta.spartatigers.global.token.JwtHandshakeInterceptor;
 
 /**
  * WebSocket Handler를 등록하기 위한 설정 클래스 EnableWebSocket -> WebSocket 사용하도록 지원
@@ -24,7 +25,7 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-	private final LiveBoardInterceptor liveBoardInterceptor;
+    private final LiveBoardInterceptor liveBoardInterceptor;
     private final TokenChannelInterceptor tokenChannelInterceptor;
 
     /**
@@ -35,8 +36,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setHandshakeHandler(new DefaultWebSocketHandshakeHandler())
-                .setAllowedOrigins("http://127.0.0.1:5500")
-                .setAllowedOrigins("http://localhost:5173")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(new JwtHandshakeInterceptor())
                 .withSockJS();
     }
 

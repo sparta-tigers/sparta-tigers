@@ -3,6 +3,8 @@ package com.sparta.spartatigers.global.token;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+
 import com.sparta.spartatigers.domain.user.model.UserRole;
 
 public interface TokenProvider {
@@ -10,6 +12,8 @@ public interface TokenProvider {
     String generateAccessToken(Long userId);
 
     String generateAccessToken(Long userId, List<UserRole> roles);
+
+    Authentication getAuthentication(String token);
 
     Date getExpirationFromToken(String token);
 
