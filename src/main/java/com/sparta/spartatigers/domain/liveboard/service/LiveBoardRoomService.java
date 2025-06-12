@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 @RequiredArgsConstructor
 public class LiveBoardRoomService {
 
+	private final RedisTemplate<String, String> redisTemplate;
     private final LiveBoardRoomRepository roomRepository;
     private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
@@ -46,11 +48,10 @@ public class LiveBoardRoomService {
                             .matchId(match.getId())
                             .title(title)
                             .openAt(roomStart)
-                            .connectCount(0)
                             .build();
 
             roomRepository.saveRoom(room);
-            todayRoomList.add(LiveBoardRoomResponseDto.of(room));
+            todayRoomList.add(LiveBoardRoomResponseDto.of(room, 0L)); // 생성한 직후 접속자 수 = 0
         }
         return todayRoomList;
     }
@@ -58,8 +59,10 @@ public class LiveBoardRoomService {
     // 라이브 보드룸 전체 조회
     public List<LiveBoardRoomResponseDto> findAllRooms() {
         return roomRepository.findAllRoom().stream()
-                .map(LiveBoardRoomResponseDto::of)
-                .collect(Collectors.toList());
+                .map(room-> {
+					long count = getConnectCount(room.getRoomId());
+					return LiveBoardRoomResponseDto.of(room, count);
+					}).collect((Collectors.toList()));
     }
 
     // 오늘의 라이브 보드룸 조회
@@ -69,8 +72,10 @@ public class LiveBoardRoomService {
 
         return roomRepository.findAllRoom().stream()
                 .filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
-                .map(LiveBoardRoomResponseDto::of)
-                .toList();
+                .map(room ->{
+					long count = getConnectCount(room.getRoomId());
+					return LiveBoardRoomResponseDto.of(room, count);
+				}).toList();
     }
 
     // 라이브 보드룸 삭제
@@ -78,17 +83,21 @@ public class LiveBoardRoomService {
         roomRepository.deleteRoom(roomId);
     }
 
+	private static final String CONNECT_COUNT_KEY = "liveboard:connectCount";
+
     // 라이브 보드룸 접속자 수 증가
     public void increaseConnectCount(String roomId) {
-        LiveBoardRoom room = roomRepository.findRoomById(roomId);
-        room.increaseCount();
-        roomRepository.saveRoom(room);
+        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, 1);
     }
 
     // 라이브 보드룸 접속자 수 감소
     public void decreaseConnectCount(String roomId) {
-        LiveBoardRoom room = roomRepository.findRoomById(roomId);
-        room.decreaseCount();
-        roomRepository.saveRoom(room);
+		redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, 1);
     }
+
+	// 라이브 보드룸 접속자 수 조회
+	public Long getConnectCount(String roomId) {
+		Object currentCount = redisTemplate.opsForHash().get(CONNECT_COUNT_KEY, roomId);
+		return currentCount != null ? Long.parseLong(currentCount.toString()) : 0;
+	}
 }

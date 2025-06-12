@@ -17,15 +17,5 @@ public class LiveBoardRoom {
     private Long matchId;
     private String title;
     private LocalDateTime openAt;
-    private int connectCount;
 
-    public void increaseCount() {
-        this.connectCount++;
-    }
-
-    public void decreaseCount() {
-        if (this.connectCount > 0) {
-            this.connectCount--;
-        }
-    }
 }

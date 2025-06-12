@@ -13,10 +13,10 @@ public class LiveBoardRoomResponseDto {
     private String roomId;
     private String title;
     private LocalDateTime startedAt;
-    private int connectCount;
+    private Long connectCount;
 
-    public static LiveBoardRoomResponseDto of(LiveBoardRoom room) {
+    public static LiveBoardRoomResponseDto of(LiveBoardRoom room, long connectCount) {
         return new LiveBoardRoomResponseDto(
-                room.getRoomId(), room.getTitle(), room.getOpenAt(), room.getConnectCount());
+                room.getRoomId(), room.getTitle(), room.getOpenAt(), connectCount);
     }
 }
