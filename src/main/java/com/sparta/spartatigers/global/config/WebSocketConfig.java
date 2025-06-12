@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
+import com.sparta.spartatigers.global.interceptor.AuthChannelInterceptor;
 
 /**
  * WebSocket Handler를 등록하기 위한 설정 클래스 EnableWebSocket -> WebSocket 사용하도록 지원
@@ -24,6 +25,7 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
+    private final AuthChannelInterceptor authChannelInterceptor;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
@@ -57,5 +59,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(liveBoardInterceptor);
+        registration.interceptors(authChannelInterceptor);
     }
 }
