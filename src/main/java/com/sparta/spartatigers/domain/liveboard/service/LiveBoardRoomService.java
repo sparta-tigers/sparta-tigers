@@ -2,10 +2,10 @@ package com.sparta.spartatigers.domain.liveboard.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -14,49 +14,103 @@ import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomRespon
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
+import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 
 @Service
 @RequiredArgsConstructor
 public class LiveBoardRoomService {
 
+    private final RedisTemplate<String, String> redisTemplate;
     private final LiveBoardRoomRepository roomRepository;
+    private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
-    // private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
+    // 라이브 보드룸 생성
+    public String createTodayRoom() {
 
-    public List<LiveBoardRoomResponseDto> getAllRooms() {
-        return roomRepository.findAllRoom().stream()
-                .map(LiveBoardRoomResponseDto::of)
-                .collect(Collectors.toList());
-    }
-
-    public void createTodayLiveBoard() {
+        // 오늘 경기 일정 찾기
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
+        List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
 
-        List<Match> matches = new ArrayList<>(); // 임시예요
+        boolean alreadyCreated = false;
 
-        // List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
-
+        // 라이브 보드룸 생성 후 저장
         for (Match match : matches) {
             String roomId = "ROOM_" + match.getId();
+
+            if (roomRepository.existsById(roomId)) { // 중복 여부 확인 (생성 막지는 않음)
+                alreadyCreated = true;
+            }
+
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
+            LocalDateTime matchTime = match.getMatchTime();
 
-            // 채팅방 운영시간 TODO: 끝나는시간?
-            LocalDateTime roomStart = match.getMatchTime().minusMinutes(30);
-            LocalDateTime roomClose =
-                    match.getMatchTime().plusHours(4).plusMinutes(30); // 경기 4시간으로 일단 잡아둠..
-
-            // TODO 사용하는 코드가 없어서 일단 실행이 안되가지고 변경 수린님 확인후 수정 부탁드려요! - (jungmin)
             LiveBoardRoom room =
                     LiveBoardRoom.builder()
                             .roomId(roomId)
                             .matchId(match.getId())
                             .title(title)
-                            .openAt(roomStart)
-                            .closedAt(roomClose)
+                            .openAt(matchTime)
                             .build();
 
             roomRepository.saveRoom(room);
         }
+
+        return alreadyCreated ? "ALREADY_CREATED" : "CREATED";
+    }
+
+    // 라이브 보드룸 전체 조회
+    public List<LiveBoardRoomResponseDto> findAllRooms() {
+        return roomRepository.findAllRoom().stream()
+                .map(
+                        room -> {
+                            long count = getConnectCount(room.getRoomId());
+                            return LiveBoardRoomResponseDto.of(room, count);
+                        })
+                .collect((Collectors.toList()));
+    }
+
+    // 오늘의 라이브 보드룸 조회
+    public List<LiveBoardRoomResponseDto> findTodayRooms() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        return roomRepository.findAllRoom().stream()
+                .filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
+                .map(
+                        room -> {
+                            long count = getConnectCount(room.getRoomId());
+                            return LiveBoardRoomResponseDto.of(room, count);
+                        })
+                .toList();
+    }
+
+    // 라이브 보드룸 삭제
+    public String deleteRoom(String roomId) {
+        LiveBoardRoom room = roomRepository.findRoomById(roomId);
+
+        if (room == null) {
+            return "ALREADY_DELETED";
+        }
+        roomRepository.deleteRoom(roomId);
+        return "DELETED";
+    }
+
+    private static final String CONNECT_COUNT_KEY = "liveboard:connectCount";
+
+    // 라이브 보드룸 접속자 수 증가
+    public void increaseConnectCount(String roomId) {
+        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, 1);
+    }
+
+    // 라이브 보드룸 접속자 수 감소
+    public void decreaseConnectCount(String roomId) {
+        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, -1);
+    }
+
+    // 라이브 보드룸 접속자 수 조회
+    public Long getConnectCount(String roomId) {
+        Object currentCount = redisTemplate.opsForHash().get(CONNECT_COUNT_KEY, roomId);
+        return currentCount != null ? Long.parseLong(currentCount.toString()) : 0;
     }
 }
