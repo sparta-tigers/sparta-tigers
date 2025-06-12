@@ -42,6 +42,10 @@ public class TokenChannelInterceptor implements ChannelInterceptor {
 
             String token = bearerToken.replace("Bearer ", "");
 
+			// TODO 현재 로컬에서 웹소켓 연결 시 secret 키가 맞지 않다고 함
+			//  UnExpected Exception When Token Validating:
+			//  JWT signature does not match locally computed signature.
+			//  JWT validity cannot be asserted and should not be trusted.
             if (jwtProvider.validateToken(token)) {
                 Long userId = jwtProvider.getUserIdFromToken(token);
                 User user = userRepository.findByIdOrElseThrow(userId);
