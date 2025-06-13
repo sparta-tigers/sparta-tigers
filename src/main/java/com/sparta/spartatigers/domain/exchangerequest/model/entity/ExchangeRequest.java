@@ -58,10 +58,15 @@ public class ExchangeRequest extends BaseEntity {
         this.status = status;
     }
 
+    public void complete() {
+        this.status = ExchangeStatus.COMPLETED;
+    }
+
     public enum ExchangeStatus {
         PENDING,
         ACCEPTED,
-        REJECTED;
+        REJECTED,
+        COMPLETED;
 
         @JsonCreator
         public static ExchangeStatus parsing(String inputValue) {

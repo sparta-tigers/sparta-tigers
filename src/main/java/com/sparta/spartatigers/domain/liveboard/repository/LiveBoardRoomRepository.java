@@ -48,4 +48,8 @@ public class LiveBoardRoomRepository {
     public void deleteRoom(String roomId) {
         opsHash.delete(LIVEBOARD_ROOMS, roomId);
     }
+
+    public boolean existsById(String roomId) {
+        return opsHash.hasKey(LIVEBOARD_ROOMS, roomId);
+    }
 }

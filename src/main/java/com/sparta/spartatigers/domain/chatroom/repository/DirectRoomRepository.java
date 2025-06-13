@@ -24,4 +24,6 @@ public interface DirectRoomRepository extends JpaRepository<DirectRoom, Long> {
                     "select count(dr) from direct_rooms dr "
                             + "where dr.sender.id = :userId or dr.receiver.id = :userId")
     Page<DirectRoom> findBySenderIdOrReceiverIdWithUsers(Long userId, Pageable pageable);
+
+    Optional<DirectRoom> findByExchangeRequestId(Long exchangeRequestId);
 }

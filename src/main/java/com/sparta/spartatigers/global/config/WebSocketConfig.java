@@ -10,7 +10,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.liveboard.controller.LiveBoardInterceptor;
+import com.sparta.spartatigers.domain.chatroom.config.StompAuthInterceptor;
+import com.sparta.spartatigers.domain.liveboard.interceptor.LiveBoardInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 import com.sparta.spartatigers.global.interceptor.AuthChannelInterceptor;
 
@@ -26,6 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
     private final AuthChannelInterceptor authChannelInterceptor;
+    private final StompAuthInterceptor stompAuthInterceptor;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
@@ -34,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler())
+                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler()) // 커스텀 핸드쉐이크 핸들러
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
@@ -58,7 +60,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(liveBoardInterceptor);
-        registration.interceptors(authChannelInterceptor);
+        registration.interceptors(liveBoardInterceptor, stompAuthInterceptor, authChannelInterceptor);
     }
 }
