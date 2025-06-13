@@ -18,7 +18,7 @@ public class RedisListenerConfig {
     private final RedisConnectionFactory connectionFactory;
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer() {
+    public RedisMessageListenerContainer redisLocationMessageListenerContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(locationSubscriber, new ChannelTopic("location-channel"));
