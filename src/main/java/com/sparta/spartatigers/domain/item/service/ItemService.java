@@ -1,9 +1,11 @@
 package com.sparta.spartatigers.domain.item.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class ItemService {
     private static final double SEARCH_RADIUS_KM = 0.05;
     private final ItemRepository itemRepository;
     private final LocationService locationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public CreateItemResponseDto createItem(
@@ -35,6 +38,16 @@ public class ItemService {
 
         Item item = Item.of(request, user);
         itemRepository.save(item);
+
+        ReadItemResponseDto newItemDto = ReadItemResponseDto.from(item);
+        List<Long> nearByUserIds = locationService.findUsersNearBy(user.getId(), SEARCH_RADIUS_KM);
+
+        nearByUserIds.forEach(
+                targetUserId -> {
+                    String destination = "/server/items/user/" + targetUserId;
+                    messagingTemplate.convertAndSend(
+                            destination, Map.of("type", "ADD_ITEM", "data", newItemDto));
+                });
 
         return CreateItemResponseDto.from(item);
     }
