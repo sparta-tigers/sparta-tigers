@@ -10,8 +10,7 @@ import com.sparta.spartatigers.domain.chatroom.model.entity.DirectMessage;
 
 public interface DirectMessageRepository extends JpaRepository<DirectMessage, Long> {
 
-    @Query(
-            "SELECT m FROM direct_message m JOIN FETCH m.sender WHERE m.directRoom.id = :roomId ORDER BY m.sentAt DESC")
+    @Query("SELECT m FROM direct_message m JOIN FETCH m.sender WHERE m.directRoom.id = :roomId")
     Page<DirectMessage> findByDirectRoomIdWithSender(
             @Param("roomId") Long roomId, Pageable pageable);
 }
