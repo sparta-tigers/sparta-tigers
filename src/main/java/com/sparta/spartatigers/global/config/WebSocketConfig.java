@@ -60,6 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(liveBoardInterceptor, stompAuthInterceptor, authChannelInterceptor);
+        registration.interceptors(
+                liveBoardInterceptor, stompAuthInterceptor, authChannelInterceptor);
     }
 }
