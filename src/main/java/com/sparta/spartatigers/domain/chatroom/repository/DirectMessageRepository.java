@@ -13,4 +13,6 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, Lo
     @Query("SELECT m FROM direct_message m JOIN FETCH m.sender WHERE m.directRoom.id = :roomId")
     Page<DirectMessage> findByDirectRoomIdWithSender(
             @Param("roomId") Long roomId, Pageable pageable);
+
+    void deleteAllByDirectRoomId(Long directRoomId);
 }

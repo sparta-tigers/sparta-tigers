@@ -34,6 +34,7 @@ public class DirectRoom extends BaseEntity {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    // TODO: 나중에 확장 기능에서 교환 완료 시점에 채팅방을 readOnly로 바꿀 수 있게 보류
     @Column(nullable = false)
     private boolean isCompleted = false;
 
