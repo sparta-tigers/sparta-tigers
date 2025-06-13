@@ -11,7 +11,7 @@ public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자
     private String senderId;
-    private String senderNickname;
+    private String senderNickname; // 사용자가 지정
     private String content; // 내용
     private LocalDateTime sentAt;
 

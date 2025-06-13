@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.liveboard.controller;
+package com.sparta.spartatigers.domain.liveboard.interceptor;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.Message;
@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardService;
+import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
 
 @Component
 @RequiredArgsConstructor
 public class LiveBoardInterceptor implements ChannelInterceptor {
 
-    private final LiveBoardService liveBoardService;
+    private final LiveBoardRoomService liveBoardRoomService;
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
@@ -36,11 +36,10 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
 
                 // 다른 채팅방에서 넘어온 경우
                 if (lastRoomId != null && !lastRoomId.equals(enterRoomId)) {
-                    liveBoardService.decreaseConnectCount(lastRoomId);
+                    liveBoardRoomService.decreaseConnectCount(lastRoomId);
                 }
 
                 // 새로 입장한 채팅방 접속자 수 증가
-                liveBoardService.increaseConnectCount(enterRoomId);
                 redisTemplate.opsForValue().set(sessionId, enterRoomId);
             }
         }
@@ -51,7 +50,6 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
             String roomId = redisTemplate.opsForValue().get(sessionId);
 
             if (roomId != null) {
-                liveBoardService.decreaseConnectCount(roomId);
                 redisTemplate.delete(sessionId);
             }
         }
