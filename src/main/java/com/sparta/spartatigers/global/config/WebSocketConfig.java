@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.domain.chatroom.config.StompAuthInterceptor;
 import com.sparta.spartatigers.domain.liveboard.interceptor.LiveBoardInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
+import com.sparta.spartatigers.global.interceptor.AuthChannelInterceptor;
 
 /**
  * WebSocket Handler를 등록하기 위한 설정 클래스 EnableWebSocket -> WebSocket 사용하도록 지원
@@ -25,6 +26,7 @@ import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
+    private final AuthChannelInterceptor authChannelInterceptor;
     private final StompAuthInterceptor stompAuthInterceptor;
 
     /**
@@ -58,6 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(liveBoardInterceptor, stompAuthInterceptor);
+        registration.interceptors(
+                liveBoardInterceptor, stompAuthInterceptor, authChannelInterceptor);
     }
 }

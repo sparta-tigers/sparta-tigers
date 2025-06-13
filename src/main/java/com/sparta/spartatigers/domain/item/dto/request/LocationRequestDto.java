@@ -1,7 +1,14 @@
 package com.sparta.spartatigers.domain.item.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public record LocationRequestDto(
-        @NotNull(message = "위도는 필수입니다.") Double latitude,
-        @NotNull(message = "경도는 필수입니다.") Double longitude) {}
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class LocationRequestDto {
+
+    private Double latitude;
+    private Double longitude;
+}
