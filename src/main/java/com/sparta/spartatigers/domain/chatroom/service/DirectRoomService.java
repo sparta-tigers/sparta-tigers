@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomResponseDto;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
+import com.sparta.spartatigers.domain.chatroom.repository.DirectMessageRepository;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
@@ -22,6 +23,7 @@ public class DirectRoomService {
 
     private final ExchangeRequestRepository exchangeRequestRepository;
     private final DirectRoomRepository directRoomRepository;
+    private final DirectMessageRepository directMessageRepository;
 
     @Transactional
     public DirectRoomResponseDto createRoom(Long exchangeRequestId, Long currentUserId) {
@@ -56,6 +58,7 @@ public class DirectRoomService {
                 .map(DirectRoomResponseDto::from);
     }
 
+    // 나중에 readOnly일 때 동작하거나, 교환에 실패했을 때 직접 채팅방을 삭제할 수 있게 놔두려고
     @Transactional
     public void deleteRoom(Long directRoomId, Long currentUserId) {
         DirectRoom room =
@@ -73,6 +76,22 @@ public class DirectRoomService {
             throw new InvalidRequestException(ExceptionCode.FORBIDDEN_REQUEST);
         }
 
+        directMessageRepository.deleteAllByDirectRoomId(room.getId());
+        directRoomRepository.delete(room);
+    }
+
+    // 교환 완료 시 호출
+    @Transactional
+    public void deleteRoomByExchangeRequestId(Long exchangeRequestId) {
+        DirectRoom room =
+                directRoomRepository
+                        .findByExchangeRequestId(exchangeRequestId)
+                        .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                ExceptionCode.CHATROOM_NOT_FOUND));
+
+        directMessageRepository.deleteAllByDirectRoomId(room.getId());
         directRoomRepository.delete(room);
     }
 }
