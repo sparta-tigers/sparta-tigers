@@ -1,7 +1,5 @@
 package com.sparta.spartatigers.domain.item.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,11 +21,11 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    public ApiResponse<Void> createLocation(
-            @Valid @RequestBody LocationRequestDto request,
+    public ApiResponse<Void> updateLocation(
+            @RequestBody LocationRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
 
-        locationService.createLocation(request, userPrincipal);
+        locationService.updateLocation(request, CustomUserPrincipal.getUserId(userPrincipal));
 
         return ApiResponse.created(null);
     }
