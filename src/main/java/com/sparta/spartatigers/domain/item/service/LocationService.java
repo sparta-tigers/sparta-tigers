@@ -57,4 +57,9 @@ public class LocationService {
                 .filter(id -> !id.equals(userId))
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteLocation(Long userId) {
+        redisTemplate.opsForGeo().remove(USER_LOCATION_KEY, userId);
+    }
 }
