@@ -46,12 +46,14 @@ public class StompAuthInterceptor implements ChannelInterceptor {
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
 
+            System.out.println("Authorization header: " + token);
+
+
             if (token == null || !token.startsWith("Bearer ")) {
                 throw new InvalidRequestException(ExceptionCode.NOT_FOUND_JWT);
             }
             token = token.substring(7);
 
-            System.out.println("Authorization header: " + token);
 
             Claims claims = jwtUtil.validateToken(token);
             if (claims == null) {
