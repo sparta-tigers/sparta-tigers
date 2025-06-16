@@ -20,7 +20,7 @@ import com.sparta.spartatigers.domain.alarm.dto.response.AlarmResponseDto;
 import com.sparta.spartatigers.domain.alarm.dto.response.MatchDetailResponseDto;
 import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDto;
 import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
-import com.sparta.spartatigers.domain.alarm.service.AlarmServiceImpl;
+import com.sparta.spartatigers.domain.alarm.service.AlarmService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
@@ -30,7 +30,7 @@ import com.sparta.spartatigers.global.response.MessageCode;
 @RequiredArgsConstructor
 @RequestMapping("/api/alarms")
 public class AlarmController {
-    private final AlarmServiceImpl alarmService;
+    private final AlarmService alarmService;
 
     @GetMapping
     public ApiResponse<List<AlarmResponseDto>> getAllAlarms(
