@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +21,8 @@ import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDt
 import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 import com.sparta.spartatigers.domain.alarm.service.AlarmServiceImpl;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.global.response.ApiResponse;
+import com.sparta.spartatigers.global.response.MessageCode;
 
 @Log4j2
 @RestController
@@ -31,57 +32,60 @@ public class AlarmController {
     private final AlarmServiceImpl alarmService;
 
     @GetMapping
-    public ResponseEntity<List<AlarmResponseDto>> getAllAlarms(
+    public ApiResponse<List<AlarmResponseDto>> getAllAlarms(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
-        return ResponseEntity.ok(alarmService.findMyAlarms(userPrincipal.getUser().getId()));
+        List<AlarmResponseDto> response =
+                alarmService.findMyAlarms(userPrincipal.getUser().getId());
+        return ApiResponse.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAlarm(
+    public ApiResponse<String> createAlarm(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @Valid @RequestBody AlarmRegisterDto alarmRegisterDto) {
+
         alarmService.createAlarm(userPrincipal.getUser().getId(), alarmRegisterDto);
-        return ResponseEntity.ok().build();
+
+        return ApiResponse.created(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateAlarm(
+    public ApiResponse<String> updateAlarm(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @Valid @RequestBody AlarmUpdateDto alarmUpdateDto) {
         alarmService.updateAlarm(userPrincipal.getUser().getId(), alarmUpdateDto);
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAlarm(
+    public ApiResponse<String> deleteAlarm(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @Valid @RequestBody AlarmDeleteDto alarmDeleteDto) {
         alarmService.deleteAlarm(
                 customUserPrincipal.getUser().getId(), alarmDeleteDto.getMatchId());
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
     // 팀 이름 조회 (O)
     @GetMapping("/teams")
-    public ResponseEntity<List<TeamNameResponseDto>> getAllTeamNames() {
-        System.out.println("TEST");
-        return ResponseEntity.ok(alarmService.findTeamNames());
+    public ApiResponse<List<TeamNameResponseDto>> getAllTeamNames() {
+        return ApiResponse.ok(alarmService.findTeamNames());
     }
 
     // 월별 팀 일정 조회 (O)
     @GetMapping("/teams/{teamId}/schedules")
-    public ResponseEntity<List<MatchScheduleResponseDto>> getMatchSchedule(
+    public ApiResponse<List<MatchScheduleResponseDto>> getMatchSchedule(
             @PathVariable Long teamId, @RequestParam int year, @RequestParam int month) {
-        List<MatchScheduleResponseDto> schedule =
+        List<MatchScheduleResponseDto> responseDtos =
                 alarmService.getMatchScheduleByTeamId(teamId, year, month);
-        return ResponseEntity.ok(schedule);
+        return ApiResponse.ok(responseDtos);
     }
 
     // 팀 일정 세부 조회 (O)
     @GetMapping("/matches/{matchId}")
-    public ResponseEntity<MatchDetailResponseDto> getMatchScheduleDetails(
-            @PathVariable Long matchId) {
-        return ResponseEntity.ok(alarmService.getMatchByMatchId(matchId));
+    public ApiResponse<MatchDetailResponseDto> getMatchScheduleDetails(@PathVariable Long matchId) {
+        MatchDetailResponseDto responseDtos = alarmService.getMatchByMatchId(matchId);
+        return ApiResponse.ok(responseDtos);
     }
 
     @GetMapping("/sse/subscribe")

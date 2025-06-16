@@ -31,4 +31,3 @@ public interface AlarmService {
 
     public void sendAlarm(AlarmInfo alarmInfo);
 }
-;
