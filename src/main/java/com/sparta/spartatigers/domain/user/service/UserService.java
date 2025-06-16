@@ -11,7 +11,6 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     public UserInfoResponseDto getUserInfo(CustomUserPrincipal userPrincipal) {
         User user = userPrincipal.getUser();
         return new UserInfoResponseDto(

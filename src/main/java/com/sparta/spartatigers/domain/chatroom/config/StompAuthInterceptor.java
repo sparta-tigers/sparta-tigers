@@ -51,6 +51,8 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             }
             token = token.substring(7);
 
+            System.out.println("Authorization header: " + token);
+
             Claims claims = jwtUtil.validateToken(token);
             if (claims == null) {
                 throw new InvalidRequestException(ExceptionCode.NOT_FOUND_JWT);
@@ -70,7 +72,11 @@ public class StompAuthInterceptor implements ChannelInterceptor {
                             principal, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            // 세션-유저 매핑 저장소에 등록
             userSessionRegistry.registerSession(user.getId(), accessor.getSessionId());
+
+            System.out.println("연결된 userId: " + user.getId());
+            System.out.println("세션 ID: " + accessor.getSessionId());
         }
 
         return message;
