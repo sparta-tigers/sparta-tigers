@@ -26,60 +26,41 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor =
                 MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (accessor != null
-                && (StompCommand.CONNECT.equals(accessor.getCommand())
-                        || StompCommand.SEND.equals(accessor.getCommand())
-                        || StompCommand.SUBSCRIBE.equals(accessor.getCommand()))) {
-
+        if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
             Principal principal = accessor.getUser();
+
             if (principal == null) {
-                log.warn("WebSocket principal is null.");
+                log.warn("WebSocket CONNECT 시점에 Principal이 존재하지 않습니다.");
                 return message;
             }
 
-            Long userId = null;
+            CustomUserPrincipal customUserPrincipal = null;
 
-            if (principal instanceof OAuth2AuthenticationToken oauthToken) {
-                Map<String, Object> attributes = oauthToken.getPrincipal().getAttributes();
-                Object idAttribute = attributes.get("id");
-                userId = Long.valueOf(idAttribute.toString());
-
-                Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-                if (sessionAttributes != null) {
-                    sessionAttributes.put("userId", userId);
-                    log.info("OAuth 사용자 ID '{}'", userId);
+            // 1. Authentication 객체에서 Principal을 꺼냅니다.
+            if (principal instanceof UsernamePasswordAuthenticationToken authToken) {
+                if (authToken.getPrincipal() instanceof CustomUserPrincipal) {
+                    customUserPrincipal = (CustomUserPrincipal) authToken.getPrincipal();
                 }
-
-            } else if (principal instanceof UsernamePasswordAuthenticationToken authToken) {
-                Object details = authToken.getPrincipal();
-                if (details instanceof CustomUserPrincipal customUserPrincipal) {
-                    userId = customUserPrincipal.getUser().getId();
-
-                    Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-                    if (sessionAttributes != null) {
-                        sessionAttributes.put("userId", userId);
-                        log.info("일반 로그인 사용자 ID '{}'", userId);
-                    } else {
-                        log.warn("Session attributes가 null입니다.");
-                    }
-                } else {
-                    log.warn("CustomUserPrincipal이 아닙니다: {}", details.getClass().getName());
+            } else if (principal instanceof OAuth2AuthenticationToken oauthToken) {
+                if (oauthToken.getPrincipal() instanceof CustomUserPrincipal) {
+                    customUserPrincipal = (CustomUserPrincipal) oauthToken.getPrincipal();
                 }
             }
 
-            if (userId != null) {
+            if (customUserPrincipal != null) {
+                Long userId = customUserPrincipal.getUser().getId(); // 내부 ID를 사용!
+
                 Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
                 if (sessionAttributes != null) {
                     sessionAttributes.put("userId", userId);
                     log.info("✅ WebSocket 세션에 userId 저장됨: {}", userId);
-                } else {
-                    log.warn("세션 attribute가 null입니다. userId 저장 실패");
                 }
             } else {
-                log.warn("userId 추출 실패");
+                log.warn(
+                        "Principal 객체에서 CustomUserPrincipal을 추출하지 못했습니다: {}",
+                        principal.getClass().getName());
             }
         }
-
         return message;
     }
 }
