@@ -28,7 +28,7 @@ public class AlarmScheduler {
     private final AlarmService alarmService;
     private static final String REDIS_KEY = "alarms";
 
-    @Scheduled(fixedRate = 10_000)
+    @Scheduled(fixedRate = 60_000)
     public void sendAlarms() {
         long now =
                 LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(ZoneOffset.UTC);
