@@ -32,7 +32,6 @@ public class AlarmScheduler {
     public void sendAlarms() {
         long now =
                 LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(ZoneOffset.UTC);
-        log.info("Scheduler running at {}", now);
 
         Set<String> alarmJsons = redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, now, now);
         if (alarmJsons == null || alarmJsons.isEmpty()) return;
