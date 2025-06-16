@@ -26,6 +26,10 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
         this.attributes = null; // 또는 Collections.emptyMap()
     }
 
+    public static Long getUserId(CustomUserPrincipal principal) {
+        return principal.getUser().getId();
+    }
+
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
@@ -64,10 +68,6 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public static Long getUserId(CustomUserPrincipal principal) {
-        return principal.getUser().getId();
     }
 
     @Override

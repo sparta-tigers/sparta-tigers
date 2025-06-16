@@ -17,6 +17,7 @@ import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeReque
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
+import com.sparta.spartatigers.domain.item.service.LocationService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
@@ -31,6 +32,7 @@ public class ExchangeRequestService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final DirectRoomService directRoomService;
+    private final LocationService locationService;
 
     @Transactional
     public void createExchangeRequest(ExchangeRequestDto request, CustomUserPrincipal principal) {
@@ -101,9 +103,12 @@ public class ExchangeRequestService {
         exchangeRequest.validateReceiverIsOwner(user);
 
         Item item = itemRepository.findItemByIdOrElseThrow(exchangeRequest.getItem().getId());
-        // 현재 교환 완료는 Item의 상태(COMPLETED)로 관리
-        // ExchangeRequest는 (ACCEPTED) 상태까지만 관리
         item.complete();
+        exchangeRequest.complete();
+
+        directRoomService.deleteRoomByExchangeRequestId(exchangeRequestId);
+
+        locationService.deleteLocation(user.getId());
     }
 
     private User getReceiver(Long receiverId) {

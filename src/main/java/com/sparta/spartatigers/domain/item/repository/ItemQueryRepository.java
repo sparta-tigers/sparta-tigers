@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ import com.sparta.spartatigers.global.exception.ServerException;
 
 public interface ItemQueryRepository {
 
-    Page<Item> findAllByStatus(Status status, Pageable pageable);
+    Page<Item> findAllByStatus(Status status, List<Long> nearByUserIds, Pageable pageable);
 
     Optional<Item> findItemById(Long itemId, Status status);
 

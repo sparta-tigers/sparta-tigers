@@ -4,7 +4,6 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
 public class RedisMessageSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
@@ -30,11 +28,10 @@ public class RedisMessageSubscriber implements MessageListener {
                     (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
             LiveBoardMessage liveBoardMessage =
                     objectMapper.readValue(publishMessage, LiveBoardMessage.class);
-
             messagingTemplate.convertAndSend(
                     "/server/liveboard/room/" + liveBoardMessage.getRoomId(), liveBoardMessage);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("RedisMessageSubscriber Error: {}", e.getMessage());
         }
     }
 }

@@ -9,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomResponseDto;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
+import com.sparta.spartatigers.domain.chatroom.repository.DirectMessageRepository;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.exchangerequest.repository.ExchangeRequestRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class DirectRoomService {
 
     private final ExchangeRequestRepository exchangeRequestRepository;
     private final DirectRoomRepository directRoomRepository;
+    private final DirectMessageRepository directMessageRepository;
 
     @Transactional
     public DirectRoomResponseDto createRoom(Long exchangeRequestId, Long currentUserId) {
@@ -31,7 +33,7 @@ public class DirectRoomService {
         // 권한 확인: 요청한 사람이 교환 요청의 sender 또는 receiver여야 함
         if (!exchangeRequest.getSender().getId().equals(currentUserId)
                 && !exchangeRequest.getReceiver().getId().equals(currentUserId)) {
-            throw new ServerException(ExceptionCode.UNAUTHORIZED);
+            throw new InvalidRequestException(ExceptionCode.UNAUTHORIZED);
         }
 
         // sender/receiver는 교환 요청 그대로
@@ -56,20 +58,40 @@ public class DirectRoomService {
                 .map(DirectRoomResponseDto::from);
     }
 
+    // 나중에 readOnly일 때 동작하거나, 교환에 실패했을 때 직접 채팅방을 삭제할 수 있게 놔두려고
     @Transactional
     public void deleteRoom(Long directRoomId, Long currentUserId) {
         DirectRoom room =
                 directRoomRepository
                         .findById(directRoomId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.CHATROOM_NOT_FOUND));
+                        .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                ExceptionCode.CHATROOM_NOT_FOUND));
 
         boolean isSender = room.getSender().getId().equals(currentUserId);
         boolean isReceiver = room.getReceiver().getId().equals(currentUserId);
 
         if (!isSender && !isReceiver) {
-            throw new ServerException(ExceptionCode.FORBIDDEN_REQUEST); // 403 권한 없음
+            throw new InvalidRequestException(ExceptionCode.FORBIDDEN_REQUEST);
         }
 
+        directMessageRepository.deleteAllByDirectRoomId(room.getId());
+        directRoomRepository.delete(room);
+    }
+
+    // 교환 완료 시 호출
+    @Transactional
+    public void deleteRoomByExchangeRequestId(Long exchangeRequestId) {
+        DirectRoom room =
+                directRoomRepository
+                        .findByExchangeRequestId(exchangeRequestId)
+                        .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                ExceptionCode.CHATROOM_NOT_FOUND));
+
+        directMessageRepository.deleteAllByDirectRoomId(room.getId());
         directRoomRepository.delete(room);
     }
 }
