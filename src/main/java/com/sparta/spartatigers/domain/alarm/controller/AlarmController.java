@@ -64,7 +64,9 @@ public class AlarmController {
     // 팀 이름 조회 (O)
     @GetMapping("/teams")
     public ResponseEntity<List<TeamNameResponseDto>> getAllTeamNames() {
+		System.out.println("TEST");
         return ResponseEntity.ok(alarmService.findTeamNames());
+
     }
 
     // 월별 팀 일정 조회 (O)
