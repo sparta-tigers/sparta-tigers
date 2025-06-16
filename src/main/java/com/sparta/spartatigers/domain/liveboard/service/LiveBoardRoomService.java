@@ -45,13 +45,7 @@ public class LiveBoardRoomService {
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
             LocalDateTime matchTime = match.getMatchTime();
 
-            LiveBoardRoom room =
-                    LiveBoardRoom.builder()
-                            .roomId(roomId)
-                            .matchId(match.getId())
-                            .title(title)
-                            .openAt(matchTime)
-                            .build();
+			LiveBoardRoom room = new LiveBoardRoom(roomId,match.getId(),title,matchTime);
 
             roomRepository.saveRoom(room);
         }

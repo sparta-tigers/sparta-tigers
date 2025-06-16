@@ -41,9 +41,21 @@ public class LiveBoardRoomRepository {
         return room;
     }
 
-    public List<LiveBoardRoom> findAllRoom() {
-        return opsHash.values(LIVEBOARD_ROOMS);
-    }
+	public List<LiveBoardRoom> findAllRoom() {
+		Object object = opsHash.values(LIVEBOARD_ROOMS);
+		List liveBoardRooms = objectMapper.convertValue(object, List.class);
+		List<LiveBoardRoom> realLiveBoardRooms =
+			liveBoardRooms.stream()
+				.map(
+					liveBoardRoomMap ->
+						objectMapper.convertValue(
+							liveBoardRoomMap, LiveBoardRoom.class))
+				.toList();
+		log.info("liveBoardRooms = {}", liveBoardRooms);
+		// Object -> ArrayList
+		// ArrayList를 돌면서 LiveBoardRoom 으로 바꿀꺼
+		return realLiveBoardRooms;
+	}
 
     public void deleteRoom(String roomId) {
         opsHash.delete(LIVEBOARD_ROOMS, roomId);
