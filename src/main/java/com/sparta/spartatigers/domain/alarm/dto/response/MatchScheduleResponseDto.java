@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import com.sparta.spartatigers.domain.match.model.entity.Match;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 @Getter
 @AllArgsConstructor
@@ -22,6 +24,10 @@ public class MatchScheduleResponseDto {
     private LocalDateTime matchTime;
 
     public static MatchScheduleResponseDto from(Match match) {
+        if (match == null) {
+            throw new ServerException(ExceptionCode.MATCH_NOT_FOUND);
+        }
+
         return new MatchScheduleResponseDto(
                 match.getHomeTeam().getId(),
                 match.getAwayTeam().getId(),

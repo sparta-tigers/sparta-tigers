@@ -3,6 +3,8 @@ package com.sparta.spartatigers.domain.alarm.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import com.sparta.spartatigers.domain.alarm.dto.request.AlarmDeleteDto;
 import com.sparta.spartatigers.domain.alarm.dto.request.AlarmRegisterDto;
 import com.sparta.spartatigers.domain.alarm.dto.request.AlarmUpdateDto;
 import com.sparta.spartatigers.domain.alarm.dto.response.AlarmResponseDto;
@@ -57,12 +58,11 @@ public class AlarmController {
         return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
-    @DeleteMapping
+    @DeleteMapping("/matches/{matchId}")
     public ApiResponse<String> deleteAlarm(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody AlarmDeleteDto alarmDeleteDto) {
-        alarmService.deleteAlarm(
-                customUserPrincipal.getUser().getId(), alarmDeleteDto.getMatchId());
+            @PathVariable Long matchId) {
+        alarmService.deleteAlarm(customUserPrincipal.getUser().getId(), matchId);
         return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
@@ -75,7 +75,9 @@ public class AlarmController {
     // 월별 팀 일정 조회 (O)
     @GetMapping("/teams/{teamId}/schedules")
     public ApiResponse<List<MatchScheduleResponseDto>> getMatchSchedule(
-            @PathVariable Long teamId, @RequestParam int year, @RequestParam int month) {
+            @PathVariable Long teamId,
+            @RequestParam @Min(2020) @Max(2100) int year,
+            @RequestParam @Min(1) @Max(12) int month) {
         List<MatchScheduleResponseDto> responseDtos =
                 alarmService.getMatchScheduleByTeamId(teamId, year, month);
         return ApiResponse.ok(responseDtos);

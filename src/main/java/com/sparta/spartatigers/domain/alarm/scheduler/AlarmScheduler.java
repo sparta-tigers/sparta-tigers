@@ -41,7 +41,6 @@ public class AlarmScheduler {
             try {
                 String innerJson = objectMapper.readValue(alarmJson, String.class);
                 AlarmInfo alarm = objectMapper.readValue(innerJson, AlarmInfo.class);
-                System.out.println(alarm.getMatchId());
                 redisAlarmPublisher.publishAlarm(alarm);
                 redisTemplate.opsForZSet().remove(REDIS_KEY, alarmJson);
                 alarmService.deleteAlarm(alarm.getUserId(), alarm.getMatchId());

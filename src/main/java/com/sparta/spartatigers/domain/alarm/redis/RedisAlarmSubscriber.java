@@ -21,11 +21,7 @@ public class RedisAlarmSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             String body = new String(message.getBody());
-            // 1단계: body가 JSON 문자열이 또 감싸져 있을 수 있으니 한번 String으로 변환
-            System.out.println("message body: " + body);
-
             String jsonStr = objectMapper.readValue(body, String.class);
-            // 2단계: 다시 AlarmInfo 객체로 변환
             AlarmInfo info = objectMapper.readValue(jsonStr, AlarmInfo.class);
             alarmService.sendAlarm(info);
         } catch (Exception e) {

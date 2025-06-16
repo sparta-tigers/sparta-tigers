@@ -113,7 +113,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void deleteAlarm(Long userId, Long matchId) {
-        Optional<Alarm> alarmOpt = alarmRepository.findByUserIdAndMatchId(userId, matchId);
+        Optional<Alarm> alarmOpt = alarmRepository.findByUser_IdAndMatch_Id(userId, matchId);
         alarmOpt.ifPresent(alarmRepository::delete);
     }
 
@@ -204,7 +204,7 @@ public class AlarmServiceImpl implements AlarmService {
             saveAlarmIfPresent(dto.getMinutes(), matchTime, user, match, offset);
             saveAlarmIfPresent(dto.getPreMinutes(), matchTime, user, match, offset);
         } catch (JsonProcessingException e) {
-            System.out.println("저장 실패");
+            log.warn("저장 실패");
         }
     }
 
