@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.alarm.model.entity;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,10 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.user.model.entity.User;
@@ -23,6 +21,7 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class Alarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +38,15 @@ public class Alarm {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;
+
+    public void updateAlarmTimes(Integer minutes, Integer preMinutes, LocalDateTime matchTime) {
+        if (minutes != null) {
+            this.normalAlarmTime = matchTime.minusMinutes(minutes).truncatedTo(ChronoUnit.MINUTES);
+        }
+        if (preMinutes != null) {
+            this.preAlarmTime = matchTime.minusMinutes(preMinutes).truncatedTo(ChronoUnit.MINUTES);
+        }
+    }
 
     public static Alarm of(User user, Match match, Integer minutes, Integer preMinutes) {
         LocalDateTime matchStartTime = match.getMatchTime();

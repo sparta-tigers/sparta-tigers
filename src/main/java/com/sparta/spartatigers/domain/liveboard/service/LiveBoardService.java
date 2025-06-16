@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
-import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
@@ -76,17 +73,15 @@ public class LiveBoardService {
         }
     }
 
-	public void increaseConnectCount(String roomId) {
-		LiveBoardRoom room = roomRepository.findRoomById(roomId);
-		room.increaseCount();
-		roomRepository.saveRoom(room);
-	}
+    public void increaseConnectCount(String roomId) {
+        LiveBoardRoom room = roomRepository.findRoomById(roomId);
+        room.increaseCount();
+        roomRepository.saveRoom(room);
+    }
 
-	public void decreaseConnectCount(String roomId) {
-		LiveBoardRoom room = roomRepository.findRoomById(roomId);
-		room.decreaseCount();
-		roomRepository.saveRoom(room);
-	}
-
-
+    public void decreaseConnectCount(String roomId) {
+        LiveBoardRoom room = roomRepository.findRoomById(roomId);
+        room.decreaseCount();
+        roomRepository.saveRoom(room);
+    }
 }

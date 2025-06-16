@@ -27,6 +27,7 @@ public enum ExceptionCode {
     // 라이브 보드
 
     // 알람
+    ALARM_NOT_FOUND("알람을 찾을 수 없습니다."),
 
     // 채팅방
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class RedisMessageSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String,String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
 
     @Override
