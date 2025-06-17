@@ -54,7 +54,8 @@ public class AlarmScheduler {
             long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
             long fiveMinutesAgo = now - 300;
 
-            Set<String> alarmJsons = redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, fiveMinutesAgo, now);
+            Set<String> alarmJsons =
+                    redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, fiveMinutesAgo, now);
             if (alarmJsons == null || alarmJsons.isEmpty()) return;
 
             for (String alarmJson : alarmJsons) {
@@ -69,20 +70,21 @@ public class AlarmScheduler {
                         LocalDateTime currentAlarmTime = alarmInfo.getAlarmTime();
                         boolean updated = false;
 
-                        if (alarm.getNormalAlarmTime() != null &&
-                                alarm.getNormalAlarmTime().equals(currentAlarmTime)) {
+                        if (alarm.getNormalAlarmTime() != null
+                                && alarm.getNormalAlarmTime().equals(currentAlarmTime)) {
                             alarm.updateNormalAlarmTime(null);
                             updated = true;
                         }
 
-                        if (alarm.getPreAlarmTime() != null &&
-                                alarm.getPreAlarmTime().equals(currentAlarmTime)) {
+                        if (alarm.getPreAlarmTime() != null
+                                && alarm.getPreAlarmTime().equals(currentAlarmTime)) {
                             alarm.updatePreAlarmTime(null);
                             updated = true;
                         }
 
                         if (updated) {
-                            if (alarm.getNormalAlarmTime() == null && alarm.getPreAlarmTime() == null) {
+                            if (alarm.getNormalAlarmTime() == null
+                                    && alarm.getPreAlarmTime() == null) {
                                 alarmRepository.delete(alarm);
                             } else {
                                 alarmRepository.save(alarm);
