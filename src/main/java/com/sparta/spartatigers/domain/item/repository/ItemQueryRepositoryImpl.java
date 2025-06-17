@@ -38,7 +38,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                         .where(
                                 itemStatusEq(status),
                                 item.user.id.in(nearByUserIds),
-                                itemCreatedDateEq())
+                                itemCreatedDateEq(LocalDate.now()))
                         .join(item.user, user)
                         .fetchJoin()
                         .orderBy(item.createdAt.desc())
@@ -53,7 +53,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                         .where(
                                 itemStatusEq(status),
                                 item.user.id.in(nearByUserIds),
-                                itemCreatedDateEq())
+                                itemCreatedDateEq(LocalDate.now()))
                         .fetchOne();
 
         long count = (total == null) ? 0L : total;
@@ -67,10 +67,22 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(item)
-                        .where(itemStatusEq(status), item.id.eq(itemId), itemCreatedDateEq())
+                        .where(
+                                itemStatusEq(status),
+                                item.id.eq(itemId),
+                                itemCreatedDateEq(LocalDate.now()))
                         .join(item.user, user)
                         .fetchJoin()
                         .fetchOne());
+    }
+
+    @Override
+    public List<Item> findUncompletedItems(LocalDate yesterDay) {
+
+        return queryFactory
+                .selectFrom(item)
+                .where(itemStatusEq(Status.REGISTERED), itemCreatedDateEq(yesterDay))
+                .fetch();
     }
 
     private BooleanExpression itemStatusEq(Status status) {
@@ -78,8 +90,8 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         return item.status.eq(status);
     }
 
-    private BooleanExpression itemCreatedDateEq() {
+    private BooleanExpression itemCreatedDateEq(LocalDate date) {
 
-        return item.createdDate.eq(LocalDate.now());
+        return item.createdDate.eq(date);
     }
 }

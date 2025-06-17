@@ -89,6 +89,10 @@ public class Item extends BaseEntity {
         this.status = Status.COMPLETED;
     }
 
+    public void fail() {
+        this.status = Status.FAILED;
+    }
+
     public enum Category {
         GOODS,
         TICKET;
@@ -104,6 +108,7 @@ public class Item extends BaseEntity {
 
     public enum Status {
         REGISTERED,
-        COMPLETED
+        COMPLETED,
+        FAILED
     }
 }

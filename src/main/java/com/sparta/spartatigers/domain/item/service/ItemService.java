@@ -1,11 +1,13 @@
 package com.sparta.spartatigers.domain.item.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,5 +75,15 @@ public class ItemService {
         Item item = itemRepository.findItemByIdOrElseThrow(itemId);
 
         return ReadItemDetailResponseDto.from(item);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void failItem() {
+
+        LocalDate today = LocalDate.now();
+        List<Item> itemList = itemRepository.findUncompletedItems(today.minusDays(1));
+
+        itemList.forEach(Item::fail);
     }
 }
