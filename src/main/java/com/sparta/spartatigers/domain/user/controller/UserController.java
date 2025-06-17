@@ -1,6 +1,5 @@
 package com.sparta.spartatigers.domain.user.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import com.sparta.spartatigers.domain.user.dto.UserInfoResponseDto;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.service.UserService;
+import com.sparta.spartatigers.global.response.ApiResponse;
 
 @Log4j2
 @RestController
@@ -21,10 +21,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserInfoResponseDto> getUserInfo(
+    public ApiResponse<UserInfoResponseDto> getUserInfo(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
-        log.info("유저 프린시펄 : " + userPrincipal);
         UserInfoResponseDto userInfoResponseDto = userService.getUserInfo(userPrincipal);
-        return ResponseEntity.ok(userInfoResponseDto);
+        return ApiResponse.ok(userInfoResponseDto);
     }
 }
