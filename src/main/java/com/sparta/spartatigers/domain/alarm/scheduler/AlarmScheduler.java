@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,62 +31,75 @@ public class AlarmScheduler {
     private final ObjectMapper objectMapper;
     private final RedisAlarmPublisher redisAlarmPublisher;
     private final AlarmRepository alarmRepository;
+    private final RedissonClient redissonClient;
     private static final String REDIS_KEY = "alarms";
+    private static final String LOCK_KEY = "lock:alarmScheduler";
 
     @Scheduled(fixedRate = 60_000)
     @Transactional
     public void sendAlarms() {
-        ZoneOffset offset = ZoneOffset.of("+09:00");
-        long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
-        long fiveMinutesAgo = now - 300;
+        RLock lock = redissonClient.getLock(LOCK_KEY);
 
-        Set<String> alarmJsons =
-                redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, fiveMinutesAgo, now);
-        if (alarmJsons == null || alarmJsons.isEmpty()) return;
+        boolean isLocked = false;
+        try {
+            isLocked = lock.tryLock(1, 10, TimeUnit.SECONDS);
 
-        for (String alarmJson : alarmJsons) {
-            try {
-                AlarmInfo alarmInfo = objectMapper.readValue(alarmJson, AlarmInfo.class);
+            if (!isLocked) {
+                return;
+            }
 
-                // 알람 전송
-                redisAlarmPublisher.publishAlarm(alarmInfo);
+            log.info("분산 락 @@@");
 
-                // Redis에서 현재 알람만 삭제
-                redisTemplate.opsForZSet().remove(REDIS_KEY, alarmJson);
+            ZoneOffset offset = ZoneOffset.of("+09:00");
+            long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
+            long fiveMinutesAgo = now - 300;
 
-                // DB Alarm 조회
-                Alarm alarm = alarmRepository.findById(alarmInfo.getAlarmId()).orElse(null);
+            Set<String> alarmJsons = redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, fiveMinutesAgo, now);
+            if (alarmJsons == null || alarmJsons.isEmpty()) return;
 
-                if (alarm != null) {
-                    // 현재 울린 알람 시간이 일반 알람 시간인지, 선예매 알람 시간인지 비교 후 null 처리
-                    LocalDateTime currentAlarmTime = alarmInfo.getAlarmTime();
+            for (String alarmJson : alarmJsons) {
+                try {
+                    AlarmInfo alarmInfo = objectMapper.readValue(alarmJson, AlarmInfo.class);
+                    redisAlarmPublisher.publishAlarm(alarmInfo);
+                    redisTemplate.opsForZSet().remove(REDIS_KEY, alarmJson);
 
-                    boolean updated = false;
+                    Alarm alarm = alarmRepository.findById(alarmInfo.getAlarmId()).orElse(null);
 
-                    if (alarm.getNormalAlarmTime() != null
-                            && alarm.getNormalAlarmTime().equals(currentAlarmTime)) {
-                        alarm.updateNormalAlarmTime(null);
-                        updated = true;
-                    }
-                    if (alarm.getPreAlarmTime() != null
-                            && alarm.getPreAlarmTime().equals(currentAlarmTime)) {
-                        alarm.updatePreAlarmTime(null);
-                        updated = true;
-                    }
+                    if (alarm != null) {
+                        LocalDateTime currentAlarmTime = alarmInfo.getAlarmTime();
+                        boolean updated = false;
 
-                    if (updated) {
-                        if (alarm.getNormalAlarmTime() == null && alarm.getPreAlarmTime() == null) {
-                            // 두 알람 다 소진됐으면 DB에서 삭제
-                            alarmRepository.delete(alarm);
-                        } else {
-                            // 남은 알람 시간 있을 경우 업데이트 저장
-                            alarmRepository.save(alarm);
+                        if (alarm.getNormalAlarmTime() != null &&
+                                alarm.getNormalAlarmTime().equals(currentAlarmTime)) {
+                            alarm.updateNormalAlarmTime(null);
+                            updated = true;
+                        }
+
+                        if (alarm.getPreAlarmTime() != null &&
+                                alarm.getPreAlarmTime().equals(currentAlarmTime)) {
+                            alarm.updatePreAlarmTime(null);
+                            updated = true;
+                        }
+
+                        if (updated) {
+                            if (alarm.getNormalAlarmTime() == null && alarm.getPreAlarmTime() == null) {
+                                alarmRepository.delete(alarm);
+                            } else {
+                                alarmRepository.save(alarm);
+                            }
                         }
                     }
-                }
 
-            } catch (Exception e) {
-                log.error("Failed to process alarm: {}", alarmJson, e);
+                } catch (Exception e) {
+                    log.error("Failed to process alarm: {}", alarmJson, e);
+                }
+            }
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            if (isLocked) {
+                lock.unlock();
             }
         }
     }
