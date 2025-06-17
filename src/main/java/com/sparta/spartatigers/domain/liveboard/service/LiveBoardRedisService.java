@@ -25,10 +25,7 @@ import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
 import com.sparta.spartatigers.domain.liveboard.util.GlobalSessionIdGenerator;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
-import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,20 +73,20 @@ public class LiveBoardRedisService {
         return GlobalSessionIdGenerator.generate(sessionId);
     }
 
-
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Authentication authentication) {
         Object principalObj = authentication.getPrincipal();
 
-		if (principalObj instanceof StompPrincipal principal && "null".equals(principal.getName())) {
-			throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
-		}
-		if (principalObj == null) {
-			throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
-		}
+        if (principalObj instanceof StompPrincipal principal
+                && "null".equals(principal.getName())) {
+            throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
+        }
+        if (principalObj == null) {
+            throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
+        }
 
         // 메세지에 유저정보 세팅
-		Long senderId = findSenderId(authentication);
+        Long senderId = findSenderId(authentication);
         String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         message =
                 LiveBoardMessage.of(message.getRoomId(), senderId, nickname, message.getContent());
@@ -101,11 +98,11 @@ public class LiveBoardRedisService {
 
     // 입장
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
-		Long senderId = findSenderId(authentication);
-		String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
+        Long senderId = findSenderId(authentication);
+        String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         String globalSessionId = generateGlobalSessionId(message);
 
-		// get topic
+        // get topic
         String roomId = message.getPayload().getRoomId();
         ChannelTopic topic = getOrInitTopic(roomId);
 
@@ -114,7 +111,7 @@ public class LiveBoardRedisService {
                 LiveBoardConnection.of(
                         globalSessionId,
                         senderId != null ? String.valueOf(senderId) : null,
-						nickname,
+                        nickname,
                         roomId,
                         LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
@@ -125,24 +122,25 @@ public class LiveBoardRedisService {
     // 퇴장
     public void exitRoom(Message<LiveBoardMessage> message) {
         // connection 삭제
-		String roomId = message.getPayload().getRoomId();
+        String roomId = message.getPayload().getRoomId();
         String globalSessionId = generateGlobalSessionId(message);
         liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
 
-		// get topic 후 publish
+        // get topic 후 publish
         ChannelTopic topic = getOrInitTopic(roomId);
         redisPublisher.publish(topic, message.getPayload());
     }
 
-	public void handleDisconnect(String globalSessionId) {
-		List<String> roomIds = liveBoardConnectionRepository.findAllRoomIds();
+    public void handleDisconnect(String globalSessionId) {
+        List<String> roomIds = liveBoardConnectionRepository.findAllRoomIds();
 
-		for (String roomId : roomIds) {
-			Map <Object, Object> connections = liveBoardConnectionRepository.findAllConnections(roomId);
+        for (String roomId : roomIds) {
+            Map<Object, Object> connections =
+                    liveBoardConnectionRepository.findAllConnections(roomId);
 
-			if(connections.containsKey(globalSessionId)) {
-				liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
-			}
-		}
-	}
+            if (connections.containsKey(globalSessionId)) {
+                liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
+            }
+        }
+    }
 }
