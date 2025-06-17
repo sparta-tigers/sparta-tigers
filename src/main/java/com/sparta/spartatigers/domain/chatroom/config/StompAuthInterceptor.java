@@ -43,6 +43,8 @@ public class StompAuthInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        // 첫 연결할 때만 인증 및 세션id-userid 레지스트리에 저장 수행
+        // TODO: StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
 
