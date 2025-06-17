@@ -10,12 +10,11 @@ import lombok.Getter;
 public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자
-    private String senderId;
-    private String senderNickname; // 사용자가 지정
+    private Long senderId;
     private String content; // 내용
     private LocalDateTime sentAt;
 
-    public LiveBoardMessage() {
-        this.sentAt = LocalDateTime.now();
+    public static LiveBoardMessage of(String roomId, Long senderId, String content) {
+        return new LiveBoardMessage(roomId, senderId, content, LocalDateTime.now());
     }
 }

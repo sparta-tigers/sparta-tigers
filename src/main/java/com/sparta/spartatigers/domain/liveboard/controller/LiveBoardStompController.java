@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.liveboard.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import lombok.RequiredArgsConstructor;
@@ -18,21 +19,21 @@ public class LiveBoardStompController {
 
     // 채팅
     @MessageMapping("/liveboard/message")
-    public void sendMessage(LiveBoardMessage message) {
-        liveBoardRedisService.handleMessage(message);
+    public void sendMessage(LiveBoardMessage message, Authentication authentication) {
+        liveBoardRedisService.handleMessage(message, authentication);
     }
 
     // 입장
     @MessageMapping("/liveboard/enter")
-    public void enterLiveBoard(LiveBoardMessage message) {
-        liveBoardRedisService.handleMessage(message);
+    public void enterLiveBoard(LiveBoardMessage message, Authentication authentication) {
+        liveBoardRedisService.handleMessage(message, authentication);
         liveBoardRoomService.increaseConnectCount(message.getRoomId());
     }
 
     // 퇴장
     @MessageMapping("/liveboard/exit")
-    public void exitLiveBoard(LiveBoardMessage message) {
-        liveBoardRedisService.handleMessage(message);
+    public void exitLiveBoard(LiveBoardMessage message, Authentication authentication) {
+        liveBoardRedisService.handleMessage(message, authentication);
         liveBoardRoomService.decreaseConnectCount(message.getRoomId());
     }
 }
