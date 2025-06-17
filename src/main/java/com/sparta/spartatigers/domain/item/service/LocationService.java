@@ -30,6 +30,10 @@ public class LocationService {
     @Transactional
     public void updateLocation(LocationRequestDto request, Long userId) {
 
+        if (userId == null) {
+            return;
+        }
+
         Point point = new Point(request.getLongitude(), request.getLatitude());
         redisTemplate.opsForGeo().add(USER_LOCATION_KEY, point, userId);
 
