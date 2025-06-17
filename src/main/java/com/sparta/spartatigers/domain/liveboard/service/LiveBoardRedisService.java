@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.liveboard.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,24 +76,21 @@ public class LiveBoardRedisService {
         return GlobalSessionIdGenerator.generate(sessionId);
     }
 
+
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Authentication authentication) {
         Object principalObj = authentication.getPrincipal();
-        if (principalObj == null
-                || principalObj instanceof StompPrincipal principal
-                        && principal.getName().equals("null")) {
-            throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
-        }
 
-        Long senderId = findSenderId(authentication);
+		if (principalObj instanceof StompPrincipal principal && "null".equals(principal.getName())) {
+			throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
+		}
+		if (principalObj == null) {
+			throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
+		}
 
         // 메세지에 유저정보 세팅
-        User sender =
-                userRepository
-                        .findById(senderId)
-                        .orElseThrow(
-                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
-        String nickname = sender.getNickname();
+		Long senderId = findSenderId(authentication);
+        String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         message =
                 LiveBoardMessage.of(message.getRoomId(), senderId, nickname, message.getContent());
 
@@ -103,25 +101,20 @@ public class LiveBoardRedisService {
 
     // 입장
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
-        Object principalObj = authentication.getPrincipal();
-
-        if (principalObj == null) {
-            log.warn("비회원 유저가 입장 시도");
-            return;
-        }
-
-        Long senderId = findSenderId(authentication);
+		Long senderId = findSenderId(authentication);
+		String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         String globalSessionId = generateGlobalSessionId(message);
 
-        // 룸토픽 던져
+		// get topic
         String roomId = message.getPayload().getRoomId();
         ChannelTopic topic = getOrInitTopic(roomId);
 
-        // 커넥션 객체 생성
+        // connection 생성 후 저장
         LiveBoardConnection connection =
                 LiveBoardConnection.of(
                         globalSessionId,
                         senderId != null ? String.valueOf(senderId) : null,
+						nickname,
                         roomId,
                         LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
@@ -131,12 +124,25 @@ public class LiveBoardRedisService {
 
     // 퇴장
     public void exitRoom(Message<LiveBoardMessage> message) {
-        String roomId = message.getPayload().getRoomId();
+        // connection 삭제
+		String roomId = message.getPayload().getRoomId();
         String globalSessionId = generateGlobalSessionId(message);
         liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
 
-        // 룸토픽 던져
+		// get topic 후 publish
         ChannelTopic topic = getOrInitTopic(roomId);
         redisPublisher.publish(topic, message.getPayload());
     }
+
+	public void handleDisconnect(String globalSessionId) {
+		List<String> roomIds = liveBoardConnectionRepository.findAllRoomIds();
+
+		for (String roomId : roomIds) {
+			Map <Object, Object> connections = liveBoardConnectionRepository.findAllConnections(roomId);
+
+			if(connections.containsKey(globalSessionId)) {
+				liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
+			}
+		}
+	}
 }

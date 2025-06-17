@@ -9,14 +9,12 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRedisService;
-import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
 
 @Controller
 @RequiredArgsConstructor
 public class LiveBoardStompController {
 
     private final LiveBoardRedisService liveBoardRedisService;
-    private final LiveBoardRoomService liveBoardRoomService;
 
     // 채팅
     @MessageMapping("/liveboard/message")

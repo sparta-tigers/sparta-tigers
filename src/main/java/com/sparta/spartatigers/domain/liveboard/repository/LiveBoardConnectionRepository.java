@@ -1,6 +1,9 @@
 package com.sparta.spartatigers.domain.liveboard.repository;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,4 +30,14 @@ public class LiveBoardConnectionRepository {
 	public Long getConnectionCount(String roomId) {
 		return redisTemplate.opsForHash().size(PREFIX+roomId);
 	}
+
+	public List<String> findAllRoomIds() {
+		Set<String> keys = redisTemplate.keys(PREFIX+"*");
+		return keys.stream().map(key->key.replace(PREFIX,"")).collect(Collectors.toList());
+	}
+
+	public Map<Object, Object> findAllConnections(String roomId) {
+		return redisTemplate.opsForHash().entries(PREFIX+roomId);
+	}
+
 }
