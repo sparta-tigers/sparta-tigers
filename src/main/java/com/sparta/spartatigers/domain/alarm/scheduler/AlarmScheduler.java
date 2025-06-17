@@ -48,8 +48,6 @@ public class AlarmScheduler {
                 return;
             }
 
-            log.info("분산 락 @@@");
-
             ZoneOffset offset = ZoneOffset.of("+09:00");
             long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
             long fiveMinutesAgo = now - 300;
