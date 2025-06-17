@@ -68,4 +68,12 @@ public class Alarm {
         alarm.preAlarmTime = preAlarmTime;
         return alarm;
     }
+
+    public void updateNormalAlarmTime(LocalDateTime normalAlarmTime) {
+        this.normalAlarmTime = normalAlarmTime;
+    }
+
+    public void updatePreAlarmTime(LocalDateTime preAlarmTime) {
+        this.preAlarmTime = preAlarmTime;
+    }
 }

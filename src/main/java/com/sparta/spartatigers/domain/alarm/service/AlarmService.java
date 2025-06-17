@@ -15,13 +15,9 @@ public interface AlarmService {
 
     public List<TeamNameResponseDto> findTeamNames();
 
-    public MatchScheduleResponseDto findMatchSchedules();
-
-    public void deleteAlarm(Long userId, Long matchId);
+    public void deleteAlarm(Long userId, Long alarmId);
 
     public AlarmUpdateDto updateAlarm(Long userId, AlarmUpdateDto alarmUpdateDto);
-
-    public void checkAlarm();
 
     SseEmitter subscribe(Long id);
 

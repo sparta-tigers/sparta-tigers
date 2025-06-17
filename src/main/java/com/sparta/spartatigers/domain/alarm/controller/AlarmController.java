@@ -32,6 +32,7 @@ import com.sparta.spartatigers.global.response.MessageCode;
 public class AlarmController {
     private final AlarmService alarmService;
 
+    // 알람 조회 (O)
     @GetMapping
     public ApiResponse<List<AlarmResponseDto>> getAllAlarms(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
@@ -40,6 +41,7 @@ public class AlarmController {
         return ApiResponse.ok(response);
     }
 
+    // 알람 생성 (O)
     @PostMapping
     public ApiResponse<String> createAlarm(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
@@ -50,6 +52,7 @@ public class AlarmController {
         return ApiResponse.created(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
+    // 알람 수정 (O)
     @PutMapping
     public ApiResponse<String> updateAlarm(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
@@ -58,11 +61,12 @@ public class AlarmController {
         return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 
-    @DeleteMapping("/matches/{matchId}")
+    // 알람 삭제 (O)
+    @DeleteMapping("/{alarmId}")
     public ApiResponse<String> deleteAlarm(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-            @PathVariable Long matchId) {
-        alarmService.deleteAlarm(customUserPrincipal.getUser().getId(), matchId);
+            @PathVariable Long alarmId) {
+        alarmService.deleteAlarm(customUserPrincipal.getUser().getId(), alarmId);
         return ApiResponse.ok(MessageCode.ALARM_REQUEST_SUCCESS.getMessage());
     }
 

@@ -6,7 +6,6 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -45,7 +44,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final MatchRepository matchRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     @Override
@@ -67,7 +66,7 @@ public class AlarmServiceImpl implements AlarmService {
                         alarmRegisterDto.getMinutes(),
                         alarmRegisterDto.getPreMinutes());
         alarmRepository.save(alarm);
-        saveToRedis(user, match, alarmRegisterDto);
+        saveToRedis(alarm);
         return alarmRegisterDto;
     }
 
@@ -81,40 +80,27 @@ public class AlarmServiceImpl implements AlarmService {
 
         List<Alarm> alarms = alarmRepository.findAllByUserIdWithMatchAndTeams(user.getId());
 
-        return alarms.stream()
-                .map(
-                        alarm -> {
-                            Match match = alarm.getMatch();
-
-                            return new AlarmResponseDto(
-                                    match.getHomeTeam().getName(),
-                                    match.getAwayTeam().getName(),
-                                    match.getStadium().getName(),
-                                    match.getMatchTime().toString(),
-                                    alarm.getNormalAlarmTime(),
-                                    alarm.getPreAlarmTime());
-                        })
-                .collect(Collectors.toList());
+        return alarms.stream().map(AlarmResponseDto::from).collect(Collectors.toList());
     }
 
     @Override
     public List<TeamNameResponseDto> findTeamNames() {
         List<Team> teams = teamRepository.findAll();
-        return teams.stream()
-                .map(team -> new TeamNameResponseDto(team.getId(), team.getName()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public MatchScheduleResponseDto findMatchSchedules() {
-        return null;
+        return teams.stream().map(TeamNameResponseDto::from).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public void deleteAlarm(Long userId, Long matchId) {
-        Optional<Alarm> alarmOpt = alarmRepository.findByUser_IdAndMatch_Id(userId, matchId);
-        alarmOpt.ifPresent(alarmRepository::delete);
+    public void deleteAlarm(Long userId, Long alarmId) {
+        Alarm alarm =
+                alarmRepository
+                        .findById(alarmId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.ALARM_NOT_FOUND));
+
+        if (!alarm.getUser().getId().equals(userId)) {
+            throw new ServerException(ExceptionCode.ACCESS_DENIED);
+        }
+        alarmRepository.delete(alarm);
     }
 
     @Override
@@ -134,9 +120,6 @@ public class AlarmServiceImpl implements AlarmService {
 
         return AlarmUpdateDto.from(alarm);
     }
-
-    @Override
-    public void checkAlarm() {}
 
     @Override
     public SseEmitter subscribe(Long id) {
@@ -196,33 +179,24 @@ public class AlarmServiceImpl implements AlarmService {
         }
     }
 
-    private void saveToRedis(User user, Match match, AlarmRegisterDto dto) {
+    private void saveToRedis(Alarm alarm) {
         try {
-            LocalDateTime matchTime = match.getMatchTime();
-            ZoneOffset offset = ZoneOffset.UTC;
+            ZoneOffset offset = ZoneOffset.of("+09:00");
 
-            saveAlarmIfPresent(dto.getMinutes(), matchTime, user, match, offset);
-            saveAlarmIfPresent(dto.getPreMinutes(), matchTime, user, match, offset);
+            saveAlarmIfPresent(alarm.getNormalAlarmTime(), alarm, offset);
+            saveAlarmIfPresent(alarm.getPreAlarmTime(), alarm, offset);
         } catch (JsonProcessingException e) {
             log.warn("저장 실패");
         }
     }
 
-    private void saveAlarmIfPresent(
-            Integer minutes, LocalDateTime matchTime, User user, Match match, ZoneOffset offset)
+    private void saveAlarmIfPresent(LocalDateTime alarmTime, Alarm alarm, ZoneOffset offset)
             throws JsonProcessingException {
-        if (minutes == null) return;
+        if (alarmTime == null) return;
 
-        LocalDateTime alarmTime = matchTime.minusMinutes(minutes);
         long score = alarmTime.truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
 
-        AlarmInfo info =
-                AlarmInfo.builder()
-                        .userId(user.getId())
-                        .matchId(match.getId())
-                        .alarmTime(alarmTime)
-                        .build();
-
+        AlarmInfo info = AlarmInfo.from(alarm, alarmTime);
         String json = objectMapper.writeValueAsString(info);
         redisTemplate.opsForZSet().add("alarms", json, score);
     }
