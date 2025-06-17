@@ -14,7 +14,7 @@ public enum MessageCode {
     // 라이브 보드
 
     // 알람
-
+    ALARM_REQUEST_SUCCESS("알람 요청을 성공적으로 보냈습니다."),
     // 채팅방
 
     // 교환 요청

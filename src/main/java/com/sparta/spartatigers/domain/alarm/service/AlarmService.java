@@ -6,9 +6,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.sparta.spartatigers.domain.alarm.dto.request.AlarmRegisterDto;
 import com.sparta.spartatigers.domain.alarm.dto.request.AlarmUpdateDto;
-import com.sparta.spartatigers.domain.alarm.dto.response.AlarmResponseDto;
-import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDto;
-import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
+import com.sparta.spartatigers.domain.alarm.dto.response.*;
 
 public interface AlarmService {
     public AlarmRegisterDto createAlarm(Long id, AlarmRegisterDto alarmRegisterDto);
@@ -17,13 +15,15 @@ public interface AlarmService {
 
     public List<TeamNameResponseDto> findTeamNames();
 
-    public MatchScheduleResponseDto findMatchSchedules();
+    public void deleteAlarm(Long userId, Long alarmId);
 
-    public void deleteAlarms();
-
-    public AlarmUpdateDto updateAlarm(Long id, AlarmUpdateDto alarmUpdateDto);
-
-    public void checkAlarm();
+    public AlarmUpdateDto updateAlarm(Long userId, AlarmUpdateDto alarmUpdateDto);
 
     SseEmitter subscribe(Long id);
+
+    List<MatchScheduleResponseDto> getMatchScheduleByTeamId(Long teamId, int year, int month);
+
+    MatchDetailResponseDto getMatchByMatchId(Long matchId);
+
+    public void sendAlarm(AlarmInfo alarmInfo);
 }
