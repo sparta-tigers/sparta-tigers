@@ -45,15 +45,16 @@ public class LiveBoardRedisService {
     private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
 
     private ChannelTopic getOrInitTopic(String roomId) {
-        ChannelTopic topic = topics.get(roomId);
-        if (topic == null) {
-            topic = new ChannelTopic(roomId);
-            RedisMessageSubscriber subscriber =
-                    new RedisMessageSubscriber(objectMapper, redisTemplate, messagingTemplate);
-            redisMessageListener.addMessageListener(subscriber, topic);
-            topics.put(roomId, topic);
-        }
-        return topic;
+        return topics.computeIfAbsent(
+                roomId,
+                key -> {
+                    ChannelTopic topic = new ChannelTopic(key);
+                    RedisMessageSubscriber subscriber =
+                            new RedisMessageSubscriber(
+                                    objectMapper, redisTemplate, messagingTemplate);
+                    redisMessageListener.addMessageListener(subscriber, topic);
+                    return topic;
+                });
     }
 
     private Long findSenderId(Authentication authentication) {
@@ -64,7 +65,7 @@ public class LiveBoardRedisService {
         } else if (principalObj instanceof StompPrincipal principal) {
             return Long.parseLong(principal.getName());
         }
-        throw new RuntimeException("지원하지 않는 principal타입 : " + principalObj.getClass());
+        throw new IllegalStateException("지원하지 않는 principal타입 : " + principalObj.getClass());
     }
 
     private String generateGlobalSessionId(Message<LiveBoardMessage> message) {
@@ -77,11 +78,8 @@ public class LiveBoardRedisService {
     public void handleMessage(LiveBoardMessage message, Authentication authentication) {
         Object principalObj = authentication.getPrincipal();
 
-        if (principalObj instanceof StompPrincipal principal
-                && "null".equals(principal.getName())) {
-            throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
-        }
-        if (principalObj == null) {
+        if (principalObj == null ||
+			principalObj instanceof StompPrincipal principal && "null".equals(principal.getName())) {
             throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
         }
 
@@ -99,7 +97,7 @@ public class LiveBoardRedisService {
     // 입장
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
         Long senderId = findSenderId(authentication);
-        String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
+		String nickname = senderId != null ? userRepository.findNicknameById(senderId).orElse("비회원") : "비회원";
         String globalSessionId = generateGlobalSessionId(message);
 
         // get topic
@@ -109,11 +107,7 @@ public class LiveBoardRedisService {
         // connection 생성 후 저장
         LiveBoardConnection connection =
                 LiveBoardConnection.of(
-                        globalSessionId,
-                        senderId != null ? String.valueOf(senderId) : null,
-                        nickname,
-                        roomId,
-                        LocalDateTime.now());
+                        globalSessionId, senderId , nickname, roomId, LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
 
         redisPublisher.publish(topic, message.getPayload());

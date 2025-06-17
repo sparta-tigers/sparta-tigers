@@ -17,7 +17,7 @@ import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 public class LiveBoardConnectionRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final String PREFIX = "liveboard:connections";
+    private static final String PREFIX = "liveboard:connections:";
 
     public void saveConnection(String roomId, String sessionId, LiveBoardConnection connection) {
         redisTemplate.opsForHash().put(PREFIX + roomId, sessionId, connection);

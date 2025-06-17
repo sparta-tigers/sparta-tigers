@@ -47,7 +47,7 @@ public class LiveBoardRoomService {
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
             LocalDateTime matchTime = match.getMatchTime();
 
-            LiveBoardRoom room = new LiveBoardRoom(roomId, match.getId(), title, matchTime);
+            LiveBoardRoom room = LiveBoardRoom.of(roomId, match.getId(), title, matchTime);
 
             roomRepository.saveRoom(room);
         }
@@ -60,7 +60,7 @@ public class LiveBoardRoomService {
         return roomRepository.findAllRoom().stream()
                 .map(
                         room -> {
-                            long count = connectionRepository.getConnectionCount(room.getRoomId());
+                            Long count = connectionRepository.getConnectionCount(room.getRoomId());
                             return LiveBoardRoomResponseDto.of(room, count);
                         })
                 .collect((Collectors.toList()));
@@ -75,7 +75,7 @@ public class LiveBoardRoomService {
                 .filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
                 .map(
                         room -> {
-                            long count = connectionRepository.getConnectionCount(room.getRoomId());
+                            Long count = connectionRepository.getConnectionCount(room.getRoomId());
                             return LiveBoardRoomResponseDto.of(room, count);
                         })
                 .toList();

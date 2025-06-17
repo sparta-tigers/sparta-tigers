@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LiveBoardConnection {
     private String sessionId;
-    private String userId; // null - 비회원
+    private Long userId; // null - 비회원
     private String nickname;
     private String roomId;
     private LocalDateTime connectedAt;
 
     public static LiveBoardConnection of(
             String sessionId,
-            String userId,
+            Long userId,
             String nickname,
             String roomId,
             LocalDateTime connectedAt) {

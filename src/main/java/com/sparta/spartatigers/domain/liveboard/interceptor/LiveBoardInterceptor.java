@@ -49,6 +49,7 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
 
                     // 웹소켓에 사용자 등록
                     StompPrincipal principal = new StompPrincipal(userId, nickname);
+                    accessor.setUser(principal);
 
                     // Spring 시큐리티 인증
                     UsernamePasswordAuthenticationToken authentication =

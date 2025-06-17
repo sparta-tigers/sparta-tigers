@@ -17,6 +17,6 @@ public class LiveBoardMessage {
 
     public static LiveBoardMessage of(
             String roomId, Long senderId, String senderNickname, String content) {
-        return new LiveBoardMessage(roomId, senderId, content, senderNickname, LocalDateTime.now());
+        return new LiveBoardMessage(roomId, senderId, senderNickname, content, LocalDateTime.now());
     }
 }
