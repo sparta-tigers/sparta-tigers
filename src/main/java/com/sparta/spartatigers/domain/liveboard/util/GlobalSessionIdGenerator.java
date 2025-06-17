@@ -16,7 +16,7 @@ public class GlobalSessionIdGenerator {
             serverId = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             serverId = "Unknown";
-			log.warn("Failed to resolve hostname. Fallback to 'unknown'", e);
+            log.warn("Failed to resolve hostname. Fallback to 'unknown'", e);
         }
         SERVER_ID = serverId;
     }

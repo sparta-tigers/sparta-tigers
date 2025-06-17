@@ -78,8 +78,9 @@ public class LiveBoardRedisService {
     public void handleMessage(LiveBoardMessage message, Authentication authentication) {
         Object principalObj = authentication.getPrincipal();
 
-        if (principalObj == null ||
-			principalObj instanceof StompPrincipal principal && "null".equals(principal.getName())) {
+        if (principalObj == null
+                || principalObj instanceof StompPrincipal principal
+                        && "null".equals(principal.getName())) {
             throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
         }
 
@@ -97,7 +98,8 @@ public class LiveBoardRedisService {
     // 입장
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
         Long senderId = findSenderId(authentication);
-		String nickname = senderId != null ? userRepository.findNicknameById(senderId).orElse("비회원") : "비회원";
+        String nickname =
+                senderId != null ? userRepository.findNicknameById(senderId).orElse("비회원") : "비회원";
         String globalSessionId = generateGlobalSessionId(message);
 
         // get topic
@@ -107,7 +109,7 @@ public class LiveBoardRedisService {
         // connection 생성 후 저장
         LiveBoardConnection connection =
                 LiveBoardConnection.of(
-                        globalSessionId, senderId , nickname, roomId, LocalDateTime.now());
+                        globalSessionId, senderId, nickname, roomId, LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
 
         redisPublisher.publish(topic, message.getPayload());
