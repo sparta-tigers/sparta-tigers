@@ -10,7 +10,7 @@ public enum MessageCode {
     // 인증/인가
 
     // 회원
-
+    USER_REQUEST_SUCCESS("회원 요청을 성공적으로 보냈습니다."),
     // 라이브 보드
 
     // 알람

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.sparta.spartatigers.domain.exchangerequest.model.entity.ExchangeRequest;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Category;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
-import com.sparta.spartatigers.domain.user.dto.UserResponseDto;
+import com.sparta.spartatigers.domain.user.dto.response.UserResponseDto;
 
 public record SendRequestResponseDto(
         Long exchangeRequestId,
