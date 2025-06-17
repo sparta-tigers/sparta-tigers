@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,13 +30,15 @@ public class AlarmScheduler {
     private final AlarmRepository alarmRepository;
     private static final String REDIS_KEY = "alarms";
 
-    @Scheduled(fixedRate = 10_000)
+    @Scheduled(fixedRate = 60_000)
+    @Transactional
     public void sendAlarms() {
         ZoneOffset offset = ZoneOffset.of("+09:00");
-
         long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
+        long fiveMinutesAgo = now - 300;
 
-        Set<String> alarmJsons = redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, now, now);
+        Set<String> alarmJsons =
+                redisTemplate.opsForZSet().rangeByScore(REDIS_KEY, fiveMinutesAgo, now);
         if (alarmJsons == null || alarmJsons.isEmpty()) return;
 
         for (String alarmJson : alarmJsons) {
