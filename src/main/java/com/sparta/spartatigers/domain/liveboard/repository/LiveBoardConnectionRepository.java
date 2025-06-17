@@ -27,6 +27,4 @@ public class LiveBoardConnectionRepository {
 	public Long getConnectionCount(String roomId) {
 		return redisTemplate.opsForHash().size(PREFIX+roomId);
 	}
-
-
 }

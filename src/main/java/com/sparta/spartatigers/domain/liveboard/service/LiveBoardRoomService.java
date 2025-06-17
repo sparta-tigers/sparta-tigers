@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.dto.response.LiveBoardRoomResponseDto;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardRoom;
+import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardRoomRepository;
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
@@ -22,6 +23,7 @@ public class LiveBoardRoomService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final LiveBoardRoomRepository roomRepository;
+    private final LiveBoardConnectionRepository connectionRepository;
     private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
 
     // 라이브 보드룸 생성
@@ -45,7 +47,7 @@ public class LiveBoardRoomService {
             String title = match.getAwayTeam().getName() + "VS" + match.getHomeTeam().getName();
             LocalDateTime matchTime = match.getMatchTime();
 
-			LiveBoardRoom room = new LiveBoardRoom(roomId,match.getId(),title,matchTime);
+            LiveBoardRoom room = new LiveBoardRoom(roomId, match.getId(), title, matchTime);
 
             roomRepository.saveRoom(room);
         }
@@ -58,7 +60,7 @@ public class LiveBoardRoomService {
         return roomRepository.findAllRoom().stream()
                 .map(
                         room -> {
-                            long count = getConnectCount(room.getRoomId());
+                            long count = connectionRepository.getConnectionCount(room.getRoomId());
                             return LiveBoardRoomResponseDto.of(room, count);
                         })
                 .collect((Collectors.toList()));
@@ -73,7 +75,7 @@ public class LiveBoardRoomService {
                 .filter(room -> !room.getOpenAt().isBefore(start) && room.getOpenAt().isBefore(end))
                 .map(
                         room -> {
-                            long count = getConnectCount(room.getRoomId());
+                            long count = connectionRepository.getConnectionCount(room.getRoomId());
                             return LiveBoardRoomResponseDto.of(room, count);
                         })
                 .toList();
@@ -88,23 +90,5 @@ public class LiveBoardRoomService {
         }
         roomRepository.deleteRoom(roomId);
         return "DELETED";
-    }
-
-    private static final String CONNECT_COUNT_KEY = "liveboard:connectCount";
-
-    // 라이브 보드룸 접속자 수 증가
-    public void increaseConnectCount(String roomId) {
-        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, 1);
-    }
-
-    // 라이브 보드룸 접속자 수 감소
-    public void decreaseConnectCount(String roomId) {
-        redisTemplate.opsForHash().increment(CONNECT_COUNT_KEY, roomId, -1);
-    }
-
-    // 라이브 보드룸 접속자 수 조회
-    public Long getConnectCount(String roomId) {
-        Object currentCount = redisTemplate.opsForHash().get(CONNECT_COUNT_KEY, roomId);
-        return currentCount != null ? Long.parseLong(currentCount.toString()) : 0;
     }
 }

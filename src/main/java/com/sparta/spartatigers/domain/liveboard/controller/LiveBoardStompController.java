@@ -1,9 +1,7 @@
 package com.sparta.spartatigers.domain.liveboard.controller;
 
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
@@ -28,14 +26,13 @@ public class LiveBoardStompController {
 
     // 입장
     @MessageMapping("/liveboard/enter")
-    public void enterLiveBoard(Message<LiveBoardMessage> message, Authentication authentication
-	) {
-		liveBoardRedisService.enterRoom(message, authentication);
+    public void enterLiveBoard(Message<LiveBoardMessage> message, Authentication authentication) {
+        liveBoardRedisService.enterRoom(message, authentication);
     }
 
     // 퇴장
     @MessageMapping("/liveboard/exit")
-    public void exitLiveBoard(Message<LiveBoardMessage> message, Authentication authentication) {
-        liveBoardRedisService.exitRoom(message, authentication);
+    public void exitLiveBoard(Message<LiveBoardMessage> message) {
+        liveBoardRedisService.exitRoom(message);
     }
 }
