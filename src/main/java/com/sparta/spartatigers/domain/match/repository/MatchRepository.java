@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 
@@ -32,4 +33,10 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 			WHERE m.id = :id
 			""")
     Match findByIdWithTeamsAndStadium(Long id);
+
+    @Query(
+            "SELECT m FROM matches m WHERE (m.homeTeam.id = :teamId OR m.awayTeam.id = :teamId) "
+                    + "AND FUNCTION('DATE_FORMAT', m.matchTime, '%Y-%m') = :yearMonth")
+    List<Match> findByTeamIdAndYearMonth(
+            @Param("teamId") Long teamId, @Param("yearMonth") String yearMonth);
 }
