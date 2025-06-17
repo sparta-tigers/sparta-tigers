@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.model.entity;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import jakarta.persistence.Column;
@@ -9,6 +10,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +31,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "UNIQUE_USER_ITEM",
+                    columnNames = {"user_id", "created_date"})
+        })
 public class Item extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
@@ -48,6 +57,8 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column private LocalDate createdDate;
+
     public static Item of(CreateItemRequestDto dto, User user) {
         return new Item(
                 dto.category(),
@@ -56,7 +67,8 @@ public class Item extends BaseEntity {
                 dto.title(),
                 dto.description(),
                 Status.REGISTERED,
-                user);
+                user,
+                LocalDate.now());
     }
 
     public void validateSenderIsNotOwner(User sender) {

@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,10 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         List<Item> itemList =
                 queryFactory
                         .selectFrom(item)
-                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
+                        .where(
+                                itemStatusEq(status),
+                                item.user.id.in(nearByUserIds),
+                                itemCreatedDateEq())
                         .join(item.user, user)
                         .fetchJoin()
                         .orderBy(item.createdAt.desc())
@@ -46,7 +50,10 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                 queryFactory
                         .select(item.count())
                         .from(item)
-                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
+                        .where(
+                                itemStatusEq(status),
+                                item.user.id.in(nearByUserIds),
+                                itemCreatedDateEq())
                         .fetchOne();
 
         long count = (total == null) ? 0L : total;
@@ -60,7 +67,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(item)
-                        .where(itemStatusEq(status), item.id.eq(itemId))
+                        .where(itemStatusEq(status), item.id.eq(itemId), itemCreatedDateEq())
                         .join(item.user, user)
                         .fetchJoin()
                         .fetchOne());
@@ -69,5 +76,10 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
     private BooleanExpression itemStatusEq(Status status) {
 
         return item.status.eq(status);
+    }
+
+    private BooleanExpression itemCreatedDateEq() {
+
+        return item.createdDate.eq(LocalDate.now());
     }
 }
