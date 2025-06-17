@@ -44,8 +44,15 @@ public class StompAuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         // 첫 연결할 때만 인증 및 세션id-userid 레지스트리에 저장 수행
-        // TODO: StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            String chatDomain = accessor.getFirstNativeHeader("ChatDomain");
+
+            // StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
+            if (chatDomain == null || !chatDomain.equals("directroom")) {
+                System.out.println("chatDomain값이 null이거나 directroom이 아닌 연결은 인증x");
+                return message;
+            }
+
             String token = accessor.getFirstNativeHeader("Authorization");
 
             System.out.println("Authorization header: " + token);
@@ -77,6 +84,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             // 세션-유저 매핑 저장소에 등록
             userSessionRegistry.registerSession(user.getId(), accessor.getSessionId());
 
+            System.out.println("채팅 도메인 인증까지 완료vV");
             System.out.println("연결된 userId: " + user.getId());
             System.out.println("세션 ID: " + accessor.getSessionId());
         }
