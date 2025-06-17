@@ -87,6 +87,7 @@ public class Item extends BaseEntity {
 
     public void complete() {
         this.status = Status.COMPLETED;
+        this.createdDate = null;
     }
 
     public void fail() {
