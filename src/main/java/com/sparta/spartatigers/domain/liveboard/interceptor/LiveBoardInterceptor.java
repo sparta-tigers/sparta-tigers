@@ -1,58 +1,65 @@
 package com.sparta.spartatigers.domain.liveboard.interceptor;
 
+import java.util.List;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.config.RedisUserSessionRegistry;
+import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
+import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRoomService;
+import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
+import com.sparta.spartatigers.global.util.JwtUtil;
 
 @Component
 @RequiredArgsConstructor
 public class LiveBoardInterceptor implements ChannelInterceptor {
 
-    private final LiveBoardRoomService liveBoardRoomService;
-    private final RedisTemplate<String, String> redisTemplate;
+	private final JwtUtil jwtUtil;
+	private final CustomUserDetailsService userDetailsService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor =
-                StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
-        StompCommand command = accessor.getCommand();
+		StompHeaderAccessor accessor =
+			StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
+		StompCommand command = accessor.getCommand();
 
-        // 채팅방 구독시
-        if (StompCommand.SUBSCRIBE.equals(command)) {
-            String destination = accessor.getDestination(); // url
-            String sessionId = accessor.getSessionId(); // 세션 id
+		if (StompCommand.CONNECT.equals(command)) {
+			String token = accessor.getFirstNativeHeader("Authorization");
 
-            if (destination != null && destination.startsWith("/server/liveboard/room/")) {
-                String enterRoomId = destination.substring("/server/liveboard/room/".length());
-                String lastRoomId = redisTemplate.opsForValue().get(sessionId);
+			if(token != null && token.startsWith("Bearer ")) {
+				token = token.substring(7);
+				Claims claims = jwtUtil.validateToken(token);
 
-                // 다른 채팅방에서 넘어온 경우
-                if (lastRoomId != null && !lastRoomId.equals(enterRoomId)) {
-                    liveBoardRoomService.decreaseConnectCount(lastRoomId);
-                }
+				if(claims != null ) { // 토큰이 있을때
+					String email = claims.getSubject();
+					User user = userDetailsService.loadUserByUsername(email).getUser();
+					Long userId = user.getId();
+					String nickname = user.getNickname();
 
-                // 새로 입장한 채팅방 접속자 수 증가
-                redisTemplate.opsForValue().set(sessionId, enterRoomId);
-            }
-        }
+					// 웹소켓에 사용자 등록
+					StompPrincipal principal = new StompPrincipal(userId, nickname);
 
-        // 웹소켓 연결 종료시
-        if (StompCommand.DISCONNECT.equals(command)) {
-            String sessionId = accessor.getSessionId();
-            String roomId = redisTemplate.opsForValue().get(sessionId);
-
-            if (roomId != null) {
-                redisTemplate.delete(sessionId);
-            }
-        }
-        return message;
-    }
+					// Spring 시큐리티 인증
+					UsernamePasswordAuthenticationToken authentication =
+						new UsernamePasswordAuthenticationToken(principal, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				}
+			}
+		}
+		return message;
+	}
 }
