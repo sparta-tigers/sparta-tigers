@@ -39,7 +39,7 @@ public class ExchangeRequestService {
 
         User sender = principal.getUser();
         User receiver = getReceiver(request.receiverId());
-        Item requestItem = itemRepository.findItemByIdOrElseThrow(request.itemId());
+        Item requestItem = itemRepository.findByIdWithLockOrElseThrow(request.itemId());
 
         requestItem.validateSenderIsNotOwner(sender);
         requestItem.validateReceiverIsOwner(receiver);
