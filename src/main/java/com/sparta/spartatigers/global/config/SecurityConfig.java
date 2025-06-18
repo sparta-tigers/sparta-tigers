@@ -48,7 +48,11 @@ public class SecurityConfig {
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(
                         auth ->
-                                auth.requestMatchers("/api/users/signup", "/api/users/login")
+                                auth.requestMatchers(
+                                                "/api/users/signup",
+                                                "/api/users/login",
+                                                "/login/oauth2/**",
+                                                "/oauth2/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
