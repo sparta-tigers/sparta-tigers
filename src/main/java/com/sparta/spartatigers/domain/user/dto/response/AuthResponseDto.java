@@ -1,15 +1,15 @@
 package com.sparta.spartatigers.domain.user.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class AuthResponseDto {
-    private Long id;
-    private String path;
-    private String email;
-    private String nickname;
+    private String accessToken;
+
+    public static AuthResponseDto from(String token) {
+        return new AuthResponseDto(token);
+    }
 }

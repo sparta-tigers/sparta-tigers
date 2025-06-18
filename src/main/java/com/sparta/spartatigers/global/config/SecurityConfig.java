@@ -47,7 +47,11 @@ public class SecurityConfig {
                 .sessionManagement(
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/*").permitAll().anyRequest().authenticated())
+                        auth ->
+                                auth.requestMatchers("/api/users/signup", "/api/users/login")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .oauth2Login(
                         oauth ->
                                 oauth.userInfoEndpoint(
@@ -61,7 +65,7 @@ public class SecurityConfig {
 
         http.logout(
                 logout ->
-                        logout.logoutUrl("/api/users/logout") // 클라이언트가 이 경로로 POST하면 로그아웃 수행
+                        logout.logoutUrl("/api/users/logout")
                                 .invalidateHttpSession(true)
                                 .deleteCookies("JSESSIONID")
                                 .permitAll());
