@@ -46,6 +46,7 @@
     stompClient.connect(
         {
           Authorization: token,
+          ChatDomain: "directroom"
         },
         function (frame) {
           console.log("Connected: " + frame);
