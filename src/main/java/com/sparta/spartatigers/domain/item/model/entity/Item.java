@@ -12,11 +12,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
@@ -28,7 +28,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 @Entity(name = "items")
 @Getter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
@@ -58,6 +57,28 @@ public class Item extends BaseEntity {
     private User user;
 
     @Column private LocalDate createdDate;
+
+    @Version private Long version;
+
+    public Item(
+            Item.Category category,
+            String image,
+            String seatInfo,
+            String title,
+            String description,
+            Status status,
+            User user,
+            LocalDate createdDate) {
+
+        this.category = category;
+        this.image = image;
+        this.seatInfo = seatInfo;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.user = user;
+        this.createdDate = createdDate;
+    }
 
     public static Item of(CreateItemRequestDto dto, User user) {
         return new Item(
