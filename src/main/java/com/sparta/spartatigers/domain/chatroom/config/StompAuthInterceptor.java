@@ -90,7 +90,6 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             // 세션-유저 매핑 저장소에 등록
             userSessionRegistry.registerSession(user.getId(), accessor.getSessionId());
 
-            log.info("채팅 도메인 인증 완료vV");
             log.info("연결된 userId: {}", user.getId());
             log.info("세션 ID: {}", accessor.getSessionId());
         }

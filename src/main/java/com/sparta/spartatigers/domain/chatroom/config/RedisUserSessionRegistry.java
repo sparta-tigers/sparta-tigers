@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.chatroom.config;
 
 import java.time.Duration;
+import java.util.Set;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -53,11 +54,10 @@ public class RedisUserSessionRegistry {
         return userId != null ? Long.parseLong(userId.toString()) : null;
     }
 
-    /*
-    나중에 멀티 세션에 대응하려면 꼭 필요한 로직 지금은 사용x
+    // TODO: 나중에 멀티 세션에 대응하려면 꼭 필요한 로직 지금은 사용x
+    // TODO: 추후에 한 사용자가 여러 브라우저로 로그인했을 때 한 명의 유저에게 여러 세션이 생기는 멀티 세션에 대응하기 위함
     public Set<String> getSessionIds(Long userId) {
-    	String userKey = USER_SESSION_KEY_PREFIX + userId;
-    	return redisTemplate.opsForSet().members(userKey);
+        String userKey = USER_SESSION_KEY_PREFIX + userId;
+        return redisTemplate.opsForSet().members(userKey);
     }
-       */
 }

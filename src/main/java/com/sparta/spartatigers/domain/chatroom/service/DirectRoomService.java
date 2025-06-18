@@ -58,7 +58,8 @@ public class DirectRoomService {
                 .map(DirectRoomResponseDto::from);
     }
 
-    // 나중에 readOnly일 때 동작하거나, 교환에 실패했을 때 직접 채팅방을 삭제할 수 있게 놔두려고
+    // 유저가 직접 채팅방을 삭제할 수도 있음
+    // TODO: 교환 완료 시 채팅방이 readOnly 상태로 바뀌고 6시간 후 자동 삭제 (확장 기능)
     @Transactional
     public void deleteRoom(Long directRoomId, Long currentUserId) {
         DirectRoom room =
@@ -80,7 +81,7 @@ public class DirectRoomService {
         directRoomRepository.delete(room);
     }
 
-    // 교환 완료 시 호출
+    // 교환 완료 시 호출되며 채팅방이 삭제되는 로직
     @Transactional
     public void deleteRoomByExchangeRequestId(Long exchangeRequestId) {
         DirectRoom room =

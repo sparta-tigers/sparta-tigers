@@ -39,7 +39,6 @@ public class RedisDirectMessageSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        log.info("onMessage 호출됨ㅎㅇ");
         try {
             // Redis에서 전달된 메시지를 UTF-8 문자열로 변환
             String body = new String(message.getBody(), StandardCharsets.UTF_8);
