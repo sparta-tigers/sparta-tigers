@@ -24,7 +24,7 @@ public class ItemScheduler {
 
     private static final String LOCK_KEY = "lock:itemScheduler";
     private final RedissonClient redissonClient;
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
