@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
+import com.sparta.spartatigers.domain.user.dto.request.SignUpRequestDto;
 
 @Entity(name = "users")
 @Getter
@@ -27,9 +28,13 @@ public class User extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column private String provider;
+
     @Column private String providerId;
 
     @Column private String email;
+
+    @Column private String password;
 
     @Column private String nickname;
 
@@ -40,12 +45,32 @@ public class User extends BaseEntity implements Serializable {
 
     @Column private LocalDateTime deletedAt;
 
+    // 소셜 로그인
     public User(String email, String providerId, String nickname, String path) {
         this.email = email;
         this.providerId = providerId;
         this.nickname = nickname;
         this.path = path;
         this.roles = Role.USER;
+    }
+
+    // 일반 로그인
+    public User(String email, String provider, String nickname, String path, String password) {
+        this.email = email;
+        this.providerId = provider;
+        this.nickname = nickname;
+        this.path = path;
+        this.password = password;
+        this.roles = Role.USER;
+    }
+
+    public static User from(SignUpRequestDto signUpRequestDto, String encodedPassword) {
+        return new User(
+                signUpRequestDto.getEmail(),
+                "local",
+                signUpRequestDto.getNickname(),
+                null,
+                encodedPassword);
     }
 
     public void deleted() {
