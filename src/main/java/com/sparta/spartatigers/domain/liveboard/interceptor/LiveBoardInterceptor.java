@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
+import com.sparta.spartatigers.domain.liveboard.util.GlobalSessionIdGenerator;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
 import com.sparta.spartatigers.global.util.JwtUtil;
@@ -34,6 +35,7 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                 StompHeaderAccessor.wrap(message); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
         StompCommand command = accessor.getCommand();
 
+        // TODO : 글로벌 세션아이디를 만들어서 넘겨주기
         if (StompCommand.CONNECT.equals(command)) {
             String token = accessor.getFirstNativeHeader("Authorization");
 
@@ -58,6 +60,10 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                                     null,
                                     List.of(new SimpleGrantedAuthority("ROLE_USER")));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    String rawSessionId = accessor.getSessionId();
+                    String globalSessionId = GlobalSessionIdGenerator.generate(rawSessionId);
+                    accessor.setNativeHeader("GLOBAL_SESSION_HEADER", globalSessionId);
                 }
             }
         }

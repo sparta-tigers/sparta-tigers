@@ -23,7 +23,6 @@ import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessagePublisher;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
-import com.sparta.spartatigers.domain.liveboard.util.GlobalSessionIdGenerator;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
@@ -65,13 +64,13 @@ public class LiveBoardRedisService {
         } else if (principalObj instanceof StompPrincipal principal) {
             return Long.parseLong(principal.getName());
         }
-        throw new IllegalStateException("지원하지 않는 principal타입 : " + principalObj.getClass());
+        return null;
     }
 
-    private String generateGlobalSessionId(Message<LiveBoardMessage> message) {
+    private String getGlobalSessionId(Message<LiveBoardMessage> message) {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
-        String sessionId = accessor.getSessionId();
-        return GlobalSessionIdGenerator.generate(sessionId);
+        String globalSessionId = accessor.getSessionId();
+        return globalSessionId;
     }
 
     // 채팅 전송
@@ -95,12 +94,12 @@ public class LiveBoardRedisService {
         redisPublisher.publish(topic, message);
     }
 
-    // 입장
+    // 입장 TODO: Message<LiveBoardMessage> message -> 글로벌 세션ID만 뺄수있음 된다!, paylood 없어도 된다
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
         Long senderId = findSenderId(authentication);
         String nickname =
                 senderId != null ? userRepository.findNicknameById(senderId).orElse("비회원") : "비회원";
-        String globalSessionId = generateGlobalSessionId(message);
+        String globalSessionId = getGlobalSessionId(message);
 
         // get topic
         String roomId = message.getPayload().getRoomId();
@@ -115,11 +114,11 @@ public class LiveBoardRedisService {
         redisPublisher.publish(topic, message.getPayload());
     }
 
-    // 퇴장
+    // 퇴장 TODO: 글로벌 세션id 새로 생성 X / 위랑 똑같이 이미 만들어진 글로벌세션 ID 받아오기
     public void exitRoom(Message<LiveBoardMessage> message) {
         // connection 삭제
         String roomId = message.getPayload().getRoomId();
-        String globalSessionId = generateGlobalSessionId(message);
+        String globalSessionId = getGlobalSessionId(message);
         liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
 
         // get topic 후 publish
