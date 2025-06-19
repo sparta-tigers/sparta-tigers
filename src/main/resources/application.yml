@@ -21,4 +21,4 @@ server:
 
 logging:
   level:
-    com.sparta.sparta-tigers.domain.chatroom.config.StompAuthInterceptor: info # 개발할 때 info 운영 단계에서는 warn으로
+    com.sparta.sparta-tigers.global.config.StompAuthInterceptor: info # 개발할 때 info 운영 단계에서는 warn으로
