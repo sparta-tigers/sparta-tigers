@@ -44,11 +44,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public AuthResponseDto login(LoginRequestDto loginRequestDto) {
         User user =
                 userRepository
                         .findByEmail(loginRequestDto.getEmail())
-                        .orElseThrow(() -> new RuntimeException("user not found"));
+                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new ServerException(ExceptionCode.PASSWORD_NOT_MATCH);
         }

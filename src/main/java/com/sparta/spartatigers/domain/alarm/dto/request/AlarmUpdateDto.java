@@ -5,11 +5,15 @@ import java.time.temporal.ChronoUnit;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import com.sparta.spartatigers.domain.alarm.model.entity.Alarm;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlarmUpdateDto {
     @NotNull private Long id;
     private Integer minutes;

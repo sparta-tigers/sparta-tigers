@@ -13,7 +13,7 @@ public class ServerException extends BaseException {
 
     @Override
     public HttpStatus getStatus() {
-        return HttpStatus.INTERNAL_SERVER_ERROR;
+        return exceptionCode.getStatus();
     }
 
     @Override

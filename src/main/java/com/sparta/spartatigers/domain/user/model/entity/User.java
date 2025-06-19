@@ -3,12 +3,7 @@ package com.sparta.spartatigers.domain.user.model.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,6 +19,7 @@ import com.sparta.spartatigers.domain.user.dto.request.SignUpRequestDto;
 @AllArgsConstructor
 public class User extends BaseEntity implements Serializable {
 
+    @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,8 +42,9 @@ public class User extends BaseEntity implements Serializable {
     @Column private LocalDateTime deletedAt;
 
     // 소셜 로그인
-    public User(String email, String providerId, String nickname, String path) {
+    public User(String email, String provider, String providerId, String nickname, String path) {
         this.email = email;
+        this.provider = provider;
         this.providerId = providerId;
         this.nickname = nickname;
         this.path = path;
@@ -55,22 +52,24 @@ public class User extends BaseEntity implements Serializable {
     }
 
     // 일반 로그인
-    public User(String email, String provider, String nickname, String path, String password) {
+    public User(String email, String nickname, String password) {
         this.email = email;
-        this.providerId = provider;
+        this.provider = "local";
+        this.providerId = null;
         this.nickname = nickname;
-        this.path = path;
         this.password = password;
+        this.path = null;
         this.roles = Role.USER;
     }
 
     public static User from(SignUpRequestDto signUpRequestDto, String encodedPassword) {
         return new User(
-                signUpRequestDto.getEmail(),
-                "local",
-                signUpRequestDto.getNickname(),
-                null,
-                encodedPassword);
+                signUpRequestDto.getEmail(), signUpRequestDto.getNickname(), encodedPassword);
+    }
+
+    public static User from(
+            String provider, String providerId, String email, String nickname, String path) {
+        return new User(email, provider, providerId, nickname, path);
     }
 
     public void deleted() {

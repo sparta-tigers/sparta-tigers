@@ -1,7 +1,6 @@
 package com.sparta.spartatigers.global.handler;
 
 import java.io.IOException;
-import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.user.model.*;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.util.JwtUtil;
@@ -32,15 +31,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             throws IOException, ServletException {
         CustomUserPrincipal customUser = (CustomUserPrincipal) authentication.getPrincipal();
 
-        Map<String, Object> attributes = customUser.getAttributes();
-        String providerId = String.valueOf(attributes.get("id"));
-        Map<String, Object> kakaoAccount =
-                (Map<String, Object>) customUser.getAttributes().get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-
-        String email = (String) kakaoAccount.get("email");
-        String nickname = (String) profile.get("nickname");
-        String path = (String) profile.get("profile_image_url");
+        String provider = customUser.getProvider();
+        String providerId = customUser.getUser().getProviderId();
+        String email = customUser.getUser().getEmail();
+        String nickname = customUser.getUser().getNickname();
+        String path = customUser.getUser().getPath();
 
         log.info("email: {}", email);
         log.info("nickname: {}", nickname);
@@ -49,7 +44,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtUtil.generateToken(email, "USER");
 
         if (!userRepository.existsByProviderId(providerId)) {
-            User newUser = new User(email, providerId, nickname, path);
+            User newUser = User.from(provider, providerId, email, nickname, path);
             userRepository.save(newUser);
         }
 
