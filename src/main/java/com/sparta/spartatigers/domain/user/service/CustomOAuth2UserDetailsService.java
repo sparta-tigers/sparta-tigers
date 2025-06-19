@@ -29,7 +29,6 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String registrationId =
                 userRequest.getClientRegistration().getRegistrationId(); // google, kakao, naver
-
         OAuth2UserInfo userInfo =
                 switch (registrationId) {
                     case "kakao" -> new KakaoUserInfo(attributes);
