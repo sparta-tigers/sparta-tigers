@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
 import com.sparta.spartatigers.domain.chatroom.dto.request.ChatMessageRequest;
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.chatroom.pubsub.RedisDirectMessagePublisher;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 

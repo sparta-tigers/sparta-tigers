@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.config.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.dto.response.ChatMessageResponse;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectMessage;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
+import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectMessageRepository;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;

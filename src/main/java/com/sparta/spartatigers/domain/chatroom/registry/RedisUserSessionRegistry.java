@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.chatroom.config;
+package com.sparta.spartatigers.domain.chatroom.registry;
 
 import java.time.Duration;
 import java.util.Set;

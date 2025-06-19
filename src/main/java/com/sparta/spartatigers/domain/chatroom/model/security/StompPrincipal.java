@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.chatroom.config;
+package com.sparta.spartatigers.domain.chatroom.model.security;
 
 import java.security.Principal;
 
