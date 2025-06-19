@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Category;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
-import com.sparta.spartatigers.domain.user.dto.UserResponseDto;
+import com.sparta.spartatigers.domain.user.dto.response.UserResponseDto;
 
 public record ReadItemDetailResponseDto(
         Long id,
