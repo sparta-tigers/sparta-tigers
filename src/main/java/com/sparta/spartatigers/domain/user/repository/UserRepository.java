@@ -3,6 +3,7 @@ package com.sparta.spartatigers.domain.user.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
@@ -23,4 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     }
 
     boolean existsByNickname(String nickname);
+
+    @Query("SELECT u.nickname FROM users u WHERE u.id = :userId")
+    Optional<String> findNicknameById(Long userId);
 }
