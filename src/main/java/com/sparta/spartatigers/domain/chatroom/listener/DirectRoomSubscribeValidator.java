@@ -41,6 +41,12 @@ public class DirectRoomSubscribeValidator {
     }
 
     private Long extractRoomId(String destination) {
-        return Long.parseLong(destination.substring("/server/directRoom/".length()));
+        String prefix = "/server/directRoom/";
+        if (destination == null
+                || !destination.startsWith(prefix)
+                || destination.length() <= prefix.length()) {
+            throw new NumberFormatException("잘못된 형식의 주소입니다: " + destination);
+        }
+        return Long.parseLong(destination.substring(prefix.length()));
     }
 }
