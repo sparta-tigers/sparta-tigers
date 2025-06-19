@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.item.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.geo.Circle;
@@ -10,6 +11,7 @@ import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +26,10 @@ import com.sparta.spartatigers.domain.item.pubsub.LocationPublisher;
 public class LocationService {
 
     private static final String USER_LOCATION_KEY = "USERLOCATION:";
+    private static final double SEARCH_RADIUS_KM = 0.05;
     private final RedisTemplate<String, Object> redisTemplate;
     private final LocationPublisher locationPublisher;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public void updateLocation(LocationRequestDto request, Long userId) {
@@ -65,5 +69,20 @@ public class LocationService {
     @Transactional
     public void deleteLocation(Long userId) {
         redisTemplate.opsForGeo().remove(USER_LOCATION_KEY, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public void notifyUsersNearBy(Long userId, String messageType, Object data) {
+
+        List<Long> nearByUserIds = findUsersNearBy(userId, SEARCH_RADIUS_KM);
+        nearByUserIds.add(userId);
+
+        Map<String, Object> messagePayload = Map.of("type", messageType, "data", data);
+
+        nearByUserIds.forEach(
+                targetUserId -> {
+                    String destination = "/server/items/user/" + targetUserId;
+                    messagingTemplate.convertAndSend(destination, messagePayload);
+                });
     }
 }
