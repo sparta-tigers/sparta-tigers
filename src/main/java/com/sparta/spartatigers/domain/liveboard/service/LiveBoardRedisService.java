@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
+import com.sparta.spartatigers.domain.liveboard.model.MessageType;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessagePublisher;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
@@ -87,7 +88,12 @@ public class LiveBoardRedisService {
         Long senderId = findSenderId(authentication);
         String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         message =
-                LiveBoardMessage.of(message.getRoomId(), senderId, nickname, message.getContent());
+                LiveBoardMessage.of(
+                        message.getRoomId(),
+                        senderId,
+                        nickname,
+                        message.getContent(),
+                        MessageType.CHAT);
 
         // Redis publish
         ChannelTopic topic = getOrInitTopic(message.getRoomId());
@@ -105,13 +111,16 @@ public class LiveBoardRedisService {
         String roomId = message.getPayload().getRoomId();
         ChannelTopic topic = getOrInitTopic(roomId);
 
+        LiveBoardMessage enterMessage =
+                LiveBoardMessage.of(roomId, senderId, nickname, "입장", MessageType.ENTER);
+
         // connection 생성 후 저장
         LiveBoardConnection connection =
                 LiveBoardConnection.of(
                         globalSessionId, senderId, nickname, roomId, LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
 
-        redisPublisher.publish(topic, message.getPayload());
+        redisPublisher.publish(topic, enterMessage);
     }
 
     // 퇴장 TODO: 글로벌 세션id 새로 생성 X / 위랑 똑같이 이미 만들어진 글로벌세션 ID 받아오기
@@ -121,9 +130,12 @@ public class LiveBoardRedisService {
         String globalSessionId = getGlobalSessionId(message);
         liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
 
+        LiveBoardMessage exitMessage =
+                LiveBoardMessage.of(roomId, null, "유저", "퇴장", MessageType.EXIT);
+
         // get topic 후 publish
         ChannelTopic topic = getOrInitTopic(roomId);
-        redisPublisher.publish(topic, message.getPayload());
+        redisPublisher.publish(topic, exitMessage);
     }
 
     public void handleDisconnect(String globalSessionId) {
