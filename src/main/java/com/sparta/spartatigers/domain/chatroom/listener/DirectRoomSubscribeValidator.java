@@ -1,16 +1,14 @@
 package com.sparta.spartatigers.domain.chatroom.listener;
 
+import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
 @Component
 @RequiredArgsConstructor
@@ -43,9 +41,9 @@ public class DirectRoomSubscribeValidator {
     private Long extractRoomId(String destination) {
         String prefix = "/server/directRoom/";
         if (destination == null
-                || !destination.startsWith(prefix)
-                || destination.length() <= prefix.length()) {
-            throw new NumberFormatException("잘못된 형식의 주소입니다: " + destination);
+            || !destination.startsWith(prefix)
+            || destination.length() <= prefix.length()) {
+            throw new NumberFormatException("잘못된 형식의 채팅방 주소입니다: " + destination);
         }
         return Long.parseLong(destination.substring(prefix.length()));
     }
