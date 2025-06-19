@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 .orElseThrow(() -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
     }
 
+    boolean existsByNickname(String nickname);
+
     @Query("SELECT u.nickname FROM users u WHERE u.id = :userId")
     Optional<String> findNicknameById(Long userId);
 }

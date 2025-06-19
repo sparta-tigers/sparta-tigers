@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.model.entity;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import jakarta.persistence.Column;
@@ -9,11 +10,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
@@ -25,9 +28,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 @Entity(name = "items")
 @Getter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "UNIQUE_USER_ITEM",
+                    columnNames = {"user_id", "created_date"})
+        })
 public class Item extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
@@ -48,6 +56,30 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column private LocalDate createdDate;
+
+    @Version private Long version;
+
+    public Item(
+            Item.Category category,
+            String image,
+            String seatInfo,
+            String title,
+            String description,
+            Status status,
+            User user,
+            LocalDate createdDate) {
+
+        this.category = category;
+        this.image = image;
+        this.seatInfo = seatInfo;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.user = user;
+        this.createdDate = createdDate;
+    }
+
     public static Item of(CreateItemRequestDto dto, User user) {
         return new Item(
                 dto.category(),
@@ -56,7 +88,8 @@ public class Item extends BaseEntity {
                 dto.title(),
                 dto.description(),
                 Status.REGISTERED,
-                user);
+                user,
+                LocalDate.now());
     }
 
     public void validateSenderIsNotOwner(User sender) {
@@ -75,6 +108,11 @@ public class Item extends BaseEntity {
 
     public void complete() {
         this.status = Status.COMPLETED;
+        this.createdDate = null;
+    }
+
+    public void fail() {
+        this.status = Status.FAILED;
     }
 
     public enum Category {
@@ -92,6 +130,7 @@ public class Item extends BaseEntity {
 
     public enum Status {
         REGISTERED,
-        COMPLETED
+        COMPLETED,
+        FAILED
     }
 }

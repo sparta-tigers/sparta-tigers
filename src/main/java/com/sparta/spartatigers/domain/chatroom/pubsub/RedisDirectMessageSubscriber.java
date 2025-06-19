@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.config.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.dto.response.ChatMessageResponse;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectMessage;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
+import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectMessageRepository;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
@@ -39,7 +39,6 @@ public class RedisDirectMessageSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        log.info("onMessage 호출됨ㅎㅇ");
         try {
             // Redis에서 전달된 메시지를 UTF-8 문자열로 변환
             String body = new String(message.getBody(), StandardCharsets.UTF_8);

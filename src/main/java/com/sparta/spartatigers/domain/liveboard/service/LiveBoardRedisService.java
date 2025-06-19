@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.MessageType;
@@ -42,7 +42,8 @@ public class LiveBoardRedisService {
     private final UserRepository userRepository;
     private final LiveBoardConnectionRepository liveBoardConnectionRepository;
 
-    private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
+    private final Map<String, ChannelTopic> topics =
+            new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
 
     private ChannelTopic getOrInitTopic(String roomId) {
         return topics.computeIfAbsent(

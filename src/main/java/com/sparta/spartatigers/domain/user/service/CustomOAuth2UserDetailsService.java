@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.user.model.*;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 @RequiredArgsConstructor
 @Service
@@ -25,28 +27,35 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        String registrationId =
+                userRequest.getClientRegistration().getRegistrationId(); // google, kakao, naver
+        OAuth2UserInfo userInfo =
+                switch (registrationId) {
+                    case "kakao" -> new KakaoUserInfo(attributes);
+                    case "google" -> new GoogleUserInfo(attributes);
+                    case "naver" -> new NaverUserInfo(attributes);
+                    default -> throw new ServerException(ExceptionCode.NOT_SUPPORTED_SOCIAL_LOGIN);
+                };
 
-        String providerId = String.valueOf(attributes.get("id"));
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        String email = (String) kakaoAccount.get("email");
-        String nickname = (String) profile.get("nickname");
-        String path = (String) profile.get("profile_image_url");
+        String providerId = userInfo.getProviderId();
+        String email = userInfo.getEmail();
+        String nickname = userInfo.getNickname();
+        String path = userInfo.getPath();
 
-        log.info("provider{}", providerId);
-        log.info("email{}", email);
-        log.info("nickname{}", nickname);
-        log.info("profileImage{}", path);
-
-        // 사용자 정보 DB에 저장 or 조회
         User user =
                 userRepository
                         .findByProviderId(providerId)
                         .orElseGet(
                                 () -> {
-                                    User newUser = new User(email, providerId, nickname, path);
+                                    User newUser =
+                                            User.from(
+                                                    registrationId,
+                                                    providerId,
+                                                    email,
+                                                    nickname,
+                                                    path);
                                     return userRepository.save(newUser);
                                 });
-        return new CustomUserPrincipal(user, attributes);
+        return new CustomUserPrincipal(user, attributes, registrationId);
     }
 }

@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.chatroom.config;
+package com.sparta.spartatigers.global.interceptor;
 
 import java.util.List;
 
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
+import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
@@ -90,7 +92,6 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             // 세션-유저 매핑 저장소에 등록
             userSessionRegistry.registerSession(user.getId(), accessor.getSessionId());
 
-            log.info("채팅 도메인 인증 완료vV");
             log.info("연결된 userId: {}", user.getId());
             log.info("세션 ID: {}", accessor.getSessionId());
         }

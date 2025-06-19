@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,6 +48,15 @@ public class SecurityConfig {
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers("/*").permitAll().anyRequest().permitAll())
+                        auth ->
+                                auth.requestMatchers(
+                                                "/api/users/signup",
+                                                "/api/users/login",
+                                                "/login/oauth2/**",
+                                                "/oauth2/**")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .oauth2Login(
                         oauth ->
                                 oauth.userInfoEndpoint(
@@ -59,7 +70,7 @@ public class SecurityConfig {
 
         http.logout(
                 logout ->
-                        logout.logoutUrl("/api/users/logout") // 클라이언트가 이 경로로 POST하면 로그아웃 수행
+                        logout.logoutUrl("/api/users/logout")
                                 .invalidateHttpSession(true)
                                 .deleteCookies("JSESSIONID")
                                 .permitAll());
@@ -90,5 +101,10 @@ public class SecurityConfig {
     @Bean
     public JwtFilter jwtFilter() {
         return new JwtFilter(jwtUtil, userDetailsService);
+    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
