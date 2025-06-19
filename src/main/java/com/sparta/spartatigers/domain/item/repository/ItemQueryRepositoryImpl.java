@@ -35,10 +35,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         List<Item> itemList =
                 queryFactory
                         .selectFrom(item)
-                        .where(
-                                itemStatusEq(status),
-                                item.user.id.in(nearByUserIds),
-                                itemCreatedDateEq(LocalDate.now()))
+                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
                         .join(item.user, user)
                         .fetchJoin()
                         .orderBy(item.createdAt.desc())
@@ -50,10 +47,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                 queryFactory
                         .select(item.count())
                         .from(item)
-                        .where(
-                                itemStatusEq(status),
-                                item.user.id.in(nearByUserIds),
-                                itemCreatedDateEq(LocalDate.now()))
+                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
                         .fetchOne();
 
         long count = (total == null) ? 0L : total;
@@ -67,10 +61,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(item)
-                        .where(
-                                itemStatusEq(status),
-                                item.id.eq(itemId),
-                                itemCreatedDateEq(LocalDate.now()))
+                        .where(itemStatusEq(status), item.id.eq(itemId))
                         .join(item.user, user)
                         .fetchJoin()
                         .fetchOne());
