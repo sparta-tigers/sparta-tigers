@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.user.dto;
+package com.sparta.spartatigers.domain.user.dto.response;
 
 import com.sparta.spartatigers.domain.user.model.entity.User;
 

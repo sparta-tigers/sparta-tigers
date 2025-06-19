@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
@@ -24,8 +25,11 @@ import io.jsonwebtoken.Claims;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StompAuthInterceptor implements ChannelInterceptor {
 
+    private static final String CHAT_DOMAIN_HEADER = "ChatDomain";
+    private static final String CHAT_DOMAIN_DIRECTROOM = "directroom";
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
     private final RedisUserSessionRegistry userSessionRegistry;
@@ -43,10 +47,21 @@ public class StompAuthInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        // 첫 연결할 때만 인증 및 세션id-userid 레지스트리에 저장 수행
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            String chatDomain = accessor.getFirstNativeHeader(CHAT_DOMAIN_HEADER);
+
+            // StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
+            if (chatDomain == null || !CHAT_DOMAIN_DIRECTROOM.equalsIgnoreCase(chatDomain.trim())) {
+                log.info("인증 생략: ChatDomain = {}", chatDomain);
+                accessor.setUser(null);
+                SecurityContextHolder.clearContext();
+                return message;
+            }
+
             String token = accessor.getFirstNativeHeader("Authorization");
 
-            System.out.println("Authorization header: " + token);
+            log.info("Authorization header: {}", token);
 
             if (token == null || !token.startsWith("Bearer ")) {
                 throw new InvalidRequestException(ExceptionCode.NOT_FOUND_JWT);
@@ -75,8 +90,9 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             // 세션-유저 매핑 저장소에 등록
             userSessionRegistry.registerSession(user.getId(), accessor.getSessionId());
 
-            System.out.println("연결된 userId: " + user.getId());
-            System.out.println("세션 ID: " + accessor.getSessionId());
+            log.info("채팅 도메인 인증 완료vV");
+            log.info("연결된 userId: {}", user.getId());
+            log.info("세션 ID: {}", accessor.getSessionId());
         }
 
         return message;
