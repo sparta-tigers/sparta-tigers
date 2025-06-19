@@ -10,20 +10,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.user.model.entity.User;
 
 @Getter
-@RequiredArgsConstructor
 public class CustomUserPrincipal implements UserDetails, OAuth2User {
 
     private final User user;
     private final Map<String, Object> attributes;
+    private final String provider;
 
     public CustomUserPrincipal(User user) {
         this.user = user;
-        this.attributes = null; // 또는 Collections.emptyMap()
+        this.attributes = null;
+        this.provider = null;
+    }
+
+    public CustomUserPrincipal(User user, Map<String, Object> attributes, String provider) {
+        this.user = user;
+        this.attributes = attributes;
+        this.provider = provider;
     }
 
     public static Long getUserId(CustomUserPrincipal principal) {

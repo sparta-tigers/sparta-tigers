@@ -2,6 +2,7 @@ package com.sparta.spartatigers.domain.user.controller;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +27,10 @@ public class UserController {
 
     // 일반 로그인
     @PostMapping("/login")
-    public ApiResponse<AuthResponseDto> login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
+    public ResponseEntity<ApiResponse<AuthResponseDto>> login(
+            @RequestBody @Valid LoginRequestDto loginRequestDto) {
         AuthResponseDto authResDTO = userService.login(loginRequestDto);
-        return ApiResponse.ok(authResDTO);
+        return ResponseEntity.ok(ApiResponse.ok(authResDTO));
     }
 
     // 내 정보 조회
