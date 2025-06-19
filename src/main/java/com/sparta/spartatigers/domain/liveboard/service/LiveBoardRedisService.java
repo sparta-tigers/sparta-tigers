@@ -34,42 +34,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class LiveBoardRedisService {
 
-	private final RedisMessageListenerContainer redisMessageListener;
-	private final ObjectMapper objectMapper;
-	private final RedisTemplate<String, String> redisTemplate;
-	private final SimpMessageSendingOperations messagingTemplate;
-	private final RedisMessagePublisher redisPublisher;
-	private final UserRepository userRepository;
-	private final LiveBoardConnectionRepository liveBoardConnectionRepository;
+    private final RedisMessageListenerContainer redisMessageListener;
+    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final RedisMessagePublisher redisPublisher;
+    private final UserRepository userRepository;
+    private final LiveBoardConnectionRepository liveBoardConnectionRepository;
 
-	private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
+    private Map<String, ChannelTopic> topics = new ConcurrentHashMap<>(); // 채팅방별 topic을 roomId로 찾기
 
-	private ChannelTopic getOrInitTopic(String roomId) {
-		return topics.computeIfAbsent(
-			roomId,
-			key -> {
-				ChannelTopic topic = new ChannelTopic(key);
-				RedisMessageSubscriber subscriber =
-					new RedisMessageSubscriber(
-						objectMapper, redisTemplate, messagingTemplate);
-				redisMessageListener.addMessageListener(subscriber, topic);
-				return topic;
-			});
-	}
+    private ChannelTopic getOrInitTopic(String roomId) {
+        return topics.computeIfAbsent(
+                roomId,
+                key -> {
+                    ChannelTopic topic = new ChannelTopic(key);
+                    RedisMessageSubscriber subscriber =
+                            new RedisMessageSubscriber(
+                                    objectMapper, redisTemplate, messagingTemplate);
+                    redisMessageListener.addMessageListener(subscriber, topic);
+                    return topic;
+                });
+    }
 
-	private Long findSenderId(Authentication authentication) {
-		if (authentication == null) {
-			return null;
-		}
-		Object principalObj = authentication.getPrincipal();
+    private Long findSenderId(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        }
+        Object principalObj = authentication.getPrincipal();
 
-		if (principalObj instanceof CustomUserPrincipal principal) {
-			return principal.getUser().getId();
-		} else if (principalObj instanceof StompPrincipal principal) {
-			return Long.parseLong(principal.getName());
-		} return null;
-	}
-
+        if (principalObj instanceof CustomUserPrincipal principal) {
+            return principal.getUser().getId();
+        } else if (principalObj instanceof StompPrincipal principal) {
+            return Long.parseLong(principal.getName());
+        }
+        return null;
+    }
 
     private String getGlobalSessionId(Message<LiveBoardMessage> message) {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
