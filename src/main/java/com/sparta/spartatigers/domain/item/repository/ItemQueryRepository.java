@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,8 @@ public interface ItemQueryRepository {
     Page<Item> findAllByStatus(Status status, List<Long> nearByUserIds, Pageable pageable);
 
     Optional<Item> findItemById(Long itemId, Status status);
+
+    List<Item> findUncompletedItems(LocalDate yesterDay);
 
     default Item findItemByIdOrElseThrow(Long itemId) {
         return findItemById(itemId, Status.REGISTERED)

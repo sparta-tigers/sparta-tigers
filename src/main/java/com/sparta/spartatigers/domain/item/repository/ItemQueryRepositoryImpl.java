@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,8 +67,22 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                         .fetchOne());
     }
 
+    @Override
+    public List<Item> findUncompletedItems(LocalDate yesterDay) {
+
+        return queryFactory
+                .selectFrom(item)
+                .where(itemStatusEq(Status.REGISTERED), itemCreatedDateEq(yesterDay))
+                .fetch();
+    }
+
     private BooleanExpression itemStatusEq(Status status) {
 
         return item.status.eq(status);
+    }
+
+    private BooleanExpression itemCreatedDateEq(LocalDate date) {
+
+        return item.createdDate.eq(date);
     }
 }

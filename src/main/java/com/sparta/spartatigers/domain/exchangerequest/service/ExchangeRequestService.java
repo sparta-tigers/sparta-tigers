@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.exchangerequest.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ public class ExchangeRequestService {
 
         User sender = principal.getUser();
         User receiver = getReceiver(request.receiverId());
-        Item requestItem = itemRepository.findItemByIdOrElseThrow(request.itemId());
+        Item requestItem = itemRepository.findByIdWithLockOrElseThrow(request.itemId());
 
         requestItem.validateSenderIsNotOwner(sender);
         requestItem.validateReceiverIsOwner(receiver);
@@ -108,7 +110,8 @@ public class ExchangeRequestService {
 
         directRoomService.deleteRoomByExchangeRequestId(exchangeRequestId);
 
-        locationService.deleteLocation(user.getId());
+        Map<String, Object> data = Map.of("itemId", item.getId(), "userId", item.getUser().getId());
+        locationService.notifyUsersNearBy(item.getUser().getId(), "REMOVE_ITEM", data);
     }
 
     private User getReceiver(Long receiverId) {
