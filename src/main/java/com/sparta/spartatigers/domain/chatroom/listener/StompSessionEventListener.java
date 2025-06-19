@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.chatroom.config;
+package com.sparta.spartatigers.domain.chatroom.listener;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.RequiredArgsConstructor;
+
+import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 
 @Component
 @RequiredArgsConstructor

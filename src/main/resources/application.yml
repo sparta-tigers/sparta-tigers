@@ -19,3 +19,6 @@ server:
       max: 600
       min-spare: 100
 
+logging:
+  level:
+    com.sparta.sparta-tigers.global.config.StompAuthInterceptor: info # 개발할 때 info 운영 단계에서는 warn으로

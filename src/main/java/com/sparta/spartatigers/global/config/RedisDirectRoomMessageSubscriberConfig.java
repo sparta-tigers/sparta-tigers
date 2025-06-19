@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.domain.chatroom.config;
+package com.sparta.spartatigers.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

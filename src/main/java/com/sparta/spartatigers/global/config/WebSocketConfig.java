@@ -10,10 +10,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.chatroom.config.StompAuthInterceptor;
 import com.sparta.spartatigers.domain.liveboard.interceptor.LiveBoardInterceptor;
 import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 import com.sparta.spartatigers.global.interceptor.AuthChannelInterceptor;
+import com.sparta.spartatigers.global.interceptor.StompAuthInterceptor;
 
 /**
  * WebSocket Handler를 등록하기 위한 설정 클래스 EnableWebSocket -> WebSocket 사용하도록 지원

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.chatroom.config.StompPrincipal;
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
 import com.sparta.spartatigers.global.util.JwtUtil;
