@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class LiveBoardMessage {
 
     private String roomId; // 채팅방 식별자
@@ -14,9 +16,21 @@ public class LiveBoardMessage {
     private String senderNickName;
     private String content; // 내용
     private LocalDateTime sentAt;
+    private MessageType messageType;
 
     public static LiveBoardMessage of(
             String roomId, Long senderId, String senderNickname, String content) {
-        return new LiveBoardMessage(roomId, senderId, senderNickname, content, LocalDateTime.now());
+        return new LiveBoardMessage(
+                roomId, senderId, senderNickname, content, LocalDateTime.now(), MessageType.CHAT);
+    }
+
+    public static LiveBoardMessage of(
+            String roomId,
+            Long senderId,
+            String senderNickname,
+            String content,
+            MessageType messageType) {
+        return new LiveBoardMessage(
+                roomId, senderId, senderNickname, content, LocalDateTime.now(), messageType);
     }
 }

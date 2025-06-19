@@ -17,8 +17,6 @@ public class WebSocketEventListener {
     @EventListener
     public void handleDisconnect(SessionDisconnectEvent event) {
         String sessionId = event.getSessionId();
-        String globalSessionId = GlobalSessionIdGenerator.generate(sessionId);
-
-        liveBoardService.handleDisconnect(globalSessionId);
+        liveBoardService.handleDisconnect(sessionId);
     }
 }

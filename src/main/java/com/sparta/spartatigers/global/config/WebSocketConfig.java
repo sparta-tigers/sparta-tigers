@@ -11,7 +11,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.liveboard.interceptor.LiveBoardInterceptor;
-import com.sparta.spartatigers.global.handler.DefaultWebSocketHandshakeHandler;
 import com.sparta.spartatigers.global.interceptor.AuthChannelInterceptor;
 import com.sparta.spartatigers.global.interceptor.StompAuthInterceptor;
 
@@ -36,8 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(new DefaultWebSocketHandshakeHandler()) // 커스텀 핸드쉐이크 핸들러
                 .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("http//localhost:5173")
                 .withSockJS();
     }
 

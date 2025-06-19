@@ -1,6 +1,6 @@
 package com.sparta.spartatigers.global.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.config.Customizer.*;
 
 import java.util.List;
 
@@ -46,16 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
                         sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests(
-                        auth ->
-                                auth.requestMatchers(
-                                                "/api/users/signup",
-                                                "/api/users/login",
-                                                "/login/oauth2/**",
-                                                "/oauth2/**")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .oauth2Login(
                         oauth ->
                                 oauth.userInfoEndpoint(
