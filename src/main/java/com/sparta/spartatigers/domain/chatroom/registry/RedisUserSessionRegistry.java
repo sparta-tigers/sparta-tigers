@@ -17,14 +17,24 @@ public class RedisUserSessionRegistry {
     private static final String SESSION_USER_KEY = "session-users"; // sessionId -> userId
     private final StringRedisTemplate redisTemplate;
 
-    // 한 유저가 여러 세션 저장
+    // 멀티 세션 불가 x (메시지 중복 수신 문제 발생)
+    // TODO: 추후에 멀티 디바이스 환경에도 사용할 수 있게 하려면 멀티 세션이 가능하게 대응
     public void registerSession(Long userId, String sessionId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
 
+        // 기존 세션 제거
+        Set<String> existingSessions = getSessionIds(userId);
+        if (existingSessions != null) {
+            for (String oldSessionId : existingSessions) {
+                redisTemplate.opsForSet().remove(userKey, oldSessionId);
+                redisTemplate.opsForHash().delete(SESSION_USER_KEY, oldSessionId);
+            }
+        }
+
+        // 새 세션 등록
         // userId별로 세션ID를 Set에 추가
         redisTemplate.opsForSet().add(userKey, sessionId);
         redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
-
         // 세션ID에 userId 해시에 등록
         redisTemplate.opsForHash().put(SESSION_USER_KEY, sessionId, userId.toString());
     }
@@ -54,8 +64,6 @@ public class RedisUserSessionRegistry {
         return userId != null ? Long.parseLong(userId.toString()) : null;
     }
 
-    // TODO: 나중에 멀티 세션에 대응하려면 꼭 필요한 로직 지금은 사용x
-    // TODO: 추후에 한 사용자가 여러 브라우저로 로그인했을 때 한 명의 유저에게 여러 세션이 생기는 멀티 세션에 대응하기 위함
     public Set<String> getSessionIds(Long userId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
         return redisTemplate.opsForSet().members(userKey);
