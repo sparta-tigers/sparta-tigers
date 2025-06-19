@@ -66,11 +66,6 @@ public class LocationService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void deleteLocation(Long userId) {
-        redisTemplate.opsForGeo().remove(USER_LOCATION_KEY, userId);
-    }
-
     @Transactional(readOnly = true)
     public void notifyUsersNearBy(Long userId, String messageType, Object data) {
 
