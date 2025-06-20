@@ -33,7 +33,7 @@ public class RedisUserSessionRegistry {
 		// userId별로 세션ID를 Set에 추가
 		redisTemplate.opsForSet().add(userKey, sessionId);
 		redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
-		// Sting Key로 관리
+		// 단일 키 구조로 변경
 		String sessionKey = "session-user:" + sessionId;
 		redisTemplate.opsForValue().set(sessionKey, userId.toString(), Duration.ofHours(6));
 	}
