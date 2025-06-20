@@ -20,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
+import com.sparta.spartatigers.domain.liveboard.model.MessageType;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessagePublisher;
 import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
-import com.sparta.spartatigers.domain.liveboard.util.GlobalSessionIdGenerator;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
@@ -59,6 +59,9 @@ public class LiveBoardRedisService {
     }
 
     private Long findSenderId(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        }
         Object principalObj = authentication.getPrincipal();
 
         if (principalObj instanceof CustomUserPrincipal principal) {
@@ -66,13 +69,13 @@ public class LiveBoardRedisService {
         } else if (principalObj instanceof StompPrincipal principal) {
             return Long.parseLong(principal.getName());
         }
-        throw new IllegalStateException("지원하지 않는 principal타입 : " + principalObj.getClass());
+        return null;
     }
 
-    private String generateGlobalSessionId(Message<LiveBoardMessage> message) {
+    private String getGlobalSessionId(Message<LiveBoardMessage> message) {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
-        String sessionId = accessor.getSessionId();
-        return GlobalSessionIdGenerator.generate(sessionId);
+        String globalSessionId = accessor.getSessionId();
+        return globalSessionId;
     }
 
     // 채팅 전송
@@ -89,23 +92,31 @@ public class LiveBoardRedisService {
         Long senderId = findSenderId(authentication);
         String nickname = userRepository.findNicknameById(senderId).orElse("비회원");
         message =
-                LiveBoardMessage.of(message.getRoomId(), senderId, nickname, message.getContent());
+                LiveBoardMessage.of(
+                        message.getRoomId(),
+                        senderId,
+                        nickname,
+                        message.getContent(),
+                        MessageType.CHAT);
 
         // Redis publish
         ChannelTopic topic = getOrInitTopic(message.getRoomId());
         redisPublisher.publish(topic, message);
     }
 
-    // 입장
+    // 입장 TODO: Message<LiveBoardMessage> message -> 글로벌 세션ID만 뺄수있음 된다!, paylood 없어도 된다
     public void enterRoom(Message<LiveBoardMessage> message, Authentication authentication) {
         Long senderId = findSenderId(authentication);
         String nickname =
                 senderId != null ? userRepository.findNicknameById(senderId).orElse("비회원") : "비회원";
-        String globalSessionId = generateGlobalSessionId(message);
+        String globalSessionId = getGlobalSessionId(message);
 
         // get topic
         String roomId = message.getPayload().getRoomId();
         ChannelTopic topic = getOrInitTopic(roomId);
+
+        LiveBoardMessage enterMessage =
+                LiveBoardMessage.of(roomId, senderId, nickname, "입장", MessageType.ENTER);
 
         // connection 생성 후 저장
         LiveBoardConnection connection =
@@ -113,19 +124,22 @@ public class LiveBoardRedisService {
                         globalSessionId, senderId, nickname, roomId, LocalDateTime.now());
         liveBoardConnectionRepository.saveConnection(roomId, globalSessionId, connection);
 
-        redisPublisher.publish(topic, message.getPayload());
+        redisPublisher.publish(topic, enterMessage);
     }
 
-    // 퇴장
+    // 퇴장 TODO: 글로벌 세션id 새로 생성 X / 위랑 똑같이 이미 만들어진 글로벌세션 ID 받아오기
     public void exitRoom(Message<LiveBoardMessage> message) {
         // connection 삭제
         String roomId = message.getPayload().getRoomId();
-        String globalSessionId = generateGlobalSessionId(message);
+        String globalSessionId = getGlobalSessionId(message);
         liveBoardConnectionRepository.deleteConnection(roomId, globalSessionId);
+
+        LiveBoardMessage exitMessage =
+                LiveBoardMessage.of(roomId, null, "유저", "퇴장", MessageType.EXIT);
 
         // get topic 후 publish
         ChannelTopic topic = getOrInitTopic(roomId);
-        redisPublisher.publish(topic, message.getPayload());
+        redisPublisher.publish(topic, exitMessage);
     }
 
     public void handleDisconnect(String globalSessionId) {
