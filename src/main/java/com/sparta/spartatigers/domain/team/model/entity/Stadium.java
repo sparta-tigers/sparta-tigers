@@ -16,4 +16,6 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 public class Stadium extends BaseEntity {
 
     @Column private String name;
+    @Column private double latitude;
+    @Column private double longitude;
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
@@ -20,16 +22,33 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.domain.item.dto.request.LocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.RedisUpdateDto;
 import com.sparta.spartatigers.domain.item.pubsub.LocationPublisher;
+import com.sparta.spartatigers.domain.team.model.entity.Stadium;
+import com.sparta.spartatigers.domain.team.repository.StadiumRepository;
 
 @Service
 @RequiredArgsConstructor
 public class LocationService {
 
     private static final String USER_LOCATION_KEY = "USERLOCATION:";
+    private static final String STADIUM_LOCATION_KEY = "STADIUMS:";
     private static final double SEARCH_RADIUS_KM = 0.05;
+    private static final double NEAR_STADIUM_KM = 1.0;
     private final RedisTemplate<String, Object> redisTemplate;
     private final LocationPublisher locationPublisher;
     private final SimpMessagingTemplate messagingTemplate;
+    private final StadiumRepository stadiumRepository;
+
+    @PostConstruct
+    public void loadStadiumLocation() {
+        List<Stadium> stadiums = stadiumRepository.findAll();
+
+        redisTemplate.delete(STADIUM_LOCATION_KEY);
+
+        for (Stadium stadium : stadiums) {
+            Point point = new Point(stadium.getLongitude(), stadium.getLatitude());
+            redisTemplate.opsForGeo().add(STADIUM_LOCATION_KEY, point, stadium.getId());
+        }
+    }
 
     @Transactional
     public void updateLocation(LocationRequestDto request, Long userId) {
@@ -37,7 +56,6 @@ public class LocationService {
         if (userId == null) {
             return;
         }
-
         Point point = new Point(request.getLongitude(), request.getLatitude());
         redisTemplate.opsForGeo().add(USER_LOCATION_KEY, point, userId);
 
@@ -78,5 +96,15 @@ public class LocationService {
                     String destination = "/server/items/user/" + targetUserId;
                     messagingTemplate.convertAndSend(destination, messagePayload);
                 });
+    }
+
+    public boolean isNearStadium(double longitude, double latitude) {
+        Point point = new Point(longitude, latitude);
+        Distance distance = new Distance(NEAR_STADIUM_KM, Metrics.KILOMETERS);
+        Circle circle = new Circle(point, distance);
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> results =
+                redisTemplate.opsForGeo().radius(STADIUM_LOCATION_KEY, circle);
+
+        return results != null && !results.getContent().isEmpty();
     }
 }

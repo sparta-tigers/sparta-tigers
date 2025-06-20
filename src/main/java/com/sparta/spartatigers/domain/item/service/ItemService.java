@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.LocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
@@ -18,6 +19,8 @@ import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +32,20 @@ public class ItemService {
 
     @Transactional
     public CreateItemResponseDto createItem(
-            CreateItemRequestDto request, CustomUserPrincipal principal) {
+            CreateItemWithLocationRequestDto request, CustomUserPrincipal principal) {
+
+        LocationRequestDto locationDto = request.getLocationDto();
+        boolean isNear =
+                locationService.isNearStadium(
+                        locationDto.getLongitude(), locationDto.getLatitude());
+
+        if (!isNear) {
+            throw new ServerException(ExceptionCode.LOCATION_NOT_VALID);
+        }
 
         User user = principal.getUser();
 
-        Item item = Item.of(request, user);
+        Item item = Item.of(request.getItemDto(), user);
         itemRepository.save(item);
 
         ReadItemResponseDto newItemDto = ReadItemResponseDto.from(item);
