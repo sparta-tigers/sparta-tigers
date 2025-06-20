@@ -27,7 +27,7 @@ public class RedisUserSessionRegistry {
         if (existingSessions != null) {
             for (String oldSessionId : existingSessions) {
                 redisTemplate.opsForSet().remove(userKey, oldSessionId);
-                redisTemplate.opsForHash().delete(SESSION_USER_KEY, oldSessionId);
+                redisTemplate.delete("session-user:" + oldSessionId);
             }
         }
 
@@ -35,8 +35,9 @@ public class RedisUserSessionRegistry {
         // userId별로 세션ID를 Set에 추가
         redisTemplate.opsForSet().add(userKey, sessionId);
         redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
-        // 세션ID에 userId 해시에 등록
-        redisTemplate.opsForHash().put(SESSION_USER_KEY, sessionId, userId.toString());
+        // 단일 키 구조로 변경
+        String sessionKey = "session-user:" + sessionId;
+        redisTemplate.opsForValue().set(sessionKey, userId.toString(), Duration.ofHours(6));
     }
 
     public void unregisterSession(Long userId, String sessionId) {
@@ -44,8 +45,8 @@ public class RedisUserSessionRegistry {
 
         // Set에서 세션ID 제거
         redisTemplate.opsForSet().remove(userKey, sessionId);
-        // 해시에서 세션ID 제거
-        redisTemplate.opsForHash().delete(SESSION_USER_KEY, sessionId);
+        // 세션ID 제거
+        redisTemplate.delete("session-user:" + sessionId);
 
         // 세션이 모두 제거되면 키 자체 제거
         if (Boolean.TRUE.equals(redisTemplate.opsForSet().size(userKey) == 0)) {
@@ -60,8 +61,9 @@ public class RedisUserSessionRegistry {
     }
 
     public Long getUserIdBySessionId(String sessionId) {
-        Object userId = redisTemplate.opsForHash().get(SESSION_USER_KEY, sessionId);
-        return userId != null ? Long.parseLong(userId.toString()) : null;
+        String sessionKey = "session-user:" + sessionId;
+        String userId = redisTemplate.opsForValue().get(sessionKey);
+        return userId != null ? Long.parseLong(userId) : null;
     }
 
     public Set<String> getSessionIds(Long userId) {
