@@ -54,6 +54,9 @@ public enum ExceptionCode {
     FAVORITE_TEAM_NOT_FOUND("응원하는 팀이 없습니다.", HttpStatus.NOT_FOUND),
     ALREADY_EXISTS_FAVORITE_TEAM("이미 응원하는 팀이 있습니다.", HttpStatus.CONFLICT),
 
+	// 라이브 보드
+	WEBSOCKET_UNAUTHORIZED("비회원은 라이브보드 메세지를 보낼 수 없습니다", HttpStatus.UNAUTHORIZED),
+
     // 공통
     NOT_FOUND("not found ~~", HttpStatus.NOT_FOUND),
     NOT_VALID_EXCEPTION("validation 예외 발생", HttpStatus.BAD_REQUEST),

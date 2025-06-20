@@ -28,6 +28,8 @@ import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.WebSocketException;
 
 @Slf4j
 @Service
@@ -85,7 +87,7 @@ public class LiveBoardRedisService {
         if (principalObj == null
                 || principalObj instanceof StompPrincipal principal
                         && "null".equals(principal.getName())) {
-            throw new RuntimeException("비회원 사용자는 라이브보드 메세지를 보낼 수 없습니다.");
+            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
         }
 
         // 메세지에 유저정보 세팅
