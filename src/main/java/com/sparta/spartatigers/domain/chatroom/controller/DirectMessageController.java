@@ -29,7 +29,7 @@ public class DirectMessageController {
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @PathVariable Long roomId,
             @PageableDefault(
-                            size = 20,
+                            size = 30,
                             sort = {"sentAt", "id"},
                             direction = Sort.Direction.DESC)
                     Pageable pageable) {

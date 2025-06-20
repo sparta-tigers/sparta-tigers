@@ -27,7 +27,7 @@ public class RedisUserSessionRegistry {
         if (existingSessions != null) {
             for (String oldSessionId : existingSessions) {
                 redisTemplate.opsForSet().remove(userKey, oldSessionId);
-                redisTemplate.opsForHash().delete(SESSION_USER_KEY, oldSessionId);
+                redisTemplate.delete("session-user:" + oldSessionId);
             }
         }
 
