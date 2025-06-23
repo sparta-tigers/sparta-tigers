@@ -72,6 +72,11 @@ public class User extends BaseEntity implements Serializable {
         return new User(email, provider, providerId, nickname, path);
     }
 
+    // 이미지 수정
+    public void updatePath(String filePath) {
+        this.path = filePath;
+    }
+
     public void deleted() {
         this.deletedAt = LocalDateTime.now();
     }

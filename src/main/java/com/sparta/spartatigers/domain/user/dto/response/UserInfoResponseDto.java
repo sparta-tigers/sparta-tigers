@@ -11,7 +11,7 @@ public class UserInfoResponseDto {
     private final Long id;
     private final String email;
     private final String nickname;
-    private final String profilePath;
+    private final String path;
 
     public static UserInfoResponseDto from(User user) {
         return new UserInfoResponseDto(
