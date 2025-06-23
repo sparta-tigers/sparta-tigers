@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
@@ -33,7 +33,7 @@ public class ItemController {
 
     @PostMapping
     public ApiResponse<CreateItemResponseDto> createItem(
-            @Valid @RequestBody CreateItemRequestDto request,
+            @Valid @RequestBody CreateItemWithLocationRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
 
         CreateItemResponseDto response = itemService.createItem(request, userPrincipal);

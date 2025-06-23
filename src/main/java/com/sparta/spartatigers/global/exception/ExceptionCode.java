@@ -53,6 +53,7 @@ public enum ExceptionCode {
     CANNOT_REQUEST_OWN_ITEM("자신의 아이템에 대해 교환 요청을 할 수 없습니다.", HttpStatus.BAD_REQUEST),
     RECEIVER_NOT_OWNER("해당 아이템의 소유자에게만 요청을 보낼 수 있습니다.", HttpStatus.FORBIDDEN),
     RECEIVER_FORBIDDEN("요청을 받은 사용자만 요청을 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
+    LOCATION_NOT_VALID("아이템은 야구장 근처에서만 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     // 직관 기록
     WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
