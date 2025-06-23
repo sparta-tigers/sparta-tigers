@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.item.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ public class LocationService {
         Point userPoint = redisTemplate.opsForGeo().position(USER_LOCATION_KEY, userId).get(0);
 
         if (userPoint == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         Distance distance = new Distance(radius, Metrics.KILOMETERS);
         Circle circle = new Circle(userPoint, distance);
@@ -76,7 +77,7 @@ public class LocationService {
                 redisTemplate.opsForGeo().radius(USER_LOCATION_KEY, circle);
 
         if (results == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         return results.getContent().stream()
                 .map(result -> Long.valueOf(result.getContent().getName().toString()))
