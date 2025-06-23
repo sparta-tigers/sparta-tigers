@@ -55,7 +55,7 @@ public class UserController {
      */
     @PutMapping("/profile")
     public ApiResponse<ProfileResponseDto> updateUserImage(
-            MultipartFile file, @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+            @RequestParam("file") MultipartFile file, @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
         Long userId = userPrincipal.getUser().getId();
         return ApiResponse.ok(userService.updateProfile(file, userId));
     }
@@ -69,6 +69,6 @@ public class UserController {
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
         Long userId = userPrincipal.getUser().getId();
         userService.deleteProfile(userId);
-        return ApiResponse.ok("d");
+		return ApiResponse.ok(MessageCode.PROFILE_DELETE_SUCCESS.getMessage());
     }
 }
