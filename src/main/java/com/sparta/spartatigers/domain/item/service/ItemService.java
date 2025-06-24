@@ -13,6 +13,7 @@ import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationReq
 import com.sparta.spartatigers.domain.item.dto.request.LocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemFlatResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
@@ -63,7 +64,7 @@ public class ItemService {
         List<Long> nearByUserIds = locationService.findUsersNearBy(userId, SEARCH_RADIUS_KM);
         nearByUserIds.add(userId);
 
-        Page<Item> itemList =
+        Page<ReadItemFlatResponseDto> itemList =
                 itemRepository.findAllByStatus(Status.REGISTERED, nearByUserIds, pageable);
 
         return itemList.map(ReadItemResponseDto::from);
