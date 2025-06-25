@@ -48,9 +48,7 @@ jobs:
         id: git-info
         run: |
                IMAGE_TAG=main-${{ github.sha }}
-          #         build 잡에서 사용할 환경 변수
                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          #         deploy 잡으로 전달할 출력값
                echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Build and push docker image
@@ -62,6 +60,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     needs: build
+
+    env:
+      IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
 
     if: github.ref == 'refs/heads/main' # main 브랜치만 배포
 
