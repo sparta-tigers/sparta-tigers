@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.LocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemFlatResponseDto;
@@ -20,6 +21,8 @@ import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 import com.sparta.spartatigers.global.service.S3Service;
 import com.sparta.spartatigers.global.util.S3FolderType;
 
@@ -38,14 +41,14 @@ public class ItemService {
             MultipartFile file,
             CustomUserPrincipal principal) {
 
-        //		LocationRequestDto locationDto = request.getLocationDto();
-        //		boolean isNear =
-        //			locationService.isNearStadium(
-        //				locationDto.getLongitude(), locationDto.getLatitude());
-        //
-        //		if (!isNear) {
-        //			throw new ServerException(ExceptionCode.LOCATION_NOT_VALID);
-        //		}
+        LocationRequestDto locationDto = request.getLocationDto();
+        boolean isNear =
+                locationService.isNearStadium(
+                        locationDto.getLongitude(), locationDto.getLatitude());
+
+        if (!isNear) {
+            throw new ServerException(ExceptionCode.LOCATION_NOT_VALID);
+        }
 
         String image = s3Service.uploadFile(file, S3FolderType.ITEM);
 
