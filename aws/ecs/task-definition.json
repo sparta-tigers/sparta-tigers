@@ -1,0 +1,70 @@
+{
+  "family": "sparta-tigers-task",
+  "networkMode": "bridge",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "containerDefinitions": [
+    {
+      "name": "sparta-tigers-container",
+      "image": "DOCKER_IMAGE_URI_REPLACE_ME",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "memory": 2048,
+      "environment": [
+        {
+          "name": "database_local_url",
+          "value": "${DB_URL}"
+        },
+        {
+          "name": "database_local_username",
+          "value": "${DB_USER}"
+        },
+        {
+          "name": "database_local_password",
+          "value": "${DB_PASSWORD}"
+        },
+        {
+          "name": "bucket_name",
+          "value": "${S3_BUCKET_NAME}"
+        },
+        {
+          "name": "client_id",
+          "value": "${CLIENT_ID}"
+        },
+        {
+          "name": "client_secret",
+          "value": "${CLIENT_SECRET}"
+        },
+        {
+          "name": "jwt_secret",
+          "value": "${JWT_SECRET}"
+        },
+        {
+          "name": "redis_host_local",
+          "value": "${REDIS_HOST_LOCAL}"
+        },
+        {
+          "name": "S3access_key",
+          "value": "${S3_ACCESS_KEY}"
+        },
+        {
+          "name": "S3secret_key",
+          "value": "${S3_SECRET_KEY}"
+        },
+        {
+          "name": "S3region",
+          "value": "${S3_REGION}"
+        }
+      ]
+    }
+  ]
+}

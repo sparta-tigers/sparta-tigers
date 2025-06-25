@@ -70,11 +70,19 @@ jobs:
           export DB_URL=${{ secrets.DATABASE_LOCAL_URL_EC2 }}
           export DB_USER=${{ secrets.DATABASE_LOCAL_USERNAME }}
           export DB_PASSWORD=${{ secrets.DATABASE_LOCAL_PASSWORD }}
-
+          export CLIENT_ID=${{ secrets.CLIENT_ID }}
+          export CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+          export JWT_SECRET=${{ secrets.JWT_SECRET }}
+          export REDIS_HOST_LOCAL=${{ secrets.REDIS_HOST_LOCAL }}
+          export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+          export S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+          export S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+          export S3_REGION=${{ secrets.AWS_REGION }}
+          
           sed "s|DOCKER_IMAGE_URI_REPLACE_ME|$IMAGE_URI|g" aws/ecs/task-definition.json > aws/ecs/task-definition-tmp.json
-
-          envsubst '$DB_URL $DB_USER $DB_PASSWORD' < aws/ecs/task-definition-tmp.json > aws/ecs/task-definition-final.json
-
+          
+          envsubst '$DB_URL $DB_USER $DB_PASSWORD $BUCKET_NAME $CLIENT_ID $CLIENT_SECRET $JWT_SECRET $REDIS_HOST_LOCAL $S3_ACCESS_KEY $S3_REGION $S3_SECRET_KEY' < aws/ecs/task-definition-tmp.json > aws/ecs/task-definition-final.json
+          
           echo "== FINAL TASK DEFINITION =="
           cat aws/ecs/task-definition-final.json
 
