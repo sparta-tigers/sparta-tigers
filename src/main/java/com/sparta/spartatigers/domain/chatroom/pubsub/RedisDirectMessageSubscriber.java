@@ -1,7 +1,6 @@
 package com.sparta.spartatigers.domain.chatroom.pubsub;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -30,16 +29,10 @@ public class RedisDirectMessageSubscriber implements MessageListener {
             String body = new String(message.getBody(), StandardCharsets.UTF_8);
             RedisMessage payload = objectMapper.readValue(body, RedisMessage.class);
 
-            ChatMessageResponse response =
-                    new ChatMessageResponse(
-                            payload.getRoomId(),
-                            payload.getSenderId(),
-                            payload.getSenderNickname(),
-                            payload.getMessage(),
-                            LocalDateTime.parse(payload.getSentAt()));
+            ChatMessageResponse response = ChatMessageResponse.from(payload);
 
             messagingTemplate.convertAndSend("/server/directRoom/" + payload.getRoomId(), response);
-            log.info("Redis 메시지 WebSocket 전송 완료");
+            log.info("Redis 메시지 수신 처리 완료");
 
         } catch (Exception e) {
             log.error("RedisDirectMessageSubscriber 오류 발생", e);

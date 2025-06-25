@@ -14,4 +14,13 @@ public class ChatMessageResponse {
     private String senderNickname;
     private String message;
     private LocalDateTime sentAt;
+
+    public static ChatMessageResponse from(RedisMessage message) {
+        return new ChatMessageResponse(
+                message.getRoomId(),
+                message.getSenderId(),
+                message.getSenderNickname(),
+                message.getMessage(),
+                LocalDateTime.parse(message.getSentAt()));
+    }
 }
