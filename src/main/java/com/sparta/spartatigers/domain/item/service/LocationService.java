@@ -43,9 +43,11 @@ public class LocationService {
 
     @PostConstruct
     public void loadStadiumLocation() {
-        List<Stadium> stadiums = stadiumRepository.findAll();
 
-        redisTemplate.delete(STADIUM_LOCATION_KEY);
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(STADIUM_LOCATION_KEY))) {
+            return;
+        }
+        List<Stadium> stadiums = stadiumRepository.findAll();
 
         for (Stadium stadium : stadiums) {
             Point point = new Point(stadium.getLongitude(), stadium.getLatitude());
