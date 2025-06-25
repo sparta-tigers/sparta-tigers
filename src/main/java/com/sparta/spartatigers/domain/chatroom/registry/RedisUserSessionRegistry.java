@@ -12,21 +12,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RedisUserSessionRegistry {
 
+    // TODO: 세션-userId를 redis에서 관리하는 구조를 유지해야 할 이유를 찾기
     private static final String USER_SESSION_KEY_PREFIX =
             "user-sessions:"; // userId -> Set<sessionId>
-    private static final String SESSION_USER_KEY = "session-users"; // sessionId -> userId
     private final StringRedisTemplate redisTemplate;
 
-    // 한 유저가 여러 세션 저장
+    // 멀티 세션 불가 x (메시지 중복 수신 문제 발생)
+    // TODO: 추후에 멀티 디바이스 환경에도 사용할 수 있게 하려면 멀티 세션이 가능하게 대응
     public void registerSession(Long userId, String sessionId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
 
+        // 기존 세션 제거
+        Set<String> existingSessions = getSessionIds(userId);
+        if (existingSessions != null) {
+            for (String oldSessionId : existingSessions) {
+                redisTemplate.opsForSet().remove(userKey, oldSessionId);
+                redisTemplate.delete("session-user:" + oldSessionId);
+            }
+        }
+
+        // 새 세션 등록
         // userId별로 세션ID를 Set에 추가
         redisTemplate.opsForSet().add(userKey, sessionId);
         redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
-
-        // 세션ID에 userId 해시에 등록
-        redisTemplate.opsForHash().put(SESSION_USER_KEY, sessionId, userId.toString());
+        // 단일 키 구조로 변경
+        String sessionKey = "session-user:" + sessionId;
+        redisTemplate.opsForValue().set(sessionKey, userId.toString(), Duration.ofHours(6));
     }
 
     public void unregisterSession(Long userId, String sessionId) {
@@ -34,8 +45,8 @@ public class RedisUserSessionRegistry {
 
         // Set에서 세션ID 제거
         redisTemplate.opsForSet().remove(userKey, sessionId);
-        // 해시에서 세션ID 제거
-        redisTemplate.opsForHash().delete(SESSION_USER_KEY, sessionId);
+        // 세션ID 제거
+        redisTemplate.delete("session-user:" + sessionId);
 
         // 세션이 모두 제거되면 키 자체 제거
         if (Boolean.TRUE.equals(redisTemplate.opsForSet().size(userKey) == 0)) {
@@ -50,12 +61,11 @@ public class RedisUserSessionRegistry {
     }
 
     public Long getUserIdBySessionId(String sessionId) {
-        Object userId = redisTemplate.opsForHash().get(SESSION_USER_KEY, sessionId);
-        return userId != null ? Long.parseLong(userId.toString()) : null;
+        String sessionKey = "session-user:" + sessionId;
+        String userId = redisTemplate.opsForValue().get(sessionKey);
+        return userId != null ? Long.parseLong(userId) : null;
     }
 
-    // TODO: 나중에 멀티 세션에 대응하려면 꼭 필요한 로직 지금은 사용x
-    // TODO: 추후에 한 사용자가 여러 브라우저로 로그인했을 때 한 명의 유저에게 여러 세션이 생기는 멀티 세션에 대응하기 위함
     public Set<String> getSessionIds(Long userId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
         return redisTemplate.opsForSet().members(userKey);

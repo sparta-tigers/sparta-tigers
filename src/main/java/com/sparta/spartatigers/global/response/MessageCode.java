@@ -11,6 +11,7 @@ public enum MessageCode {
 
     // 회원
     USER_REQUEST_SUCCESS("회원 요청을 성공적으로 보냈습니다."),
+    PROFILE_DELETE_SUCCESS("프로필이 성공적으로 삭제되었습니다."),
     // 라이브 보드
 
     // 알람

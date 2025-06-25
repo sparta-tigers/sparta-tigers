@@ -25,6 +25,16 @@ public enum ExceptionCode {
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
+    // 파일
+    FILE_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_NOT_FOUND("파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_FILE_EXTENSION("허용되지 않은 파일 확장자입니다.", HttpStatus.BAD_REQUEST),
+    FILE_SIZE_EXCEEDED("파일 크기가 허용된 최대 크기를 초과했습니다.", HttpStatus.BAD_REQUEST),
+    FILE_DELETE_FAILED("파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_FILE_FORMAT("파일 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    FILE_ALREADY_EXISTS("이미 존재하는 파일입니다.", HttpStatus.CONFLICT),
+    DEFAULT_IMAGE_CANNOT_BE_DELETED("기본 이미지는 삭제할 수 없습니다.", HttpStatus.BAD_REQUEST),
+
     // 매치
     MATCH_NOT_FOUND("경기 일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
