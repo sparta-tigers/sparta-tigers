@@ -21,15 +21,15 @@
       "memory": 2048,
       "environment": [
         {
-          "name": "database_local_url",
+          "name": "database_prod_url",
           "value": "${DB_URL}"
         },
         {
-          "name": "database_local_username",
+          "name": "database_prod_username",
           "value": "${DB_USER}"
         },
         {
-          "name": "database_local_password",
+          "name": "database_prod_password",
           "value": "${DB_PASSWORD}"
         },
         {
@@ -49,7 +49,7 @@
           "value": "${JWT_SECRET}"
         },
         {
-          "name": "redis_host_local",
+          "name": "redis_host_prod",
           "value": "${REDIS_HOST_LOCAL}"
         },
         {
