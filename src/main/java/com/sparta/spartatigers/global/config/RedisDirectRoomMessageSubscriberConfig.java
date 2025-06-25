@@ -24,9 +24,9 @@ public class RedisDirectRoomMessageSubscriberConfig {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
 
-        // 모든 directroom:{id} 형식의 채널 구독
-        container.addMessageListener(subscriber, new PatternTopic("directroom:*"));
-        log.info("연결된 채팅방: directroom:*");
+        // 모든 directRoom:{id} 형식의 채널 구독
+        container.addMessageListener(subscriber, new PatternTopic("directRoom:*"));
+        log.info("연결된 채팅방: directRoom:*");
 
         return container;
     }
