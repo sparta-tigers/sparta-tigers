@@ -83,6 +83,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set file permissions for task-definition.json
+        run: |
+          sudo chmod 644 "${GITHUB_WORKSPACE}/aws/ecs/task-definition.json"
+
+      - name: Set directory permissions for aws/ecs
+        run: |
+          sudo chmod -R 755 "${GITHUB_WORKSPACE}/aws/ecs"
+
       - name: Replace image URI and inject environment variables
         run: |
           IMAGE_URI=${IMAGE_NAME}:${IMAGE_TAG}
@@ -114,8 +122,7 @@ jobs:
                 {"name": "S3secret_key", "value": $S3_SECRET_KEY},
                 {"name": "S3region", "value": $S3_REGION}
              ]' \
-          
-            aws/ecs/task-definition.json > aws/ecs/task-definition-final.json
+            "${GITHUB_WORKSPACE}/aws/ecs/task-definition.json" > "${GITHUB_WORKSPACE}/aws/ecs/task-definition-final.json"
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
