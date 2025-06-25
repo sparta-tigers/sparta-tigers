@@ -115,7 +115,7 @@ jobs:
                 {"name": "S3region", "value": $S3_REGION}
              ]' \
           
-            aws/ecs/task-definition-template.json > aws/ecs/task-definition-final.json
+            aws/ecs/task-definition.json > aws/ecs/task-definition-final.json
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
