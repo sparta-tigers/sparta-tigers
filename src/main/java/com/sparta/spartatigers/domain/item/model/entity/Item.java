@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -35,6 +36,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
             @UniqueConstraint(
                     name = "UNIQUE_USER_ITEM",
                     columnNames = {"user_id", "created_date"})
+        },
+        indexes = {
+            @Index(
+                    name = "idx_item_user_status_created",
+                    columnList = "user_id, status, createdAt DESC"),
+            @Index(name = "idx_item_status_created_date", columnList = "status, createdDate")
         })
 public class Item extends BaseEntity {
 
@@ -80,10 +87,10 @@ public class Item extends BaseEntity {
         this.createdDate = createdDate;
     }
 
-    public static Item of(CreateItemRequestDto dto, User user) {
+    public static Item of(CreateItemRequestDto dto, User user, String image) {
         return new Item(
                 dto.category(),
-                dto.image(),
+                image,
                 dto.seatInfo(),
                 dto.title(),
                 dto.description(),

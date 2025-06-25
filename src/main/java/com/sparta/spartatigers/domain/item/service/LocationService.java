@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.item.service;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ import com.sparta.spartatigers.domain.team.repository.StadiumRepository;
 public class LocationService {
 
     private static final String USER_LOCATION_KEY = "USERLOCATION:";
+    private static final String LOCATION_TTL_KEY = "USERLOCATION_TTL:";
     private static final String STADIUM_LOCATION_KEY = "STADIUMS:";
     private static final double SEARCH_RADIUS_KM = 0.05;
     private static final double NEAR_STADIUM_KM = 1.0;
@@ -40,9 +43,11 @@ public class LocationService {
 
     @PostConstruct
     public void loadStadiumLocation() {
-        List<Stadium> stadiums = stadiumRepository.findAll();
 
-        redisTemplate.delete(STADIUM_LOCATION_KEY);
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(STADIUM_LOCATION_KEY))) {
+            return;
+        }
+        List<Stadium> stadiums = stadiumRepository.findAll();
 
         for (Stadium stadium : stadiums) {
             Point point = new Point(stadium.getLongitude(), stadium.getLatitude());
@@ -58,6 +63,7 @@ public class LocationService {
         }
         Point point = new Point(request.getLongitude(), request.getLatitude());
         redisTemplate.opsForGeo().add(USER_LOCATION_KEY, point, userId);
+        redisTemplate.opsForValue().set(LOCATION_TTL_KEY + userId, "1", Duration.ofMinutes(2));
 
         locationPublisher.publishLocation(RedisUpdateDto.of(userId, request));
     }
@@ -68,7 +74,7 @@ public class LocationService {
         Point userPoint = redisTemplate.opsForGeo().position(USER_LOCATION_KEY, userId).get(0);
 
         if (userPoint == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         Distance distance = new Distance(radius, Metrics.KILOMETERS);
         Circle circle = new Circle(userPoint, distance);
@@ -76,11 +82,12 @@ public class LocationService {
                 redisTemplate.opsForGeo().radius(USER_LOCATION_KEY, circle);
 
         if (results == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         return results.getContent().stream()
                 .map(result -> Long.valueOf(result.getContent().getName().toString()))
                 .filter(id -> !id.equals(userId))
+                .filter(id -> Boolean.TRUE.equals(redisTemplate.hasKey(LOCATION_TTL_KEY + id)))
                 .collect(Collectors.toList());
     }
 

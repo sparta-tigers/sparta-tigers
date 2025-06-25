@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.item.dto.response.QReadItemFlatResponseDto;
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemFlatResponseDto;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.model.entity.QItem;
@@ -26,18 +28,27 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
     private final QUser user = QUser.user;
 
     @Override
-    public Page<Item> findAllByStatus(Status status, List<Long> nearByUserIds, Pageable pageable) {
+    public Page<ReadItemFlatResponseDto> findAllByStatus(
+            Status status, List<Long> nearByUserIds, Pageable pageable) {
 
         if (nearByUserIds.isEmpty()) {
             return Page.empty(pageable);
         }
 
-        List<Item> itemList =
+        List<ReadItemFlatResponseDto> itemList =
                 queryFactory
-                        .selectFrom(item)
+                        .select(
+                                new QReadItemFlatResponseDto(
+                                        item.id,
+                                        user.id,
+                                        user.nickname,
+                                        item.category,
+                                        item.title,
+                                        item.status,
+                                        item.createdAt))
+                        .from(item)
                         .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
                         .join(item.user, user)
-                        .fetchJoin()
                         .orderBy(item.createdAt.desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
@@ -47,6 +58,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                 queryFactory
                         .select(item.count())
                         .from(item)
+                        .join(item.user, user)
                         .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
                         .fetchOne();
 
