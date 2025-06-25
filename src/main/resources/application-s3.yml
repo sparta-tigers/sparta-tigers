@@ -1,0 +1,24 @@
+cloud:
+  aws:
+    credentials:
+      access-key: ${S3access_key}
+      secret-key: ${S3secret_key}
+    region:
+      static: ${S3region}
+    s3:
+      default-image-path: "default.png"
+      bucket: ${bucket_name}
+      folders:
+        user: user/
+        record: record/
+      upload:
+        max-size: 5242880 # 5MB
+        allowed-extensions:
+          - jpg
+          - jpeg
+          - png
+    stack:
+      auto: false
+
+
+

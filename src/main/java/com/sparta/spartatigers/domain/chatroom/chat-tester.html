@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>STOMP WebSocket Tester with Token</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>WebSocket 1:1 채팅 테스트 (토큰 입력 가능)</h2>
+
+<div>
+  <label>Room ID:</label>
+  <input id="roomId" type="text" value="1"/>
+  <br/>
+  <label>Message:</label>
+  <input id="messageContent" type="text" value="안녕하세요!"/>
+  <br/>
+  <label>JWT Token (Bearer 포함):</label>
+  <input id="token" placeholder="Bearer eyJ..." style="width: 400px;" type="text"/>
+  <br/><br/>
+  <button onclick="connect()">연결하기</button>
+  <button onclick="sendMessage()">메시지 보내기</button>
+</div>
+
+<hr/>
+
+<div>
+  <h4>받은 메시지:</h4>
+  <pre id="chatLog" style="white-space: pre-wrap; background: #eee; padding: 10px;"></pre>
+</div>
+
+<script>
+  let stompClient = null;
+
+  function connect() {
+    // 이미 연결되어 있으면 재연결 막기
+    if (stompClient && stompClient.connected) {
+      alert("이미 WebSocket에 연결되어 있습니다.");
+      return;
+    }
+
+    const token = document.getElementById("token").value.trim();
+    if (!token || !token.startsWith("Bearer ")) {
+      alert("유효한 JWT 토큰을 입력하세요. 'Bearer ' 포함해야 합니다.");
+      return;
+    }
+
+    const socket = new SockJS("http://localhost:8080/ws");
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect(
+        {
+          Authorization: token,
+          ChatDomain: "directroom"
+        },
+        function (frame) {
+          console.log("Connected: " + frame);
+
+          const roomId = document.getElementById("roomId").value;
+          stompClient.subscribe(`/server/directRoom/${roomId}`, function (message) {
+            const msg = JSON.parse(message.body);
+            document.getElementById("chatLog").textContent += `[${msg.sentAt}] ${msg.senderNickname}: ${msg.message}\n`;
+          });
+
+          alert("연결 완료!");
+        },
+        function (error) {
+          alert("연결 실패: " + error);
+        }
+    );
+  }
+
+  function sendMessage() {
+    if (!stompClient || !stompClient.connected) {
+      alert("먼저 연결하세요!");
+      return;
+    }
+
+    const roomId = document.getElementById("roomId").value;
+    const message = document.getElementById("messageContent").value;
+
+    stompClient.send(
+        "/client/directRoom/send",
+        {},
+        JSON.stringify({
+          roomId: Number(roomId),
+          message: message,
+        })
+    );
+  }
+</script>
+</body>
+</html>
