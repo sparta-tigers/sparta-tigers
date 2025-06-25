@@ -87,10 +87,10 @@ public class Item extends BaseEntity {
         this.createdDate = createdDate;
     }
 
-    public static Item of(CreateItemRequestDto dto, User user) {
+    public static Item of(CreateItemRequestDto dto, User user, String image) {
         return new Item(
                 dto.category(),
-                dto.image(),
+                image,
                 dto.seatInfo(),
                 dto.title(),
                 dto.description(),
