@@ -6,18 +6,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
-import com.sparta.spartatigers.domain.item.dto.request.CreateItemRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationRequestDto;
+import com.sparta.spartatigers.domain.item.dto.request.LocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemFlatResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.domain.item.repository.ItemRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.service.S3Service;
+import com.sparta.spartatigers.global.util.S3FolderType;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +33,28 @@ public class ItemService {
     private static final double SEARCH_RADIUS_KM = 0.05;
     private final ItemRepository itemRepository;
     private final LocationService locationService;
+    private final S3Service s3Service;
 
     @Transactional
     public CreateItemResponseDto createItem(
-            CreateItemRequestDto request, CustomUserPrincipal principal) {
+            CreateItemWithLocationRequestDto request,
+            MultipartFile file,
+            CustomUserPrincipal principal) {
+
+        LocationRequestDto locationDto = request.getLocationDto();
+        boolean isNear =
+                locationService.isNearStadium(
+                        locationDto.getLongitude(), locationDto.getLatitude());
+
+        if (!isNear) {
+            throw new ServerException(ExceptionCode.LOCATION_NOT_VALID);
+        }
+
+        String image = s3Service.uploadFile(file, S3FolderType.ITEM);
 
         User user = principal.getUser();
 
-        Item item = Item.of(request, user);
+        Item item = Item.of(request.getItemDto(), user, image);
         itemRepository.save(item);
 
         ReadItemResponseDto newItemDto = ReadItemResponseDto.from(item);
@@ -51,7 +72,7 @@ public class ItemService {
         List<Long> nearByUserIds = locationService.findUsersNearBy(userId, SEARCH_RADIUS_KM);
         nearByUserIds.add(userId);
 
-        Page<Item> itemList =
+        Page<ReadItemFlatResponseDto> itemList =
                 itemRepository.findAllByStatus(Status.REGISTERED, nearByUserIds, pageable);
 
         return itemList.map(ReadItemResponseDto::from);

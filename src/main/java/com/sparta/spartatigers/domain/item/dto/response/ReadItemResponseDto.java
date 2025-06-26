@@ -25,4 +25,14 @@ public record ReadItemResponseDto(
                 item.getStatus(),
                 item.getCreatedAt());
     }
+
+    public static ReadItemResponseDto from(ReadItemFlatResponseDto dto) {
+        return new ReadItemResponseDto(
+                dto.id(),
+                UserResponseDto.from(dto.userId(), dto.nickname()),
+                dto.category(),
+                dto.title(),
+                dto.status(),
+                dto.createdAt());
+    }
 }

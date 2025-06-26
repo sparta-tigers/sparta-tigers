@@ -25,6 +25,16 @@ public enum ExceptionCode {
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
+    // 파일
+    FILE_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_NOT_FOUND("파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_FILE_EXTENSION("허용되지 않은 파일 확장자입니다.", HttpStatus.BAD_REQUEST),
+    FILE_SIZE_EXCEEDED("파일 크기가 허용된 최대 크기를 초과했습니다.", HttpStatus.BAD_REQUEST),
+    FILE_DELETE_FAILED("파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_FILE_FORMAT("파일 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    FILE_ALREADY_EXISTS("이미 존재하는 파일입니다.", HttpStatus.CONFLICT),
+    DEFAULT_IMAGE_CANNOT_BE_DELETED("기본 이미지는 삭제할 수 없습니다.", HttpStatus.BAD_REQUEST),
+
     // 매치
     MATCH_NOT_FOUND("경기 일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
@@ -33,6 +43,9 @@ public enum ExceptionCode {
 
     // 채팅방
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+
+    // 1대1 채팅방
+    TOO_MANY_MESSAGE("채팅을 너무 빠르게 입력했습니다. 잠시 후 다시 보내주세요.", HttpStatus.TOO_MANY_REQUESTS),
 
     // 교환 요청
     EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
@@ -43,6 +56,7 @@ public enum ExceptionCode {
     CANNOT_REQUEST_OWN_ITEM("자신의 아이템에 대해 교환 요청을 할 수 없습니다.", HttpStatus.BAD_REQUEST),
     RECEIVER_NOT_OWNER("해당 아이템의 소유자에게만 요청을 보낼 수 있습니다.", HttpStatus.FORBIDDEN),
     RECEIVER_FORBIDDEN("요청을 받은 사용자만 요청을 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
+    LOCATION_NOT_VALID("아이템은 야구장 근처에서만 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     // 직관 기록
     WATCH_LIST_NOT_FOUND("직관 기록이 존재하지 않습니다.", HttpStatus.NOT_FOUND),

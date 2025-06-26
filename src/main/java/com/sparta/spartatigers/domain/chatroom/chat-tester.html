@@ -34,6 +34,12 @@
   let stompClient = null;
 
   function connect() {
+    // 이미 연결되어 있으면 재연결 막기
+    if (stompClient && stompClient.connected) {
+      alert("이미 WebSocket에 연결되어 있습니다.");
+      return;
+    }
+
     const token = document.getElementById("token").value.trim();
     if (!token || !token.startsWith("Bearer ")) {
       alert("유효한 JWT 토큰을 입력하세요. 'Bearer ' 포함해야 합니다.");
@@ -83,7 +89,6 @@
         })
     );
   }
-
 </script>
 </body>
 </html>
