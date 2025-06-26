@@ -44,6 +44,9 @@ public enum ExceptionCode {
     // 채팅방
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
+    // 1대1 채팅방
+    TOO_MANY_MESSAGE("채팅을 너무 빠르게 입력했습니다. 잠시 후 다시 보내주세요.", HttpStatus.TOO_MANY_REQUESTS),
+
     // 교환 요청
     EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     EXCHANGE_REQUEST_DUPLICATED("이미 교환 요청을 보냈습니다.", HttpStatus.CONFLICT),
