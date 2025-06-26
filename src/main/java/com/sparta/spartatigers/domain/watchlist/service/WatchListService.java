@@ -14,7 +14,6 @@ import com.sparta.spartatigers.domain.favoriteteam.repository.FavoriteTeamReposi
 import com.sparta.spartatigers.domain.match.model.entity.Match;
 import com.sparta.spartatigers.domain.match.repository.MatchRepository;
 import com.sparta.spartatigers.domain.team.model.entity.Team;
-import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
@@ -41,17 +40,16 @@ public class WatchListService {
      * 직관 기록 등록 서비스
      *
      * @param request 유저 요청 객체
-     * @param principal 유저 정보
+     * @param authUser 유저 객체
      * @return {@link CreateWatchListResponseDto}
      */
     @Transactional
-    public CreateWatchListResponseDto create(
-            CreateWatchListRequestDto request, CustomUserPrincipal principal) {
+    public CreateWatchListResponseDto create(CreateWatchListRequestDto request, User authUser) {
         Match match = matchRepository.findByIdWithTeamsAndStadium(request.getMatch().getId());
         if (match == null) {
             throw new InvalidRequestException(ExceptionCode.MATCH_NOT_FOUND);
         }
-        WatchList watchList = WatchList.from(match, request, principal.getUser());
+        WatchList watchList = WatchList.from(match, request, authUser);
 
         watchListRepository.save(watchList);
 
@@ -62,12 +60,11 @@ public class WatchListService {
      * 직관 기록 다건 조회 서비스
      *
      * @param pageable 페이지 정보
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      * @return {@link WatchListResponseDto} 페이지
      */
     @Transactional(readOnly = true)
-    public Page<WatchListResponseDto> findAll(Pageable pageable, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public Page<WatchListResponseDto> findAll(Pageable pageable, Long userId) {
         Page<WatchList> all = watchListRepository.findAllByUserIdWithMatchDetails(userId, pageable);
 
         return all.map(WatchListResponseDto::of);
@@ -77,12 +74,11 @@ public class WatchListService {
      * 직관 기록 단건 조회 서비스
      *
      * @param watchListId 직관 기록 식별자
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      * @return {@link WatchListResponseDto}
      */
     @Transactional(readOnly = true)
-    public WatchListResponseDto findOne(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public WatchListResponseDto findOne(Long watchListId, Long userId) {
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -94,13 +90,12 @@ public class WatchListService {
      *
      * @param watchListId 직관 기록 식별자
      * @param request 요청 DTO
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      * @return {@link WatchListResponseDto}
      */
     @Transactional
     public WatchListResponseDto update(
-            Long watchListId, UpdateWatchListRequestDto request, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+            Long watchListId, UpdateWatchListRequestDto request, Long userId) {
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -113,11 +108,10 @@ public class WatchListService {
      * 직관 기록 삭제
      *
      * @param watchListId 직관 기록 식별자
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      */
     @Transactional
-    public void delete(Long watchListId, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public void delete(Long watchListId, Long userId) {
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
@@ -128,13 +122,12 @@ public class WatchListService {
      * 직관 기록 검색 서비스
      *
      * @param request 검색 요청 객체
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      * @return {@link Page<WatchListResponseDto>}
      */
     @Transactional(readOnly = true)
     public Page<WatchListResponseDto> search(
-            Pageable pageable, SearchWatchListRequestDto request, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+            Pageable pageable, SearchWatchListRequestDto request, Long userId) {
         Page<WatchList> all =
                 watchListRepository.findAllByKeyword(
                         userId, request.getTeamName(), request.getStadiumName(), pageable);
@@ -145,13 +138,11 @@ public class WatchListService {
     /**
      * 응원하는 팀에 한정하여 직관 통계 데이터를 제공하는 서비스
      *
-     * @param principal 유저 정보
+     * @param userId 유저 아이디
      * @return {@link StatsResponseDto}
      */
     @Transactional(readOnly = true)
-    public StatsResponseDto getStats(CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
-
+    public StatsResponseDto getStats(Long userId) {
         User user = userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam favoriteTeam = favoriteTeamRepository.findByUserIdOrElseThrow(userId);
         Team myTeam = favoriteTeam.getTeam();

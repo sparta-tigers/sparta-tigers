@@ -41,7 +41,7 @@ public class WatchListController {
     public ApiResponse<CreateWatchListResponseDto> create(
             @RequestBody CreateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.created(watchListService.create(request, principal));
+        return ApiResponse.created(watchListService.create(request, principal.getUser()));
     }
 
     /**
@@ -58,7 +58,8 @@ public class WatchListController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(watchListService.findAll(pageable, principal));
+        return ApiResponse.ok(
+                watchListService.findAll(pageable, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -72,7 +73,8 @@ public class WatchListController {
     public ApiResponse<?> findOne(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.findOne(watchListId, principal));
+        return ApiResponse.ok(
+                watchListService.findOne(watchListId, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -88,7 +90,9 @@ public class WatchListController {
             @PathVariable Long watchListId,
             @RequestBody UpdateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.update(watchListId, request, principal));
+        return ApiResponse.ok(
+                watchListService.update(
+                        watchListId, request, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -102,7 +106,7 @@ public class WatchListController {
     public ApiResponse<?> delete(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        watchListService.delete(watchListId, principal);
+        watchListService.delete(watchListId, CustomUserPrincipal.getUserId(principal));
         return ApiResponse.ok("삭제 완료");
     }
 
@@ -122,11 +126,13 @@ public class WatchListController {
             @RequestBody SearchWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(watchListService.search(pageable, request, principal));
+        return ApiResponse.ok(
+                watchListService.search(
+                        pageable, request, CustomUserPrincipal.getUserId(principal)));
     }
 
     @GetMapping("/stats")
     public ApiResponse<?> getStats(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.getStats(principal));
+        return ApiResponse.ok(watchListService.getStats(CustomUserPrincipal.getUserId(principal)));
     }
 }
