@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.watchlist.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +42,7 @@ public class WatchListController {
      */
     @PostMapping
     public ApiResponse<CreateWatchListResponseDto> create(
-            @RequestBody CreateWatchListRequestDto request,
+            @Valid @RequestBody CreateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.created(watchListService.create(request, principal.getUser()));
     }
@@ -89,7 +91,7 @@ public class WatchListController {
     @PatchMapping("/{watchListId}")
     public ApiResponse<WatchListResponseDto> update(
             @PathVariable Long watchListId,
-            @RequestBody UpdateWatchListRequestDto request,
+            @Valid @RequestBody UpdateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(
                 watchListService.update(
