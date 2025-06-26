@@ -21,9 +21,9 @@ public class DirectRoomResponseDto {
     private boolean isCompleted;
     private LocalDateTime completedAt;
     private LocalDateTime createdAt;
-    private boolean isReceiverOnline;
+    private boolean receiverOnline;
 
-    public static DirectRoomResponseDto from(DirectRoom room, boolean isReceiverOnline) {
+    public static DirectRoomResponseDto from(DirectRoom room, boolean receiverOnline) {
         return new DirectRoomResponseDto(
                 room.getId(),
                 room.getExchangeRequest().getId(),
@@ -33,6 +33,6 @@ public class DirectRoomResponseDto {
                 room.isCompleted(),
                 room.getCompletedAt(),
                 room.getCreatedAt(),
-                isReceiverOnline);
+                receiverOnline);
     }
 }
