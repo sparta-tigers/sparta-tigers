@@ -65,7 +65,8 @@ public class DirectRoomService {
                                             ? room.getReceiver().getId()
                                             : room.getSender().getId();
 
-                            boolean isOnline = userConnectService.isUserOnline(opponentId);
+                            boolean isOnline =
+                                    userConnectService.isUserOnline(currentUserId, opponentId);
 
                             return DirectRoomResponseDto.from(room, currentUserId, isOnline);
                         });
