@@ -22,10 +22,11 @@ public class UserConnectController {
     @GetMapping("/{userId}")
     public ApiResponse<Map<String, Object>> userOnlineOrOffline(@PathVariable Long userId) {
         boolean online = userConnectService.isUserOnline(userId);
+        // TODO: 인증, 인가
         Map<String, Object> response =
                 Map.of(
                         "userId", userId,
-                        "접속여부", online);
+                        "isConnected", online);
         return ApiResponse.ok(response);
     }
 }

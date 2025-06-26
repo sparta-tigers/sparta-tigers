@@ -56,19 +56,18 @@ public class DirectRoomService {
 
     public Page<DirectRoomResponseDto> getRoomsForUser(Long currentUserId, Pageable pageable) {
         return directRoomRepository
-                .findBySenderIdOrReceiverIdWithUsers(currentUserId, pageable)
+                .findBySenderIdOrReceiverIdWithUsersAndItem(currentUserId, pageable)
                 .map(
                         room -> {
-                            // 만약 현재 로그인한 유저가 sender면 receiver를 아니면 그 반대 유저 id를 가져오는 로직(상대방 유저를 찾는
-                            // 로직)
-                            Long receiverId =
+                            // 현재 로그인한 유저의 상대방 id 가져옴
+                            Long opponentId =
                                     room.getSender().getId().equals(currentUserId)
                                             ? room.getReceiver().getId()
                                             : room.getSender().getId();
 
-                            boolean isOnline = userConnectService.isUserOnline(receiverId);
+                            boolean isOnline = userConnectService.isUserOnline(opponentId);
 
-                            return DirectRoomResponseDto.from(room, isOnline);
+                            return DirectRoomResponseDto.from(room, currentUserId, isOnline);
                         });
     }
 
