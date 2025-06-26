@@ -17,29 +17,34 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class S3Properties {
+
     private String bucket;
     private Folders folders;
     private Upload upload;
     private String defaultImagePath;
 
+    public String getFolderPath(S3FolderType type) {
+        return switch (type) {
+            case USER -> folders.getUser();
+            case RECORD -> folders.getRecord();
+            case ITEM -> folders.getItem();
+        };
+    }
+
     @Getter
     @Setter
     public static class Folders {
+
         private String user;
         private String record;
+        private String item;
     }
 
     @Getter
     @Setter
     public static class Upload {
+
         private Long maxSize;
         private List<String> allowedExtensions;
-    }
-
-    public String getFolderPath(S3FolderType type) {
-        return switch (type) {
-            case USER -> folders.getUser();
-            case RECORD -> folders.getRecord();
-        };
     }
 }
