@@ -36,14 +36,14 @@ public class GlobalExceptionHandler {
     // 커스텀 예외 핸들러
     @ExceptionHandler(BaseException.class)
     public ApiResponse<?> handleBaseException(BaseException ex) {
-        log.error("Catch Business Exception : {}", ex.getMessage());
+        log.error("Catch Business Exception : ", ex);
         return ApiResponse.fail(ex);
     }
 
     // 예상치 못한 예외 핸들러
     @ExceptionHandler(Exception.class)
     public ApiResponse<?> handleGeneralException(Exception e) {
-        log.error("Catch General Exception : {}", e.getMessage());
+        log.error("Catch General Exception : ", e);
         return ApiResponse.fail(new ServerException(ExceptionCode.INTERNAL_SERVER_ERROR));
     }
 }
