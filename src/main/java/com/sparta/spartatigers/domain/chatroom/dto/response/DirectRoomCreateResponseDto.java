@@ -11,7 +11,7 @@ import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DirectRoomResponseDto {
+public class DirectRoomCreateResponseDto {
 
     private Long directRoomId;
     private Long exchangeRequestId;
@@ -21,10 +21,9 @@ public class DirectRoomResponseDto {
     private boolean isCompleted;
     private LocalDateTime completedAt;
     private LocalDateTime createdAt;
-    private boolean isReceiverOnline;
 
-    public static DirectRoomResponseDto from(DirectRoom room, boolean isReceiverOnline) {
-        return new DirectRoomResponseDto(
+    public static DirectRoomCreateResponseDto from(DirectRoom room) {
+        return new DirectRoomCreateResponseDto(
                 room.getId(),
                 room.getExchangeRequest().getId(),
                 room.getSender().getId(),
@@ -32,7 +31,6 @@ public class DirectRoomResponseDto {
                 room.getReceiver().getNickname(),
                 room.isCompleted(),
                 room.getCompletedAt(),
-                room.getCreatedAt(),
-                isReceiverOnline);
+                room.getCreatedAt());
     }
 }

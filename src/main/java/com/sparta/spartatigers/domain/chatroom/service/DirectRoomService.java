@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomCreateResponseDto;
 import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomResponseDto;
 import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectMessageRepository;
@@ -24,9 +25,10 @@ public class DirectRoomService {
     private final ExchangeRequestRepository exchangeRequestRepository;
     private final DirectRoomRepository directRoomRepository;
     private final DirectMessageRepository directMessageRepository;
+    private final UserConnectService userConnectService;
 
     @Transactional
-    public DirectRoomResponseDto createRoom(Long exchangeRequestId, Long currentUserId) {
+    public DirectRoomCreateResponseDto createRoom(Long exchangeRequestId, Long currentUserId) {
         ExchangeRequest exchangeRequest =
                 exchangeRequestRepository.findByIdOrElseThrow(exchangeRequestId);
 
@@ -49,13 +51,25 @@ public class DirectRoomService {
                                                 DirectRoom.create(
                                                         exchangeRequest, sender, receiver)));
 
-        return DirectRoomResponseDto.from(room);
+        return DirectRoomCreateResponseDto.from(room);
     }
 
     public Page<DirectRoomResponseDto> getRoomsForUser(Long currentUserId, Pageable pageable) {
         return directRoomRepository
                 .findBySenderIdOrReceiverIdWithUsers(currentUserId, pageable)
-                .map(DirectRoomResponseDto::from);
+                .map(
+                        room -> {
+                            // 만약 현재 로그인한 유저가 sender면 receiver를 아니면 그 반대 유저 id를 가져오는 로직(상대방 유저를 찾는
+                            // 로직)
+                            Long receiverId =
+                                    room.getSender().getId().equals(currentUserId)
+                                            ? room.getReceiver().getId()
+                                            : room.getSender().getId();
+
+                            boolean isOnline = userConnectService.isUserOnline(receiverId);
+
+                            return DirectRoomResponseDto.from(room, isOnline);
+                        });
     }
 
     // 유저가 직접 채팅방을 삭제할 수도 있음
