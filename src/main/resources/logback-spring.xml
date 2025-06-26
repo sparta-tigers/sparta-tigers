@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Spring Boot 기본 logback 설정 포함 (콘솔 포함) -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- 공통 로그 패턴 설정 (컬러 + 스레드 + MDC request_id) -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%5level) [%15.15t] %clr(%-40.40logger{39}){cyan} : %msg%n%wEx"/>
+
+<!--    &lt;!&ndash; 🧵 Thread 기반 custom 콘솔 appender &ndash;&gt;-->
+<!--    <appender name="THREAD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">-->
+<!--        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+<!--            <pattern>${LOG_PATTERN}</pattern>-->
+<!--            <charset>UTF-8</charset>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+    <!-- 🗃 요청/응답 전용 파일 로그 appender -->
+    <appender name="REQUEST_RESPONSE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/request-response.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 파일 이름 패턴: 날짜 + 인덱스 -->
+            <fileNamePattern>logs/request-response.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+
+            <!-- 하루 기준 + 용량 기준 -->
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- 📦 로컬 환경에서만 활성화될 로깅 설정 -->
+    <springProfile name="local">
+
+        <!-- 특정 패키지: THREAD_CONSOLE 패턴 적용 -->
+        <logger name="com.sparta" level="INFO" additivity="false">
+            <appender-ref ref="THREAD_CONSOLE"/>
+        </logger>
+
+        <!-- 메인 부트스트랩 클래스는 기본 콘솔 출력 유지 -->
+        <logger name="com.sparta.spartatigers.SpartaTigersApplication" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <!-- 요청/응답 로거: 파일로 분리 저장 -->
+        <logger name="RequestLogger" level="INFO" additivity="false">
+            <appender-ref ref="REQUEST_RESPONSE"/>
+        </logger>
+
+        <!-- 루트 로거: 기본 CONSOLE appender 적용 -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+</configuration>

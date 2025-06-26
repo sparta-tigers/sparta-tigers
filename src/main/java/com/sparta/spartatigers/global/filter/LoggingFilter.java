@@ -11,6 +11,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -40,19 +42,27 @@ public class LoggingFilter implements Filter {
         wrappedResponse.copyBodyToResponse();
     }
 
+    private static final Logger requestLogger = LoggerFactory.getLogger("RequestLogger");
+
     private void logRequest(ContentCachingRequestWrapper request) {
         String method = request.getMethod();
         String url = request.getRequestURI();
         String body = getBody(request.getContentAsByteArray());
 
-        log.info("[Request] {}/{} - {}", method, url, body);
+        requestLogger.info("[Request] {}{} ", method, url);
+        if (!body.isBlank()) {
+            requestLogger.info("  └ 요청바디 -  {} ", body);
+        }
     }
 
     private void logResponse(ContentCachingResponseWrapper response) {
         int status = response.getStatus();
         String body = getBody(response.getContentAsByteArray());
 
-        log.info("[Response] Status : {} / {}", status, body);
+        requestLogger.info("[Response] 상태코드 : {} ", status);
+        if (!body.isBlank()) {
+            requestLogger.info("  └ 응답바디 -  {} ", body);
+        }
     }
 
     private String getBody(byte[] content) {
