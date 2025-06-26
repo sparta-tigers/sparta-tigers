@@ -54,7 +54,7 @@ public class WatchListController {
      */
     @GetMapping
     public ApiResponse<Page<WatchListResponseDto>> findAll(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         Pageable pageable = PageRequest.of(page, size);
@@ -117,7 +117,7 @@ public class WatchListController {
      */
     @PostMapping("/search")
     public ApiResponse<?> search(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody SearchWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
