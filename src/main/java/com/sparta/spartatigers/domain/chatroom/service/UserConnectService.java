@@ -25,6 +25,8 @@ public class UserConnectService {
         return userSessionRegistry.isUserConnected(targetUserId);
     }
 
+    // user A와 B 사이에 채팅방이 존재하는지 확인하는 로직
+    // 채팅방 목록 조회용
     private boolean hasChatRoomBetween(Long userAId, Long userBId) {
         return directRoomRepository.existsBySenderIdAndReceiverId(userAId, userBId)
                 || directRoomRepository.existsBySenderIdAndReceiverId(userBId, userAId);
