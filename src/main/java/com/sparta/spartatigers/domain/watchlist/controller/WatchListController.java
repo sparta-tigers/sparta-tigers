@@ -24,6 +24,7 @@ import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResp
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
 import com.sparta.spartatigers.global.response.ApiResponse;
+import com.sparta.spartatigers.global.response.MessageCode;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class WatchListController {
      * @return {@link WatchListResponseDto}
      */
     @GetMapping("/{watchListId}")
-    public ApiResponse<?> findOne(
+    public ApiResponse<WatchListResponseDto> findOne(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(
@@ -86,7 +87,7 @@ public class WatchListController {
      * @return {@link WatchListResponseDto}
      */
     @PatchMapping("/{watchListId}")
-    public ApiResponse<?> update(
+    public ApiResponse<WatchListResponseDto> update(
             @PathVariable Long watchListId,
             @RequestBody UpdateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -103,11 +104,11 @@ public class WatchListController {
      * @return String
      */
     @DeleteMapping("/{watchListId}")
-    public ApiResponse<?> delete(
+    public ApiResponse<String> delete(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         watchListService.delete(watchListId, CustomUserPrincipal.getUserId(principal));
-        return ApiResponse.ok("삭제 완료");
+        return ApiResponse.ok(MessageCode.WATCH_LIST_DELETED.getMessage());
     }
 
     /**
@@ -120,7 +121,7 @@ public class WatchListController {
      * @return {@link Page<WatchListResponseDto>}
      */
     @PostMapping("/search")
-    public ApiResponse<?> search(
+    public ApiResponse<Page<WatchListResponseDto>> search(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody SearchWatchListRequestDto request,

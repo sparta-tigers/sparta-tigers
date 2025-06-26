@@ -23,9 +23,10 @@ public enum MessageCode {
     UPDATE_EXCHANGE_REQUEST_SUCCESS("교환 요청 상태 변경을 성공했습니다."),
     COMPLETE_EXCHANGE_SUCCESS("교환을 성공적으로 완료했습니다."),
 
-// 아이템
+    // 아이템
 
-// 직관 기록
+    // 직관 기록
+    WATCH_LIST_DELETED("직관 기록이 삭제되었습니다.")
 
 // 공통
 ;
