@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.chatroom.dto.request.CreateDirectRoomRequestDto;
+import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomCreateResponseDto;
 import com.sparta.spartatigers.domain.chatroom.dto.response.DirectRoomResponseDto;
 import com.sparta.spartatigers.domain.chatroom.service.DirectRoomService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
@@ -31,11 +32,11 @@ public class DirectRoomController {
     private final DirectRoomService directRoomService;
 
     @PostMapping
-    public ApiResponse<DirectRoomResponseDto> createDirectRoom(
+    public ApiResponse<DirectRoomCreateResponseDto> createDirectRoom(
             @Valid @RequestBody CreateDirectRoomRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
         Long userId = userPrincipal.getUser().getId();
-        DirectRoomResponseDto directRoomDto =
+        DirectRoomCreateResponseDto directRoomDto =
                 directRoomService.createRoom(request.getExchangeRequestId(), userId);
         return ApiResponse.created(directRoomDto);
     }

@@ -19,11 +19,13 @@ public interface DirectRoomRepository extends JpaRepository<DirectRoom, Long> {
                     "select dr from direct_rooms dr "
                             + "join fetch dr.sender s "
                             + "join fetch dr.receiver r "
+                            + "join fetch dr.exchangeRequest er "
+                            + "join fetch er.item i "
                             + "where dr.sender.id = :userId or dr.receiver.id = :userId",
             countQuery =
                     "select count(dr) from direct_rooms dr "
                             + "where dr.sender.id = :userId or dr.receiver.id = :userId")
-    Page<DirectRoom> findBySenderIdOrReceiverIdWithUsers(Long userId, Pageable pageable);
+    Page<DirectRoom> findBySenderIdOrReceiverIdWithUsersAndItem(Long userId, Pageable pageable);
 
     Optional<DirectRoom> findByExchangeRequestId(Long exchangeRequestId);
 }
