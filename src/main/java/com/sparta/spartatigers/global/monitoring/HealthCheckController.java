@@ -1,4 +1,4 @@
-package com.sparta.spartatigers.global;
+package com.sparta.spartatigers.global.monitoring;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
