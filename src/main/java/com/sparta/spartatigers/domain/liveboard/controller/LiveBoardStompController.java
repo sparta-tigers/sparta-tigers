@@ -38,10 +38,10 @@ public class LiveBoardStompController {
         liveBoardRedisService.exitRoom(message);
     }
 
-	//예외 처리
-	@MessageExceptionHandler(WebSocketException.class)
-	@SendToUser("/liveboard/errors")
-	public WebSocketErrorResponse handleWebSocketError(WebSocketException e) {
-		return WebSocketErrorResponse.from(e.getCode());
-	}
+    // 예외 처리
+    @MessageExceptionHandler(WebSocketException.class)
+    @SendToUser("/liveboard/errors")
+    public WebSocketErrorResponse handleWebSocketError(WebSocketException e) {
+        return WebSocketErrorResponse.from(e.getCode());
+    }
 }
