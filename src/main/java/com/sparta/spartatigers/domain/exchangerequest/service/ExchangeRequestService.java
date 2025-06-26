@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.exchangerequest.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -106,9 +107,16 @@ public class ExchangeRequestService {
 
         Item item = itemRepository.findItemByIdOrElseThrow(exchangeRequest.getItem().getId());
         item.complete();
+
+        List<Long> exchangeRequestIds =
+                exchangeRequestRepository.findAllExchangeRequestIds(item.getId());
+
+        for (Long requestId : exchangeRequestIds) {
+            directRoomService.deleteRoomByExchangeRequestId(requestId);
+        }
         exchangeRequest.complete();
 
-        directRoomService.deleteRoomByExchangeRequestId(exchangeRequestId);
+        exchangeRequestRepository.deleteAllByItemId(item.getId());
 
         Map<String, Object> data = Map.of("itemId", item.getId(), "userId", item.getUser().getId());
         locationService.notifyUsersNearBy(item.getUser().getId(), "REMOVE_ITEM", data);
