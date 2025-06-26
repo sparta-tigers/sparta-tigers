@@ -23,6 +23,7 @@ import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListReque
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.StatsResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
 import com.sparta.spartatigers.global.response.ApiResponse;
@@ -134,8 +135,15 @@ public class WatchListController {
                         pageable, request, CustomUserPrincipal.getUserId(principal)));
     }
 
+    /**
+     * 회원인 유저가 등록한 직관 통계 조회
+     *
+     * @param principal 유저 정보
+     * @return {@link StatsResponseDto}
+     */
     @GetMapping("/stats")
-    public ApiResponse<?> getStats(@AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ApiResponse<StatsResponseDto> getStats(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.ok(watchListService.getStats(CustomUserPrincipal.getUserId(principal)));
     }
 }
