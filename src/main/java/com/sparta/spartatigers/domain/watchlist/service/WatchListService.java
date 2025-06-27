@@ -50,7 +50,6 @@ public class WatchListService {
     private final FavoriteTeamRepository favoriteTeamRepository;
     private final UserRepository userRepository;
     private final FileUtil fileUtil;
-    private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
     private final WatchListFileRepository watchListFileRepository;
     private final S3Service s3Service;
