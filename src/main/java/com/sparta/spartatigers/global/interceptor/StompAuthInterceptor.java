@@ -54,8 +54,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             String chatDomain = accessor.getFirstNativeHeader(CHAT_DOMAIN_HEADER);
 
             // StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
-            if (chatDomain == null ||
-!CHAT_DOMAIN_DIRECTROOM.equalsIgnoreCase(chatDomain.trim())) {
+            if (chatDomain == null || !CHAT_DOMAIN_DIRECTROOM.equalsIgnoreCase(chatDomain.trim())) {
                 log.info("인증 생략: ChatDomain = {}", chatDomain);
                 accessor.setUser(null);
                 SecurityContextHolder.clearContext();
