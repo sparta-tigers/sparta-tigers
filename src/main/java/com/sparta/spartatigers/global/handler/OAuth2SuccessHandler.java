@@ -48,6 +48,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(newUser);
         }
 
-        response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
+        response.sendRedirect(
+                "http://sparta-tigers-fe.s3-website.ap-northeast-2.amazonaws.com/oauth2/redirect?token="
+                        + token);
     }
 }

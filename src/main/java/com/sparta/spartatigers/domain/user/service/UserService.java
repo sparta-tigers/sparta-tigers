@@ -99,7 +99,7 @@ public class UserService {
         String folderPath = s3Properties.getFolderPath(S3FolderType.USER);
         String originalFileName = file.getOriginalFilename();
 
-        String fileName = fileUtil.createFileName(folderPath, originalFileName);
+        String fileName = fileUtil.createFileName(folderPath, originalFileName, user.getId());
         String bucket = s3Properties.getBucket();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();

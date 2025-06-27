@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchWatchListRequestDto {
-
     private String teamName;
     private String stadiumName;
 }
