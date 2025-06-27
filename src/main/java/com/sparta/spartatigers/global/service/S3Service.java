@@ -26,7 +26,7 @@ public class S3Service {
     private final S3Properties s3Properties;
     private final FileUtil fileUtil;
 
-    public String uploadFile(MultipartFile file, S3FolderType folderType) {
+    public String uploadFile(MultipartFile file, S3FolderType folderType, Long userId) {
         if (file == null || file.isEmpty()) {
             return s3Properties.getDefaultImagePath();
         }
@@ -35,7 +35,7 @@ public class S3Service {
 
         String folderPath = s3Properties.getFolderPath(folderType);
         String originalFileName = file.getOriginalFilename();
-        String fileName = fileUtil.createFileName(folderPath, originalFileName);
+        String fileName = fileUtil.createFileName(folderPath, originalFileName, userId);
         String bucket = s3Properties.getBucket();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();

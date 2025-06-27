@@ -1,7 +1,5 @@
 package com.sparta.spartatigers.domain.watchlist.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,13 +34,12 @@ import com.sparta.spartatigers.domain.watchlist.repository.WatchListRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.service.S3Service;
 import com.sparta.spartatigers.global.util.FileUtil;
 import com.sparta.spartatigers.global.util.S3FolderType;
 import com.sparta.spartatigers.global.util.S3Properties;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +53,7 @@ public class WatchListService {
     private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
     private final WatchListFileRepository watchListFileRepository;
+    private final S3Service s3Service;
 
     /**
      * 직관 기록 등록 서비스
@@ -202,30 +200,15 @@ public class WatchListService {
      */
     @Transactional
     public CreateWatchListImageResponseDto upload(MultipartFile file, Long userId) {
-        fileUtil.validateExtension(file);
-        fileUtil.validateFileSize(file);
-
         User user =
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
 
+        String fileUrl = s3Service.uploadFile(file, S3FolderType.RECORD, userId);
         String folderPath = s3Properties.getFolderPath(S3FolderType.RECORD);
         String originalFileName = file.getOriginalFilename();
-
         String fileName = fileUtil.createFileName(folderPath, originalFileName, user.getId());
-        String bucket = s3Properties.getBucket();
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(file.getSize());
-        objectMetadata.setContentType(file.getContentType());
-
-        try (InputStream inputStream = file.getInputStream()) {
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
-        } catch (IOException e) {
-            throw new ServerException(ExceptionCode.FILE_UPLOAD_FAILED);
-        }
-        String fileUrl = amazonS3.getUrl(bucket, fileName).toString();
 
         WatchListFile image = WatchListFile.create(fileName, fileUrl, originalFileName, userId);
         watchListFileRepository.save(image);
