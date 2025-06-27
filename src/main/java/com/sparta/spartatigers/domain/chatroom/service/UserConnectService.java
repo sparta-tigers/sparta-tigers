@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
+import com.sparta.spartatigers.domain.chatroom.model.entity.DirectRoom;
 import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 import com.sparta.spartatigers.domain.chatroom.repository.DirectRoomRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
@@ -34,7 +35,7 @@ public class UserConnectService {
 
     // 특정 채팅방 참여중인 상대방 유저 접속 여부 조회
     public boolean isOpponentOnlineInRoom(Long requesterId, Long roomId) {
-        var room =
+        DirectRoom room =
                 directRoomRepository
                         .findById(roomId)
                         .orElseThrow(
