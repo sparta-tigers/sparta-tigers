@@ -56,9 +56,4 @@ public class FileUtil {
             throw new ServerException(ExceptionCode.FILE_SIZE_EXCEEDED);
         }
     }
-
-    public void delete(String fileName) {
-        String bucket = s3Properties.getBucket();
-        amazonS3.deleteObject(bucket, fileName);
-    }
 }
