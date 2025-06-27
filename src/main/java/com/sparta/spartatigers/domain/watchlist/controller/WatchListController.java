@@ -59,7 +59,6 @@ public class WatchListController {
     public ApiResponse<CreateWatchListImageResponseDto> uploadImage(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        System.out.println(file);
         Long userId = principal.getUser().getId();
         CreateWatchListImageResponseDto responseDto = watchListService.upload(file, userId);
         return ApiResponse.ok(responseDto);

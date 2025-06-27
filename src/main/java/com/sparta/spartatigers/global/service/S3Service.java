@@ -50,4 +50,13 @@ public class S3Service {
 
         return amazonS3.getUrl(bucket, fileName).toString();
     }
+
+    public void delete(String fileName) {
+        String bucket = s3Properties.getBucket();
+        try {
+            amazonS3.deleteObject(bucket, fileName);
+        } catch (com.amazonaws.services.s3.model.AmazonS3Exception e) {
+            throw new ServerException(ExceptionCode.FILE_DELETE_FAILED);
+        }
+    }
 }

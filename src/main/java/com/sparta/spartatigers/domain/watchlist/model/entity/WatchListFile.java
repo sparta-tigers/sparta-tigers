@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 
@@ -13,7 +12,6 @@ import com.sparta.spartatigers.domain.common.entity.BaseEntity;
 @Entity(name = "watch_list_file")
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 public class WatchListFile extends BaseEntity {
     @Column private String fileName;
 
@@ -39,7 +37,11 @@ public class WatchListFile extends BaseEntity {
         return file;
     }
 
-    public void markUsed() {
-        this.used = true;
+    public void updateWatchList(WatchList watchList) {
+        this.watchList = watchList;
+    }
+
+    public void changeUsed(boolean used) {
+        this.used = used;
     }
 }

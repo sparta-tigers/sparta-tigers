@@ -75,8 +75,8 @@ public class WatchListService {
         List<WatchListFile> files = watchListFileRepository.findAllByFileUrlIn(imageUrls);
 
         for (WatchListFile file : files) {
-            file.setWatchList(watchList);
-            file.setUsed(true);
+            file.updateWatchList(watchList);
+            file.changeUsed(true);
         }
 
         return CreateWatchListResponseDto.of(watchList);
