@@ -9,12 +9,14 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.service.LiveBoardRedisService;
 import com.sparta.spartatigers.global.exception.WebSocketException;
 import com.sparta.spartatigers.global.response.WebSocketErrorResponse;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class LiveBoardStompController {
@@ -24,6 +26,7 @@ public class LiveBoardStompController {
     // 채팅
     @MessageMapping("/liveboard/message")
     public void sendMessage(LiveBoardMessage message, Principal principal) {
+        log.info("principal : {}", principal);
         liveBoardRedisService.handleMessage(message, principal);
     }
 
