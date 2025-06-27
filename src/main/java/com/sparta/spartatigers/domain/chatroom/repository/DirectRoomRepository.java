@@ -28,4 +28,6 @@ public interface DirectRoomRepository extends JpaRepository<DirectRoom, Long> {
     Page<DirectRoom> findBySenderIdOrReceiverIdWithUsersAndItem(Long userId, Pageable pageable);
 
     Optional<DirectRoom> findByExchangeRequestId(Long exchangeRequestId);
+
+    boolean existsBySenderIdAndReceiverId(Long senderId, Long receiverId);
 }

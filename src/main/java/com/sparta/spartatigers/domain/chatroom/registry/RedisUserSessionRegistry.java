@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RedisUserSessionRegistry {
 
-    // TODO: 세션-userId를 redis에서 관리하는 구조를 유지해야 할 이유를 찾기
     private static final String USER_SESSION_KEY_PREFIX =
             "user-sessions:"; // userId -> Set<sessionId>
     private final StringRedisTemplate redisTemplate;
