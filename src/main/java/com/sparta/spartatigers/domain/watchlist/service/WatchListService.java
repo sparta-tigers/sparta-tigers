@@ -39,8 +39,6 @@ import com.sparta.spartatigers.global.util.FileUtil;
 import com.sparta.spartatigers.global.util.S3FolderType;
 import com.sparta.spartatigers.global.util.S3Properties;
 
-import com.amazonaws.services.s3.AmazonS3;
-
 @Service
 @RequiredArgsConstructor
 public class WatchListService {
