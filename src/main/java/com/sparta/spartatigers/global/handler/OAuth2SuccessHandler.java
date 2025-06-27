@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import com.sparta.spartatigers.domain.user.model.*;
+import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.util.JwtUtil;
@@ -48,6 +48,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(newUser);
         }
 
-        response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
+        response.sendRedirect(
+                "http://sparta-tigers-fe.s3-website.ap-northeast-2.amazonaws.com/oauth2/redirect?token="
+                        + token);
     }
 }
