@@ -19,7 +19,6 @@ import com.amazonaws.services.s3.AmazonS3;
 @Component
 @RequiredArgsConstructor
 public class FileUtil {
-    private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
 
     public String createFileName(String folderPath, String originalFileName, Long userId) {

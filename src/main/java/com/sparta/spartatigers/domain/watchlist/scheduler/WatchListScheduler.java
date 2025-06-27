@@ -22,7 +22,6 @@ import com.sparta.spartatigers.global.util.FileUtil;
 public class WatchListScheduler {
 
     private final WatchListFileRepository watchListFileRepository;
-    private final FileUtil fileUtil;
     private final S3Service s3Service;
 
     @Scheduled(cron = "0 0 * * * *")
