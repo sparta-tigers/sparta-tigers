@@ -61,7 +61,7 @@ public class WatchListController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         return ApiResponse.ok(
                 watchListService.findAll(pageable, CustomUserPrincipal.getUserId(principal)));
     }
@@ -129,7 +129,7 @@ public class WatchListController {
             @RequestParam(defaultValue = "10") int size,
             @RequestBody SearchWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         return ApiResponse.ok(
                 watchListService.search(
                         pageable, request, CustomUserPrincipal.getUserId(principal)));
