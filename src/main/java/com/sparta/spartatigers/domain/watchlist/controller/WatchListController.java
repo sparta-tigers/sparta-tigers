@@ -1,5 +1,7 @@
 package com.sparta.spartatigers.domain.watchlist.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +23,11 @@ import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListReque
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.StatsResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
 import com.sparta.spartatigers.global.response.ApiResponse;
+import com.sparta.spartatigers.global.response.MessageCode;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +43,9 @@ public class WatchListController {
      */
     @PostMapping
     public ApiResponse<CreateWatchListResponseDto> create(
-            @RequestBody CreateWatchListRequestDto request,
+            @Valid @RequestBody CreateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.created(watchListService.create(request, principal));
+        return ApiResponse.created(watchListService.create(request, principal.getUser()));
     }
 
     /**
@@ -54,11 +58,12 @@ public class WatchListController {
      */
     @GetMapping
     public ApiResponse<Page<WatchListResponseDto>> findAll(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(watchListService.findAll(pageable, principal));
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ApiResponse.ok(
+                watchListService.findAll(pageable, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -69,10 +74,11 @@ public class WatchListController {
      * @return {@link WatchListResponseDto}
      */
     @GetMapping("/{watchListId}")
-    public ApiResponse<?> findOne(
+    public ApiResponse<WatchListResponseDto> findOne(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.findOne(watchListId, principal));
+        return ApiResponse.ok(
+                watchListService.findOne(watchListId, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -84,11 +90,13 @@ public class WatchListController {
      * @return {@link WatchListResponseDto}
      */
     @PatchMapping("/{watchListId}")
-    public ApiResponse<?> update(
+    public ApiResponse<WatchListResponseDto> update(
             @PathVariable Long watchListId,
-            @RequestBody UpdateWatchListRequestDto request,
+            @Valid @RequestBody UpdateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.update(watchListId, request, principal));
+        return ApiResponse.ok(
+                watchListService.update(
+                        watchListId, request, CustomUserPrincipal.getUserId(principal)));
     }
 
     /**
@@ -99,11 +107,11 @@ public class WatchListController {
      * @return String
      */
     @DeleteMapping("/{watchListId}")
-    public ApiResponse<?> delete(
+    public ApiResponse<String> delete(
             @PathVariable Long watchListId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        watchListService.delete(watchListId, principal);
-        return ApiResponse.ok("삭제 완료");
+        watchListService.delete(watchListId, CustomUserPrincipal.getUserId(principal));
+        return ApiResponse.ok(MessageCode.WATCH_LIST_DELETED.getMessage());
     }
 
     /**
@@ -116,17 +124,26 @@ public class WatchListController {
      * @return {@link Page<WatchListResponseDto>}
      */
     @PostMapping("/search")
-    public ApiResponse<?> search(
-            @RequestParam(defaultValue = "0") int page,
+    public ApiResponse<Page<WatchListResponseDto>> search(
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody SearchWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(watchListService.search(pageable, request, principal));
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ApiResponse.ok(
+                watchListService.search(
+                        pageable, request, CustomUserPrincipal.getUserId(principal)));
     }
 
+    /**
+     * 회원인 유저가 등록한 직관 통계 조회
+     *
+     * @param principal 유저 정보
+     * @return {@link StatsResponseDto}
+     */
     @GetMapping("/stats")
-    public ApiResponse<?> getStats(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(watchListService.getStats(principal));
+    public ApiResponse<StatsResponseDto> getStats(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return ApiResponse.ok(watchListService.getStats(CustomUserPrincipal.getUserId(principal)));
     }
 }
