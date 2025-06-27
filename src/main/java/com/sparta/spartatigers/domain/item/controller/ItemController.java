@@ -1,18 +1,18 @@
 package com.sparta.spartatigers.domain.item.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,12 +31,13 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<CreateItemResponseDto> createItem(
-            @Valid @RequestBody CreateItemWithLocationRequestDto request,
+            @RequestPart("request") CreateItemWithLocationRequestDto request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
 
-        CreateItemResponseDto response = itemService.createItem(request, userPrincipal);
+        CreateItemResponseDto response = itemService.createItem(request, file, userPrincipal);
 
         return ApiResponse.created(response);
     }

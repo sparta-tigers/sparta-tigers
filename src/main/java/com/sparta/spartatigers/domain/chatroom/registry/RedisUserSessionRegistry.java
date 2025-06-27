@@ -12,13 +12,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RedisUserSessionRegistry {
 
+    // TODO: 세션-userId를 redis에서 관리하는 구조를 유지해야 할 이유를 찾기
     private static final String USER_SESSION_KEY_PREFIX =
             "user-sessions:"; // userId -> Set<sessionId>
-    private static final String SESSION_USER_KEY = "session-users"; // sessionId -> userId
     private final StringRedisTemplate redisTemplate;
 
     // 멀티 세션 불가 x (메시지 중복 수신 문제 발생)
     // TODO: 추후에 멀티 디바이스 환경에도 사용할 수 있게 하려면 멀티 세션이 가능하게 대응
+    // 지금은 기존 세션을 전부 제거하고 있기 때문에 단일 세션의 효과
     public void registerSession(Long userId, String sessionId) {
         String userKey = USER_SESSION_KEY_PREFIX + userId;
 
@@ -34,7 +35,7 @@ public class RedisUserSessionRegistry {
         // 새 세션 등록
         // userId별로 세션ID를 Set에 추가
         redisTemplate.opsForSet().add(userKey, sessionId);
-        redisTemplate.expire(userKey, Duration.ofHours(6)); // 세션 만료 시간 설정
+        redisTemplate.expire(userKey, Duration.ofHours(6));
         // 단일 키 구조로 변경
         String sessionKey = "session-user:" + sessionId;
         redisTemplate.opsForValue().set(sessionKey, userId.toString(), Duration.ofHours(6));

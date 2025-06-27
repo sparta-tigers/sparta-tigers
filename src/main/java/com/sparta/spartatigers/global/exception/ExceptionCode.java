@@ -44,6 +44,9 @@ public enum ExceptionCode {
     // 채팅방
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
+    // 1대1 채팅방
+    TOO_MANY_MESSAGE("채팅을 너무 빠르게 입력했습니다. 잠시 후 다시 보내주세요.", HttpStatus.TOO_MANY_REQUESTS),
+
     // 교환 요청
     EXCHANGE_REQUEST_NOT_FOUND("교환 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     EXCHANGE_REQUEST_DUPLICATED("이미 교환 요청을 보냈습니다.", HttpStatus.CONFLICT),
@@ -64,6 +67,9 @@ public enum ExceptionCode {
     // 응원 팀
     FAVORITE_TEAM_NOT_FOUND("응원하는 팀이 없습니다.", HttpStatus.NOT_FOUND),
     ALREADY_EXISTS_FAVORITE_TEAM("이미 응원하는 팀이 있습니다.", HttpStatus.CONFLICT),
+
+    // 라이브 보드
+    WEBSOCKET_UNAUTHORIZED("비회원은 라이브보드 메세지를 보낼 수 없습니다", HttpStatus.UNAUTHORIZED),
 
     // 공통
     NOT_FOUND("not found ~~", HttpStatus.NOT_FOUND),

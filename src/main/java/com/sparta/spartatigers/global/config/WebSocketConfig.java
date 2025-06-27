@@ -25,13 +25,9 @@ import com.sparta.spartatigers.global.interceptor.StompAuthInterceptor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
-    private final AuthChannelInterceptor authChannelInterceptor;
     private final StompAuthInterceptor stompAuthInterceptor;
+    private final AuthChannelInterceptor authChannelInterceptor;
 
-    /**
-     * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
-     * 지원하지 않는 브라우저에서도 대체 전송 프로토콜을 사용하도록 (폴링)
-     */
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을
      * 지원하지 않는 브라우저에서도 대체 전송 프로토콜을 사용하도록 (폴링)
@@ -42,7 +38,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("http//localhost:5173")
                 .setAllowedOrigins(
-                        "http://sparta-tigers-fe.s3-website.ap-northeast-2.amazonaws.com")
+                        "http://sparta-tigers-fe.s3-website.ap-northeast-2.amazonaws.com",
+                        "https://fe.yaguniv.site")
                 .withSockJS();
     }
 

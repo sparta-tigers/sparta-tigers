@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.sparta.spartatigers.domain.item.dto.response.ReadItemFlatResponseDto;
 import com.sparta.spartatigers.domain.item.model.entity.Item;
 import com.sparta.spartatigers.domain.item.model.entity.Item.Status;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
@@ -14,7 +15,8 @@ import com.sparta.spartatigers.global.exception.ServerException;
 
 public interface ItemQueryRepository {
 
-    Page<Item> findAllByStatus(Status status, List<Long> nearByUserIds, Pageable pageable);
+    Page<ReadItemFlatResponseDto> findAllByStatus(
+            Status status, List<Long> nearByUserIds, Pageable pageable);
 
     Optional<Item> findItemById(Long itemId, Status status);
 
