@@ -22,7 +22,7 @@ public class WatchListFile extends BaseEntity {
     @Column private String originalFileName;
     @Column private Long userId;
 
-    private boolean isUsed = false;
+    private boolean used = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "watch_list_id")
@@ -30,12 +30,16 @@ public class WatchListFile extends BaseEntity {
 
     public static WatchListFile create(
             String fileName, String fileUrl, String originalFileName, Long userId) {
-        WatchListFile image = new WatchListFile();
-        image.fileName = fileName;
-        image.fileUrl = fileUrl;
-        image.originalFileName = originalFileName;
-        image.userId = userId;
-        image.isUsed = false;
-        return image;
+        WatchListFile file = new WatchListFile();
+        file.fileName = fileName;
+        file.fileUrl = fileUrl;
+        file.originalFileName = originalFileName;
+        file.userId = userId;
+        file.used = false;
+        return file;
+    }
+
+    public void markUsed() {
+        this.used = true;
     }
 }

@@ -14,9 +14,12 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
 
+import com.amazonaws.services.s3.AmazonS3;
+
 @Component
 @RequiredArgsConstructor
 public class FileUtil {
+    private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
 
     public String createFileName(String folderPath, String originalFileName, Long userId) {
@@ -52,5 +55,10 @@ public class FileUtil {
         if (file.getSize() > s3Properties.getUpload().getMaxSize()) {
             throw new ServerException(ExceptionCode.FILE_SIZE_EXCEEDED);
         }
+    }
+
+    public void delete(String fileName) {
+        String bucket = s3Properties.getBucket();
+        amazonS3.deleteObject(bucket, fileName);
     }
 }

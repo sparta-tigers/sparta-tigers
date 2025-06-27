@@ -84,6 +84,7 @@ public class WatchListService {
 
         for (WatchListFile file : files) {
             file.setWatchList(watchList);
+            file.setUsed(true);
         }
 
         return CreateWatchListResponseDto.of(watchList);
