@@ -1,11 +1,15 @@
 package com.sparta.spartatigers.domain.watchlist.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +23,21 @@ import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListImageResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.StatsResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchList;
+import com.sparta.spartatigers.domain.watchlist.model.entity.WatchListFile;
+import com.sparta.spartatigers.domain.watchlist.repository.WatchListFileRepository;
 import com.sparta.spartatigers.domain.watchlist.repository.WatchListRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
+import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.service.S3Service;
+import com.sparta.spartatigers.global.util.FileUtil;
+import com.sparta.spartatigers.global.util.S3FolderType;
+import com.sparta.spartatigers.global.util.S3Properties;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +47,10 @@ public class WatchListService {
     private final MatchRepository matchRepository;
     private final FavoriteTeamRepository favoriteTeamRepository;
     private final UserRepository userRepository;
+    private final FileUtil fileUtil;
+    private final S3Properties s3Properties;
+    private final WatchListFileRepository watchListFileRepository;
+    private final S3Service s3Service;
 
     /**
      * 직관 기록 등록 서비스
@@ -53,7 +69,26 @@ public class WatchListService {
 
         watchListRepository.save(watchList);
 
+        // HTML 내 img 태그 값을 통해서 watchlist 번호 매칭
+        List<String> imageUrls = extractImageUrls(request.getRecord().getContent());
+
+        List<WatchListFile> files = watchListFileRepository.findAllByFileUrlIn(imageUrls);
+
+        for (WatchListFile file : files) {
+            file.updateWatchList(watchList);
+            file.changeUsed(true);
+        }
+
         return CreateWatchListResponseDto.of(watchList);
+    }
+
+    private List<String> extractImageUrls(String content) {
+        List<String> urls = new ArrayList<>();
+        Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?").matcher(content);
+        while (matcher.find()) {
+            urls.add(matcher.group(1));
+        }
+        return urls;
     }
 
     /**
@@ -155,5 +190,26 @@ public class WatchListService {
         }
 
         return StatsResponseDto.of(accumulator);
+    }
+
+    /*
+    파일 업로드
+     */
+    @Transactional
+    public CreateWatchListImageResponseDto upload(MultipartFile file, Long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+
+        String fileUrl = s3Service.uploadFile(file, S3FolderType.RECORD, userId);
+        String folderPath = s3Properties.getFolderPath(S3FolderType.RECORD);
+        String originalFileName = file.getOriginalFilename();
+        String fileName = fileUtil.createFileName(folderPath, originalFileName, user.getId());
+
+        WatchListFile image = WatchListFile.create(fileName, fileUrl, originalFileName, userId);
+        watchListFileRepository.save(image);
+
+        return new CreateWatchListImageResponseDto(fileUrl);
     }
 }

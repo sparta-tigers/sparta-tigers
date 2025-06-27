@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.SearchWatchListRequestDto;
 import com.sparta.spartatigers.domain.watchlist.dto.request.UpdateWatchListRequestDto;
+import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListImageResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.CreateWatchListResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.StatsResponseDto;
 import com.sparta.spartatigers.domain.watchlist.dto.response.WatchListResponseDto;
@@ -29,6 +32,7 @@ import com.sparta.spartatigers.domain.watchlist.service.WatchListService;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/watchlist")
@@ -46,6 +50,18 @@ public class WatchListController {
             @Valid @RequestBody CreateWatchListRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return ApiResponse.created(watchListService.create(request, principal.getUser()));
+    }
+
+    /*
+    직관 기록 이미지 등록
+     */
+    @PostMapping("/uploads")
+    public ApiResponse<CreateWatchListImageResponseDto> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        Long userId = principal.getUser().getId();
+        CreateWatchListImageResponseDto responseDto = watchListService.upload(file, userId);
+        return ApiResponse.ok(responseDto);
     }
 
     /**

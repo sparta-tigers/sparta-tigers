@@ -1,8 +1,5 @@
 package com.sparta.spartatigers.domain.user.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +17,13 @@ import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import com.sparta.spartatigers.global.exception.ServerException;
+import com.sparta.spartatigers.global.service.S3Service;
 import com.sparta.spartatigers.global.util.FileUtil;
 import com.sparta.spartatigers.global.util.JwtUtil;
 import com.sparta.spartatigers.global.util.S3FolderType;
 import com.sparta.spartatigers.global.util.S3Properties;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +34,7 @@ public class UserService {
     private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
     private final FileUtil fileUtil;
+    private final S3Service s3Service;
 
     public UserInfoResponseDto getUserInfo(Long userId) {
         User user =
@@ -78,8 +75,6 @@ public class UserService {
 
     @Transactional
     public ProfileResponseDto updateProfile(MultipartFile file, Long userId) {
-        fileUtil.validateExtension(file);
-        fileUtil.validateFileSize(file);
         User user =
                 userRepository
                         .findById(userId)
@@ -98,21 +93,8 @@ public class UserService {
 
         String folderPath = s3Properties.getFolderPath(S3FolderType.USER);
         String originalFileName = file.getOriginalFilename();
-
-        String fileName = fileUtil.createFileName(folderPath, originalFileName);
-        String bucket = s3Properties.getBucket();
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(file.getSize());
-        objectMetadata.setContentType(file.getContentType());
-
-        try (InputStream inputStream = file.getInputStream()) {
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
-        } catch (IOException e) {
-            throw new ServerException(ExceptionCode.FILE_UPLOAD_FAILED);
-        }
-
-        String filePath = amazonS3.getUrl(bucket, fileName).toString();
+        String fileName = fileUtil.createFileName(folderPath, originalFileName, user.getId());
+        String filePath = s3Service.uploadFile(file, S3FolderType.USER, user.getId());
 
         user.updatePath(filePath);
         userRepository.save(user);

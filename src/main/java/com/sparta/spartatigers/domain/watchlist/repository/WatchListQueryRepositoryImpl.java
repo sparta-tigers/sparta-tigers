@@ -34,11 +34,13 @@ public class WatchListQueryRepositoryImpl implements WatchListQueryRepository {
 
     @Override
     public Page<WatchList> findAllByUserIdWithMatchDetails(Long userId, Pageable pageable) {
+
         List<WatchList> results =
                 baseQueryWithMatchDetails()
                         .where(isUserOwner(userId))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
+                        .orderBy(watchList.createdAt.desc())
                         .fetch();
 
         Long total =
