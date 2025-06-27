@@ -50,7 +50,7 @@ public class ItemService {
             throw new ServerException(ExceptionCode.LOCATION_NOT_VALID);
         }
 
-        String image = s3Service.uploadFile(file, S3FolderType.ITEM);
+        String image = s3Service.uploadFile(file, S3FolderType.ITEM, principal.getUser().getId());
 
         User user = principal.getUser();
 
