@@ -14,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.ServerException;
 
-import com.amazonaws.services.s3.AmazonS3;
-
 @Component
 @RequiredArgsConstructor
 public class FileUtil {
