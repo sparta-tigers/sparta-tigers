@@ -14,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import com.sparta.spartatigers.domain.watchlist.model.entity.WatchListFile;
 import com.sparta.spartatigers.domain.watchlist.repository.WatchListFileRepository;
 import com.sparta.spartatigers.global.service.S3Service;
-import com.sparta.spartatigers.global.util.FileUtil;
 
 @Component
 @RequiredArgsConstructor
