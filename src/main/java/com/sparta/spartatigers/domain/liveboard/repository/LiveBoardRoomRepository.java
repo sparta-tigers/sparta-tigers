@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.liveboard.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
@@ -20,11 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 public class LiveBoardRoomRepository {
 
+    private static final String LIVEBOARD_ROOMS = "liveboard:rooms";
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private HashOperations<String, String, LiveBoardRoom> opsHash;
-
-    private static final String LIVEBOARD_ROOMS = "liveboard:rooms";
 
     @PostConstruct
     private void init() {
@@ -42,7 +42,12 @@ public class LiveBoardRoomRepository {
     }
 
     public List<LiveBoardRoom> findAllRoom() {
-        return opsHash.values(LIVEBOARD_ROOMS);
+        List<LiveBoardRoom> rooms = new ArrayList<>();
+        for (Object room : opsHash.values(LIVEBOARD_ROOMS)) {
+            rooms.add(objectMapper.convertValue(room, LiveBoardRoom.class));
+        }
+
+        return rooms;
     }
 
     public void deleteRoom(String roomId) {
