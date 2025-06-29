@@ -50,7 +50,6 @@ public class LiveBoardRoomController {
         return liveBoardRoomService.findRoomsByDate(date);
     }
 
-    @GetMapping("/{roomId}")
     @DeleteMapping("/{roomId}")
     public ApiResponse<String> deleteRoom(@PathVariable String roomId) {
         return ApiResponse.ok(liveBoardRoomService.deleteRoom(roomId));

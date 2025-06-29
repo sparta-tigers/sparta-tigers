@@ -32,8 +32,8 @@ public class LiveBoardRoomService {
     // 라이브 보드룸 생성
     public String createTodayRoom() {
 
-        // 오늘 경기 일정 찾기
-        LocalDateTime start = LocalDate.now().atStartOfDay();
+        // 오늘 경기 일정 찾기 TODO 테스트 용으로 하루 빼놨는데 지워야 함
+        LocalDateTime start = LocalDate.now().minusDays(1).atStartOfDay();
         LocalDateTime end = start.plusDays(1);
         List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
 
