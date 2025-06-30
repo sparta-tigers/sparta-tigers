@@ -1,10 +1,6 @@
 package com.sparta.spartatigers.domain.watchlist.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +16,8 @@ import com.sparta.spartatigers.domain.watchlist.dto.request.CreateWatchListReque
 @NoArgsConstructor
 @AllArgsConstructor
 public class WatchList extends BaseEntity {
-
-    @Column private String contents;
+    @Column(columnDefinition = "TEXT")
+    private String contents;
 
     @Column private int rating;
 

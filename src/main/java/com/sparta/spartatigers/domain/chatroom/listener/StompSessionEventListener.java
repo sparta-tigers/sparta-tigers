@@ -6,9 +6,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.chatroom.registry.RedisUserSessionRegistry;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StompSessionEventListener {

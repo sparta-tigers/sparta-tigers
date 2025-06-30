@@ -96,8 +96,8 @@ public class AlarmController {
 
     @GetMapping("/sse/subscribe")
     public SseEmitter subscribe(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-        Long userId = ((CustomUserPrincipal) principal).getUser().getId();
+        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
+        Long userId = principal.getUser().getId();
         return alarmService.subscribe(userId);
     }
 }
