@@ -11,6 +11,8 @@ import lombok.extern.log4j.Log4j2;
 
 import com.sparta.spartatigers.domain.user.dto.request.LoginRequestDto;
 import com.sparta.spartatigers.domain.user.dto.request.SignUpRequestDto;
+import com.sparta.spartatigers.domain.user.dto.request.UpdateNicknameRequestDto;
+import com.sparta.spartatigers.domain.user.dto.request.UpdatePasswordRequestDto;
 import com.sparta.spartatigers.domain.user.dto.response.AuthResponseDto;
 import com.sparta.spartatigers.domain.user.dto.response.ProfileResponseDto;
 import com.sparta.spartatigers.domain.user.dto.response.UserInfoResponseDto;
@@ -53,7 +55,7 @@ public class UserController {
     유저 이미지 수정,
     그리고 S3 내 이전 이미지 삭제
      */
-    @PutMapping("/profile")
+    @PatchMapping("/profile")
     public ApiResponse<ProfileResponseDto> updateUserImage(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
@@ -71,5 +73,31 @@ public class UserController {
         Long userId = userPrincipal.getUser().getId();
         userService.deleteProfile(userId);
         return ApiResponse.ok(MessageCode.PROFILE_DELETE_SUCCESS.getMessage());
+    }
+
+    @PatchMapping("/nickname")
+    public ApiResponse<String> updateNickname(
+            @RequestBody UpdateNicknameRequestDto updateNicknameRequestDto,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUser().getId();
+        userService.updateNickname(updateNicknameRequestDto, userId);
+        return ApiResponse.ok(MessageCode.USER_NICKNAME_UPDATE_SUCCESS.getMessage());
+    }
+
+    @PatchMapping("/password")
+    public ApiResponse<String> updatePassword(
+            @RequestBody UpdatePasswordRequestDto updatePasswordRequestDto,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUser().getId();
+        userService.updatePassword(updatePasswordRequestDto, userId);
+        return ApiResponse.ok(MessageCode.USER_PASSWORD_UPDATE_SUCCESS.getMessage());
+    }
+
+    @DeleteMapping
+    public ApiResponse<String> deleteUser(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUser().getId();
+        userService.deleteUser(userId);
+        return ApiResponse.ok(MessageCode.USER_DELETED.getMessage());
     }
 }

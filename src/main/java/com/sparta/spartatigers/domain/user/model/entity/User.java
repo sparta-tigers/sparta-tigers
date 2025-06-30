@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +19,7 @@ import com.sparta.spartatigers.domain.user.dto.request.SignUpRequestDto;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SQLRestriction("deleted_at is null")
 public class User extends BaseEntity implements Serializable {
 
     @Id
@@ -75,6 +78,14 @@ public class User extends BaseEntity implements Serializable {
     // 이미지 수정
     public void updatePath(String filePath) {
         this.path = filePath;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
     }
 
     public void deleted() {

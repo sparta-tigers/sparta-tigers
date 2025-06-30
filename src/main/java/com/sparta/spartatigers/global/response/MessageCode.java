@@ -12,6 +12,10 @@ public enum MessageCode {
     // 회원
     USER_REQUEST_SUCCESS("회원 요청을 성공적으로 보냈습니다."),
     PROFILE_DELETE_SUCCESS("프로필이 성공적으로 삭제되었습니다."),
+    USER_NICKNAME_UPDATE_SUCCESS("닉네임이 성공적으로 변경되었습니다."),
+    USER_PASSWORD_UPDATE_SUCCESS("비밀번호가 성공적으로 변경되었습니다."),
+    USER_DELETED("회원 탈퇴가 성공적으로 되었습니다."),
+
     // 라이브 보드
 
     // 알람

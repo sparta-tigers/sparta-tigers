@@ -11,4 +11,6 @@ public interface WatchListFileRepository extends JpaRepository<WatchListFile, Lo
     List<WatchListFile> findAllByFileUrlIn(List<String> urls);
 
     List<WatchListFile> findByUsedFalseAndCreatedAtBefore(LocalDateTime threshold);
+
+    void deleteByWatchListId(Long watchListId);
 }
