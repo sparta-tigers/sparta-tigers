@@ -22,8 +22,10 @@ import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDt
 import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 import com.sparta.spartatigers.domain.alarm.service.AlarmService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.user.service.UserService;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
+import com.sparta.spartatigers.global.util.JwtUtil;
 
 @Log4j2
 @RestController
@@ -31,6 +33,8 @@ import com.sparta.spartatigers.global.response.MessageCode;
 @RequestMapping("/api/alarms")
 public class AlarmController {
     private final AlarmService alarmService;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     // 알람 조회 (O)
     @GetMapping
@@ -93,6 +97,22 @@ public class AlarmController {
         MatchDetailResponseDto responseDtos = alarmService.getMatchByMatchId(matchId);
         return ApiResponse.ok(responseDtos);
     }
+
+    //    @GetMapping("/sse/subscribe")
+    //    public SseEmitter subscribe(@RequestParam String token) {
+    //
+    //        Claims claims = jwtUtil.validateToken(token);
+    //        System.out.println(claims);
+    //        if (claims == null) {
+    //            throw new ServerException(ExceptionCode.NOT_FOUND_JWT);
+    //        }
+    //
+    //        String email = claims.getSubject();
+    //
+    //        Long userId = userService.findUserIdByEmail(email);
+    //
+    //        return alarmService.subscribe(userId);
+    //    }
 
     @GetMapping("/sse/subscribe")
     public SseEmitter subscribe(Authentication authentication) {
