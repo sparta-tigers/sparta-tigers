@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.sparta.spartatigers.domain.user.dto.request.LoginRequestDto;
 import com.sparta.spartatigers.domain.user.dto.request.SignUpRequestDto;
+import com.sparta.spartatigers.domain.user.dto.request.UpdateNicknameRequestDto;
+import com.sparta.spartatigers.domain.user.dto.request.UpdatePasswordRequestDto;
 import com.sparta.spartatigers.domain.user.dto.response.AuthResponseDto;
 import com.sparta.spartatigers.domain.user.dto.response.ProfileResponseDto;
 import com.sparta.spartatigers.domain.user.dto.response.UserInfoResponseDto;
@@ -65,9 +67,10 @@ public class UserService {
         User user =
                 userRepository
                         .findByEmail(loginRequestDto.getEmail())
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
-            throw new ServerException(ExceptionCode.PASSWORD_NOT_MATCH);
+            throw new InvalidRequestException(ExceptionCode.PASSWORD_NOT_MATCH);
         }
         String token = jwtUtil.generateToken(loginRequestDto.getEmail(), "ROLE_USER");
         return AuthResponseDto.from(token);
@@ -124,6 +127,49 @@ public class UserService {
                 amazonS3.getUrl(s3Properties.getBucket(), s3Properties.getDefaultImagePath())
                         .toString();
         user.updatePath(defaultImageUrl);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateNickname(UpdateNicknameRequestDto updateNicknameRequestDto, Long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+
+        user.updateNickname(updateNicknameRequestDto.getNickname());
+    }
+
+    @Transactional
+    public void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, Long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(
+                updatePasswordRequestDto.getOldPassword(), user.getPassword())) {
+            throw new InvalidRequestException(ExceptionCode.INVALID_PASSWORD);
+        }
+
+        if (passwordEncoder.matches(
+                updatePasswordRequestDto.getNewPassword(), user.getPassword())) {
+            throw new InvalidRequestException(ExceptionCode.SAME_AS_OLD_PASSWORD);
+        }
+
+        String encodedNewPassword =
+                passwordEncoder.encode(updatePasswordRequestDto.getNewPassword());
+        user.updatePassword(encodedNewPassword);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+
+        user.deleted();
         userRepository.save(user);
     }
 }

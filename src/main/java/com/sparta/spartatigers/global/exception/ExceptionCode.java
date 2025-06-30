@@ -24,6 +24,8 @@ public enum ExceptionCode {
     ALREADY_DELETED_USER("이미 탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST),
     NICKNAME_ALREADY_USED("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT),
     ACCESS_DENIED("해당 계정의 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
+    INVALID_PASSWORD("현재 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAME_AS_OLD_PASSWORD("새 비밀번호는 현재 비밀번호와 달라야 합니다.", HttpStatus.BAD_REQUEST),
 
     // 파일
     FILE_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -33,7 +35,7 @@ public enum ExceptionCode {
     FILE_DELETE_FAILED("파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_FILE_FORMAT("파일 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     FILE_ALREADY_EXISTS("이미 존재하는 파일입니다.", HttpStatus.CONFLICT),
-    DEFAULT_IMAGE_CANNOT_BE_DELETED("기본 이미지는 삭제할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    DEFAULT_IMAGE_CANNOT_BE_DELETED("현재 기본 이미지입니다.", HttpStatus.BAD_REQUEST),
 
     // 매치
     MATCH_NOT_FOUND("경기 일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
