@@ -25,8 +25,8 @@ import com.sparta.spartatigers.global.interceptor.StompAuthInterceptor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final LiveBoardInterceptor liveBoardInterceptor;
-    private final AuthChannelInterceptor authChannelInterceptor;
     private final StompAuthInterceptor stompAuthInterceptor;
+    private final AuthChannelInterceptor authChannelInterceptor;
 
     /**
      * /ws로 연결 요청을 보내도록 설정 javaScipt ex) const socket = new SockJS('/ws'); withSockJS WebSocket을

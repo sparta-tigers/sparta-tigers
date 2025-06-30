@@ -122,6 +122,20 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
                         .fetchOne());
     }
 
+    @Override
+    public List<Long> findAllExchangeRequestIds(Long itemId) {
+        return queryFactory
+                .select(exchangeRequest.id)
+                .from(exchangeRequest)
+                .where(exchangeRequestItemIdEq(itemId))
+                .fetch();
+    }
+
+    @Override
+    public void deleteAllByItemId(Long itemId) {
+        queryFactory.delete(exchangeRequest).where(exchangeRequestItemIdEq(itemId)).execute();
+    }
+
     private BooleanExpression senderIdEq(Long senderId) {
 
         return sender.id.eq(senderId);
@@ -145,5 +159,10 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
     private BooleanExpression exchangeRequestStatusEq(ExchangeStatus status) {
 
         return exchangeRequest.status.eq(status);
+    }
+
+    private BooleanExpression exchangeRequestItemIdEq(Long itemId) {
+
+        return exchangeRequest.item.id.eq(itemId);
     }
 }

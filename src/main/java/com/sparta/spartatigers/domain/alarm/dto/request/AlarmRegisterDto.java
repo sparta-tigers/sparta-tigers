@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AlarmRegisterDto {
     @NotNull private Long id;
-    @NotNull private Integer minutes;
-    @NotNull private Integer preMinutes;
+    private Integer minutes;
+    private Integer preMinutes;
 
     @AssertTrue(message = "minutes 또는 preMinutes 중 하나는 필수입니다.")
     public boolean isAtLeastOneSet() {

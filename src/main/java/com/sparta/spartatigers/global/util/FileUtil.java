@@ -19,10 +19,10 @@ import com.sparta.spartatigers.global.exception.ServerException;
 public class FileUtil {
     private final S3Properties s3Properties;
 
-    public String createFileName(String folderPath, String originalFileName) {
+    public String createFileName(String folderPath, String originalFileName, Long userId) {
         String uuidSubstring = UUID.randomUUID().toString().substring(0, 5);
         String safeOriginalName = originalFileName.replaceAll("\\s+", "_");
-        return folderPath + uuidSubstring + "_" + safeOriginalName;
+        return folderPath + userId + "/" + uuidSubstring + "_" + safeOriginalName;
     }
 
     public String extractS3KeyFromUrl(String url) {
