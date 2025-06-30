@@ -1,7 +1,5 @@
 package com.sparta.spartatigers.domain.liveboard.interceptor;
 
-import java.util.List;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -9,20 +7,22 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.util.GlobalSessionIdGenerator;
+import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.service.CustomUserDetailsService;
 import com.sparta.spartatigers.global.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LiveBoardInterceptor implements ChannelInterceptor {
@@ -36,6 +36,8 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                 MessageHeaderAccessor.getAccessor(
                         message, StompHeaderAccessor.class); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
         StompCommand command = accessor.getCommand();
+        log.info("🔐 [LiveBoardInterceptor] Command: {}", accessor.getCommand());
+        log.info("🔐 [LiveBoardInterceptor] User: {}", accessor.getUser());
 
         if (StompCommand.CONNECT.equals(command)) {
             // TODO : 글로벌 세션아이디를 만들어서 넘겨주기
@@ -48,7 +50,8 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                 if (claims != null) { // 토큰이 있을때
                     String email = claims.getSubject();
 
-                    User user = userDetailsService.loadUserByUsername(email).getUser();
+                    CustomUserPrincipal userDetails = userDetailsService.loadUserByUsername(email);
+                    User user = userDetails.getUser();
                     Long userId = user.getId();
                     String nickname = user.getNickname();
 
@@ -59,9 +62,7 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                     // Spring 시큐리티 인증
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    principal,
-                                    null,
-                                    List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                                    userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     String rawSessionId = accessor.getSessionId();

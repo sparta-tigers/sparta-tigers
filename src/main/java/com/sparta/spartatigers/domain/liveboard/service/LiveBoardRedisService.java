@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.MessageType;
@@ -81,16 +82,11 @@ public class LiveBoardRedisService {
         Long senderId = null;
         String nickname = "비회원";
 
-        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
-            senderId = customUserPrincipal.getUser().getId();
-            nickname = customUserPrincipal.getUser().getNickname();
+        if (principal instanceof StompPrincipal stompPrincipal) {
+            senderId = Long.valueOf(stompPrincipal.getName());
+            nickname = stompPrincipal.getName();
         } else {
-            try {
-                senderId = Long.valueOf(principal.getName());
-                nickname = userRepository.findNicknameById(senderId).orElse("비회원");
-            } catch (NumberFormatException e) {
-                throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-            }
+            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
         }
 
         message =
@@ -111,16 +107,9 @@ public class LiveBoardRedisService {
         Long senderId = null;
         String nickname = "비회원";
 
-        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
-            senderId = customUserPrincipal.getUser().getId();
-            nickname = customUserPrincipal.getUser().getNickname();
-        } else if (principal != null) {
-            try {
-                senderId = Long.valueOf(principal.getName());
-                nickname = userRepository.findNicknameById(senderId).orElse("비회원");
-            } catch (NumberFormatException e) {
-                // 비회원
-            }
+        if (principal instanceof StompPrincipal stompPrincipal) {
+            senderId = Long.valueOf(stompPrincipal.getName());
+            nickname = stompPrincipal.getName();
         }
 
         String globalSessionId = getGlobalSessionId(message);
