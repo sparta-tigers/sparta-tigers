@@ -54,7 +54,7 @@ public class ItemService {
 
         String image = null;
         try {
-            image = s3Service.uploadFile(file, S3FolderType.ITEM);
+            image = s3Service.uploadFile(file, S3FolderType.ITEM, principal.getUser().getId());
             log.debug("[createItem] S3 이미지 업로드 완료: {}", image);
         } catch (Exception e) {
             log.error("[createItem] S3 이미지 업로드 중 예외 발생 - 사용자 ID: {}", user.getId(), e);
