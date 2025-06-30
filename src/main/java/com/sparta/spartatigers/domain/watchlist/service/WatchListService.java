@@ -147,6 +147,8 @@ public class WatchListService {
      */
     @Transactional
     public void delete(Long watchListId, Long userId) {
+        watchListFileRepository.deleteByWatchListId(watchListId);
+
         WatchList findWatchList =
                 watchListRepository.findDetailByIdAndOwnerOrThrow(watchListId, userId);
 
