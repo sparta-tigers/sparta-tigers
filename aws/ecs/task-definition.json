@@ -42,7 +42,7 @@
         },
         {
           "name": "kakao_client_secret",
-          "value": "${CLIENT_SECRET}"
+          "value": "${KAKAO_CLIENT_SECRET}"
         },
         {
           "name": "google_client_id",
