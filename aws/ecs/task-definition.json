@@ -37,12 +37,28 @@
           "value": "${S3_BUCKET_NAME}"
         },
         {
-          "name": "client_id",
-          "value": "${CLIENT_ID}"
+          "name": "kakao_client_id",
+          "value": "${KAKAO_CLIENT_ID}"
         },
         {
-          "name": "client_secret",
-          "value": "${CLIENT_SECRET}"
+          "name": "kakao_client_secret",
+          "value": "${KAKAO_CLIENT_SECRET}"
+        },
+        {
+          "name": "google_client_id",
+          "value": "${GOOGLE_CLIENT_ID}"
+        },
+        {
+          "name": "google_client_secret",
+          "value": "${GOOGLE_CLIENT_SECRET}"
+        },
+        {
+          "name": "naver_client_id",
+          "value": "${NAVER_CLIENT_ID}"
+        },
+        {
+          "name": "naver_client_secret",
+          "value": "${NAVER_CLIENT_SECRET}"
         },
         {
           "name": "jwt_secret",
