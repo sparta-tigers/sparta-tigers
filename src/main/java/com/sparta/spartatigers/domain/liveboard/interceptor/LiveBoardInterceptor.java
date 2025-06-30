@@ -37,8 +37,8 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
                         message, StompHeaderAccessor.class); // stomp 메세지의 헤더를 분석 ( 커멘드, 세션아이디 등등..)
         StompCommand command = accessor.getCommand();
 
-        // TODO : 글로벌 세션아이디를 만들어서 넘겨주기
         if (StompCommand.CONNECT.equals(command)) {
+            // TODO : 글로벌 세션아이디를 만들어서 넘겨주기
             String token = accessor.getFirstNativeHeader("Authorization");
 
             if (token != null && token.startsWith("Bearer ")) {
@@ -47,6 +47,7 @@ public class LiveBoardInterceptor implements ChannelInterceptor {
 
                 if (claims != null) { // 토큰이 있을때
                     String email = claims.getSubject();
+
                     User user = userDetailsService.loadUserByUsername(email).getUser();
                     Long userId = user.getId();
                     String nickname = user.getNickname();

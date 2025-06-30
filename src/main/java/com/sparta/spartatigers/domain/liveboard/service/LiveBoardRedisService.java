@@ -74,14 +74,23 @@ public class LiveBoardRedisService {
 
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Principal principal) {
+        if (principal == null) {
+            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
+        }
+
         Long senderId = null;
         String nickname = "비회원";
 
-        if (principal == null) {
-            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
+        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
+            senderId = customUserPrincipal.getUser().getId();
+            nickname = customUserPrincipal.getUser().getNickname();
         } else {
-            senderId = findSenderId(principal);
-            nickname = userRepository.findNicknameById(senderId).orElse("비회원");
+            try {
+                senderId = Long.valueOf(principal.getName());
+                nickname = userRepository.findNicknameById(senderId).orElse("비회원");
+            } catch (NumberFormatException e) {
+                throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
+            }
         }
 
         message =
@@ -103,14 +112,14 @@ public class LiveBoardRedisService {
         String nickname = "비회원";
 
         if (principal instanceof CustomUserPrincipal customUserPrincipal) {
-            senderId = findSenderId(principal);
+            senderId = customUserPrincipal.getUser().getId();
             nickname = customUserPrincipal.getUser().getNickname();
         } else if (principal != null) {
             try {
                 senderId = Long.valueOf(principal.getName());
                 nickname = userRepository.findNicknameById(senderId).orElse("비회원");
             } catch (NumberFormatException e) {
-                // fallback 유지
+                // 비회원
             }
         }
 
