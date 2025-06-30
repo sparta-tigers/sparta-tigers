@@ -1,61 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Spring Boot 기본 logback 설정 포함 (콘솔 포함) -->
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
+    <encoder>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%thread] %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <encoder>
+      <charset>UTF-8</charset>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%thread] %logger{36} - %msg%n</pattern>
+    </encoder>
 
-    <!-- 공통 로그 패턴 설정 (컬러 + 스레드 + MDC request_id) -->
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%5level) [%15.15t] %clr(%-40.40logger{39}){cyan} : %msg%n%wEx"/>
+    <file>${LOG_PATH}/${APP_NAME}.log</file>
 
-<!--    &lt;!&ndash; 🧵 Thread 기반 custom 콘솔 appender &ndash;&gt;-->
-<!--    <appender name="THREAD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">-->
-<!--        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
-<!--            <pattern>${LOG_PATTERN}</pattern>-->
-<!--            <charset>UTF-8</charset>-->
-<!--        </encoder>-->
-<!--    </appender>-->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>14</maxHistory>
+    </rollingPolicy>
+  </appender>
 
-    <!-- 🗃 요청/응답 전용 파일 로그 appender -->
-    <appender name="REQUEST_RESPONSE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/request-response.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 파일 이름 패턴: 날짜 + 인덱스 -->
-            <fileNamePattern>logs/request-response.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="REQUEST_RESPONSE">
+    <encoder>
+      <charset>UTF-8</charset>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <file>logs/request-response.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 파일 이름 패턴: 날짜 + 인덱스 -->
+      <fileNamePattern>logs/request-response.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 
-            <!-- 하루 기준 + 용량 기준 -->
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
+      <!-- 하루 기준 + 용량 기준 -->
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+  </appender>
 
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_FILE">
+    <!-- LevelFilter를 사용하여 ERROR 레벨만 기록하도록 설정 -->
+    <encoder>
+      <charset>UTF-8</charset>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%thread] %logger{36} - %msg%n</pattern>
+    </encoder>
+    <file>${LOG_PATH}/error.log</file>
+    <!-- 에러 로그는 별도의 파일에 저장 -->
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>  <!-- ERROR 레벨이면 로그를 기록 -->
+      <onMismatch>DENY</onMismatch> <!-- 다른 레벨이면 무시 -->
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory> <!-- 에러 로그는 더 길게 30일 보관 -->
+    </rollingPolicy>
+  </appender>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <!-- 📦 로컬 환경에서만 활성화될 로깅 설정 -->
-    <springProfile name="local">
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-        <!-- 특정 패키지: THREAD_CONSOLE 패턴 적용 -->
-        <logger name="com.sparta" level="INFO" additivity="false">
-            <appender-ref ref="THREAD_CONSOLE"/>
-        </logger>
+  <logger additivity="false" level="DEBUG" name="com.sparta.spartatigers">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+    <appender-ref ref="ERROR_FILE"/>
+    <appender-ref ref="REQUEST_RESPONSE"/>
+  </logger>
 
-        <!-- 메인 부트스트랩 클래스는 기본 콘솔 출력 유지 -->
-        <logger name="com.sparta.spartatigers.SpartaTigersApplication" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
+  <logger additivity="false" level="INFO" name="RequestLogger">
+    <appender-ref ref="REQUEST_RESPONSE"/>
+  </logger>
 
-        <!-- 요청/응답 로거: 파일로 분리 저장 -->
-        <logger name="RequestLogger" level="INFO" additivity="false">
-            <appender-ref ref="REQUEST_RESPONSE"/>
-        </logger>
+  <property name="APP_NAME" value="spartatigers"/>
 
-        <!-- 루트 로거: 기본 CONSOLE appender 적용 -->
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
+  <property name="LOG_PATH" value="logs"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+    <appender-ref ref="ERROR_FILE"/>
+  </root>
+
 </configuration>

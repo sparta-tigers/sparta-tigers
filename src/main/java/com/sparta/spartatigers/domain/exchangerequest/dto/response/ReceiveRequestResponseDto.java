@@ -9,6 +9,7 @@ import com.sparta.spartatigers.domain.user.dto.response.UserResponseDto;
 
 public record ReceiveRequestResponseDto(
         Long exchangeRequestId,
+        Long itemId,
         UserResponseDto sender,
         Category category,
         String title,
@@ -19,6 +20,7 @@ public record ReceiveRequestResponseDto(
 
         return new ReceiveRequestResponseDto(
                 exchangeRequest.getId(),
+                exchangeRequest.getItem().getId(),
                 UserResponseDto.from(exchangeRequest.getSender()),
                 exchangeRequest.getItem().getCategory(),
                 exchangeRequest.getItem().getTitle(),

@@ -1,5 +1,6 @@
 package com.sparta.spartatigers.domain.exchangerequest.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +21,10 @@ public interface ExchangeRequestQueryRepository {
 
     Optional<ExchangeRequest> findExchangeRequestById(
             Long exchangeRequestId, ExchangeStatus status);
+
+    List<Long> findAllExchangeRequestIds(Long itemId);
+
+    void deleteAllByItemId(Long itemId);
 
     default ExchangeRequest findExchangeRequestByIdOrElseThrow(Long exchangeRequestId) {
         return findExchangeRequestById(exchangeRequestId, ExchangeStatus.PENDING)
