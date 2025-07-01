@@ -28,7 +28,7 @@ import com.sparta.spartatigers.global.util.RedisRateLimiter;
 public class ChatMessageService {
 
     // TODO: 운영 단계에서는 조정
-    private static final int MESSAGE_LIMIT = 3;
+    private static final int MESSAGE_LIMIT = 10;
     private static final Duration LIMIT_DURATION = Duration.ofSeconds(2);
 
     private final DirectRoomRepository directRoomRepository;
