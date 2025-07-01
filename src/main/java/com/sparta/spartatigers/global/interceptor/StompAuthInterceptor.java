@@ -57,29 +57,35 @@ public class StompAuthInterceptor implements ChannelInterceptor {
 
             // StompAuthInterceptor를 채팅 기능에만 동작하도록 수정
             if (chatDomain == null || !CHAT_DOMAIN_DIRECTROOM.equalsIgnoreCase(chatDomain.trim())) {
-                log.info("인증 생략: ChatDomain = {}", chatDomain);
+                log.debug("[StompAuthInterceptor] 인증 생략 - chatDomain: {}", chatDomain);
                 accessor.setUser(null);
                 SecurityContextHolder.clearContext();
                 return message;
             }
 
             String token = accessor.getFirstNativeHeader("Authorization");
-
-            log.info("Authorization header: {}", token);
+            log.debug("[StompAuthInterceptor] Authorization 헤더 수신 - raw: {}", token);
 
             if (token == null || !token.startsWith("Bearer ")) {
+                log.warn("[StompAuthInterceptor] 토큰 누락 또는 형식 오류 - token: {}", token);
                 throw new InvalidRequestException(ExceptionCode.NOT_FOUND_JWT);
             }
             token = token.substring(7);
-
             Claims claims = jwtUtil.validateToken(token);
             if (claims == null) {
+                log.warn("[StompAuthInterceptor] JWT 유효성 검사 실패 - token: {}", token);
                 throw new InvalidRequestException(ExceptionCode.NOT_FOUND_JWT);
             }
 
             // 토큰에서 현재 유저의 이메일 추출 후 사용자 정보 조회
             String email = claims.getSubject();
+            log.debug("[StompAuthInterceptor] JWT 파싱 완료 - email: {}", email);
+
             User user = userDetailsService.loadUserByUsername(email).getUser();
+            log.info(
+                    "[StompAuthInterceptor] 사용자 인증 완료 - userId: {}, nickname: {}",
+                    user.getId(),
+                    user.getNickname());
 
             // 인증된 사용자 정보로 StompPrincipal 생성 및 메시지에 등록
             StompPrincipal principal = new StompPrincipal(user.getId(), user.getNickname());
