@@ -58,13 +58,6 @@ public class SecurityConfig {
                                         .failureUrl("/fail"))
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        http.logout(
-                logout ->
-                        logout.logoutUrl("/api/users/logout")
-                                .invalidateHttpSession(true)
-                                .deleteCookies("JSESSIONID")
-                                .permitAll());
-
         return http.build();
     }
 

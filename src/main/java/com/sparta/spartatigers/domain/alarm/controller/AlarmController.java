@@ -6,9 +6,16 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.RequiredArgsConstructor;
@@ -23,9 +30,13 @@ import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 import com.sparta.spartatigers.domain.alarm.service.AlarmService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.service.UserService;
+import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.ServerException;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
 import com.sparta.spartatigers.global.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
 
 @Log4j2
 @RestController
@@ -98,26 +109,26 @@ public class AlarmController {
         return ApiResponse.ok(responseDtos);
     }
 
-    //    @GetMapping("/sse/subscribe")
-    //    public SseEmitter subscribe(@RequestParam String token) {
-    //
-    //        Claims claims = jwtUtil.validateToken(token);
-    //        System.out.println(claims);
-    //        if (claims == null) {
-    //            throw new ServerException(ExceptionCode.NOT_FOUND_JWT);
-    //        }
-    //
-    //        String email = claims.getSubject();
-    //
-    //        Long userId = userService.findUserIdByEmail(email);
-    //
-    //        return alarmService.subscribe(userId);
-    //    }
-
     @GetMapping("/sse/subscribe")
-    public SseEmitter subscribe(Authentication authentication) {
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
-        Long userId = principal.getUser().getId();
+    public SseEmitter subscribe(@RequestParam String token) {
+
+        Claims claims = jwtUtil.validateToken(token);
+        System.out.println(claims);
+        if (claims == null) {
+            throw new ServerException(ExceptionCode.NOT_FOUND_JWT);
+        }
+
+        String email = claims.getSubject();
+
+        Long userId = userService.findUserIdByEmail(email);
+
         return alarmService.subscribe(userId);
     }
+
+    // @GetMapping("/sse/subscribe")
+    // public SseEmitter subscribe(Authentication authentication) {
+    // 	CustomUserPrincipal principal = (CustomUserPrincipal)authentication.getPrincipal();
+    // 	Long userId = principal.getUser().getId();
+    // 	return alarmService.subscribe(userId);
+    // }
 }
