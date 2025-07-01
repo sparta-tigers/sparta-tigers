@@ -12,13 +12,11 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.MessageType;
@@ -59,16 +57,9 @@ public class LiveBoardRedisService {
                 });
     }
 
-    private Long findSenderId(Authentication authentication) {
-        if (authentication == null) {
-            return null;
-        }
-        Object principalObj = authentication.getPrincipal();
-
-        if (principalObj instanceof CustomUserPrincipal principal) {
-            return principal.getUser().getId();
-        } else if (principalObj instanceof StompPrincipal principal) {
-            return Long.parseLong(principal.getName());
+    private Long findSenderId(Principal principal) {
+        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
+            return customUserPrincipal.getUser().getId();
         }
         return null;
     }
@@ -81,33 +72,6 @@ public class LiveBoardRedisService {
 
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Principal principal) {
-        // Long senderId = null;
-        // String nickname = "비회원";
-        //
-        // if (principal instanceof CustomUserPrincipal customUserPrincipal) {
-        //     senderId = customUserPrincipal.getUser().getId();
-        //     nickname = customUserPrincipal.getUser().getNickname();
-        // } else if (principal != null) {
-        //     try {
-        //         senderId = Long.valueOf(principal.getName());
-        //         nickname = userRepository.findNicknameById(senderId).orElse("비회원");
-        //     } catch (NumberFormatException e) {
-        //         throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-        //     }
-        // }
-        //
-        // if (senderId == null) {
-        //     throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-        // }
-        // message =
-        //         LiveBoardMessage.of(
-        //                 message.getRoomId(),
-        //                 message.getSenderId(),
-        //                 message.getSenderNickName(),
-        //                 message.getContent(),
-        //                 MessageType.CHAT);
-
-        // Redis publish
         ChannelTopic topic = getOrInitTopic(message.getRoomId());
         redisPublisher.publish(topic, message);
     }
@@ -118,7 +82,7 @@ public class LiveBoardRedisService {
         String nickname = "비회원";
 
         if (principal instanceof CustomUserPrincipal customUserPrincipal) {
-            senderId = customUserPrincipal.getUser().getId();
+            senderId = findSenderId(principal);
             nickname = customUserPrincipal.getUser().getNickname();
         } else if (principal != null) {
             try {
