@@ -77,7 +77,7 @@ public class SecurityConfig {
                         "http://localhost:63342",
                         "http://sparta-tigers-fe.s3-website.ap-northeast-2.amazonaws.com",
                         "https://fe.yaguniv.site"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
