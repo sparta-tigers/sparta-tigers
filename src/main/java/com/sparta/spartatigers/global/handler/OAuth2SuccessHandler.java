@@ -48,6 +48,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(newUser);
         }
 
-        response.sendRedirect("https://yaguniv.site/redirect?token=" + token);
+        response.sendRedirect("https://fe.yaguniv.site/redirect?token=" + token);
     }
 }
