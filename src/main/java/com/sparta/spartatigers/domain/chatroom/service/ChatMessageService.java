@@ -38,9 +38,9 @@ public class ChatMessageService {
     @Transactional
     public void sendMessage(Long senderId, ChatMessageRequest request) {
         String rateLimitKey = "rate-limit:user:" + senderId;
-        if (redisRateLimiter.isRateLimited(rateLimitKey, MESSAGE_LIMIT, LIMIT_DURATION)) {
-            throw new InvalidRequestException(ExceptionCode.TOO_MANY_MESSAGE);
-        }
+        // if (redisRateLimiter.isRateLimited(rateLimitKey, MESSAGE_LIMIT, LIMIT_DURATION)) {
+        //     throw new InvalidRequestException(ExceptionCode.TOO_MANY_MESSAGE);
+        // }
 
         Long roomId = request.getRoomId();
         String messageText = request.getMessage();
