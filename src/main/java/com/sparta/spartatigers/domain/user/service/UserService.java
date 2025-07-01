@@ -172,4 +172,11 @@ public class UserService {
         user.deleted();
         userRepository.save(user);
     }
+
+    public Long findUserIdByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND))
+                .getId();
+    }
 }

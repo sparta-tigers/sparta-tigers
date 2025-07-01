@@ -1,7 +1,6 @@
 package com.sparta.spartatigers.global.interceptor;
 
 import java.security.Principal;
-import java.util.Map;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -9,13 +8,11 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
+import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 
 @Slf4j
 @Component
@@ -34,33 +31,24 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                 return message;
             }
 
-            CustomUserPrincipal customUserPrincipal = null;
-
-            // 1. Authentication 객체에서 Principal을 꺼냅니다.
-            if (principal instanceof UsernamePasswordAuthenticationToken authToken) {
-                if (authToken.getPrincipal() instanceof CustomUserPrincipal) {
-                    customUserPrincipal = (CustomUserPrincipal) authToken.getPrincipal();
-                }
-            } else if (principal instanceof OAuth2AuthenticationToken oauthToken) {
-                if (oauthToken.getPrincipal() instanceof CustomUserPrincipal) {
-                    customUserPrincipal = (CustomUserPrincipal) oauthToken.getPrincipal();
+            if (principal instanceof StompPrincipal stompPrincipal) {
+                try {
+                    String userIdString = stompPrincipal.getName();
+                    accessor.getSessionAttributes().put("userId", Long.parseLong(userIdString));
+                    return message;
+                } catch (Exception e) {
+                    log.warn("userId 변환중 예외가 발생 했습니다: {}", e.getCause(), e);
+                    return message;
                 }
             }
 
-            if (customUserPrincipal != null) {
-                Long userId = customUserPrincipal.getUser().getId(); // 내부 ID를 사용!
+            log.warn(
+                    "Principal 객체에서 CustomUserPrincipal을 추출하지 못했습니다: {}",
+                    principal.getClass().getName());
 
-                Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-                if (sessionAttributes != null) {
-                    sessionAttributes.put("userId", userId);
-                    log.info("✅ WebSocket 세션에 userId 저장됨: {}", userId);
-                }
-            } else {
-                log.warn(
-                        "Principal 객체에서 CustomUserPrincipal을 추출하지 못했습니다: {}",
-                        principal.getClass().getName());
-            }
+            return message;
         }
+
         return message;
     }
 }
