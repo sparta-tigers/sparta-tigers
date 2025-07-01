@@ -3,7 +3,14 @@ package com.sparta.spartatigers.domain.user.controller;
 import jakarta.validation.Valid;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +46,10 @@ public class UserController {
     @GetMapping("/me")
     public ApiResponse<UserInfoResponseDto> getUserInfo(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ApiResponse.ok(null);
+        }
+
         Long userId = userPrincipal.getUser().getId();
         UserInfoResponseDto userInfoResponseDto = userService.getUserInfo(userId);
         return ApiResponse.ok(userInfoResponseDto);

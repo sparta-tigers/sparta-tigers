@@ -9,8 +9,9 @@ spring:
       - redis.yml
       - application-social.yml
       - application-s3.yml
-  # ?? ??? ?? ????
-  web.resources.add-mappings: false
+  web:
+    resources:
+      add-mappings: false
 
 server:
   tomcat:
@@ -22,3 +23,10 @@ server:
 logging:
   level:
     com.sparta.sparta-tigers.global.config.StompAuthInterceptor: info # 개발할 때 info 운영 단계에서는 warn으로
+    org.springframework.security: debug
+    org.springframework.security.web: debug
+    org.springframework.security.authentication: debug
+    org.springframework.security.authorization: debug
+    org.springframework.security.config: debug
+    org.springframework.security.core: debug
+

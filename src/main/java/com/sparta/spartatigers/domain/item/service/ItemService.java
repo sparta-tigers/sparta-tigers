@@ -76,7 +76,6 @@ public class ItemService {
 
         Long userId = principal.getUser().getId();
         log.debug("[findAllItems] 사용자 ID: {}", userId);
-
         List<Long> nearByUserIds = locationService.findUsersNearBy(userId, SEARCH_RADIUS_KM);
         log.debug("[findAllItems] 근처 사용자 수: {}", nearByUserIds.size());
         nearByUserIds.add(userId);

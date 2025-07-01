@@ -25,8 +25,6 @@ import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.WebSocketException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -74,25 +72,6 @@ public class LiveBoardRedisService {
 
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Principal principal) {
-        Long senderId = null;
-        String nickname = "비회원";
-
-        if (principal == null) {
-            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-        } else {
-            senderId = findSenderId(principal);
-            nickname = userRepository.findNicknameById(senderId).orElse("비회원");
-        }
-
-        message =
-                LiveBoardMessage.of(
-                        message.getRoomId(),
-                        senderId,
-                        nickname,
-                        message.getContent(),
-                        MessageType.CHAT);
-
-        // Redis publish
         ChannelTopic topic = getOrInitTopic(message.getRoomId());
         redisPublisher.publish(topic, message);
     }
