@@ -15,7 +15,6 @@ import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
-import com.sparta.spartatigers.global.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor
@@ -42,9 +41,7 @@ public class FavoriteTeamService {
 
     @Transactional(readOnly = true)
     public FavTeamResponseDto get(Long userId) {
-        userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         return FavTeamResponseDto.of(findFavoriteTeam);
@@ -52,9 +49,7 @@ public class FavoriteTeamService {
 
     @Transactional
     public FavTeamResponseDto update(FavTeamRequestDto request, Long userId) {
-        userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         Team newTeam = teamRepository.findByIdOrElseThrow(request.getTeamId());
@@ -65,9 +60,7 @@ public class FavoriteTeamService {
 
     @Transactional
     public Void delete(Long userId) {
-        userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         favTeamRepository.delete(findFavoriteTeam);
