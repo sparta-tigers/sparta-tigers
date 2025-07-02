@@ -112,7 +112,7 @@ jobs:
             --arg S3_ACCESS_KEY "${{ secrets.S3_ACCESS_KEY }}" \
             --arg S3_SECRET_KEY "${{ secrets.S3_SECRET_KEY }}" \
             --arg S3_REGION "${{ secrets.AWS_REGION }}" \
-            --arg default_image_path "${{ secrets.DEFAULT_IMAGE_PATH }}" \
+            --arg userDefaultImagePath "${{ secrets.USER_DEFAULT_IMAGE_PATH }}" \
             '.containerDefinitions[0].image = $IMAGE_URI |
              .containerDefinitions[0].environment = [
                 {"name": "database_prod_url", "value": $DB_URL},
@@ -130,7 +130,7 @@ jobs:
                 {"name": "S3access_key", "value": $S3_ACCESS_KEY},
                 {"name": "S3secret_key", "value": $S3_SECRET_KEY},
                 {"name": "S3region", "value": $S3_REGION},
-                {"name": "default_image_path", "value": $DEFAULT_IMAGE_PATH}
+                {"name": "userDefaultImagePath", "value": $USER_DEFAULT_IMAGE_PATH}
              ]' \
             "${GITHUB_WORKSPACE}/aws/ecs/task-definition.json" > "${GITHUB_WORKSPACE}/aws/ecs/task-definition-final.json"
 
