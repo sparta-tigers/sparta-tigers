@@ -56,12 +56,15 @@ public class User extends BaseEntity implements Serializable {
 
     // 일반 로그인
     public User(String email, String nickname, String password) {
+        String defaultProfilePath =
+                "https://yagu-univ-bucket.s3.ap-northeast-2.amazonaws.com/user/default.png";
+
         this.email = email;
         this.provider = "local";
         this.providerId = null;
         this.nickname = nickname;
         this.password = password;
-        this.path = null;
+        this.path = defaultProfilePath;
         this.roles = Role.USER;
     }
 

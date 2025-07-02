@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,13 +29,9 @@ import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 import com.sparta.spartatigers.domain.alarm.service.AlarmService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.service.UserService;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.ServerException;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
 import com.sparta.spartatigers.global.util.JwtUtil;
-
-import io.jsonwebtoken.Claims;
 
 @Log4j2
 @RestController
@@ -109,21 +104,21 @@ public class AlarmController {
         return ApiResponse.ok(responseDtos);
     }
 
-    @GetMapping("/sse/subscribe")
-    public SseEmitter subscribe(@RequestParam String token) {
-
-        Claims claims = jwtUtil.validateToken(token);
-        System.out.println(claims);
-        if (claims == null) {
-            throw new ServerException(ExceptionCode.NOT_FOUND_JWT);
-        }
-
-        String email = claims.getSubject();
-
-        Long userId = userService.findUserIdByEmail(email);
-
-        return alarmService.subscribe(userId);
-    }
+    //    @GetMapping("/sse/subscribe")
+    //    public SseEmitter subscribe(@RequestParam String token) {
+    //
+    //        Claims claims = jwtUtil.validateToken(token);
+    //        System.out.println(claims);
+    //        if (claims == null) {
+    //            throw new ServerException(ExceptionCode.NOT_FOUND_JWT);
+    //        }
+    //
+    //        String email = claims.getSubject();
+    //
+    //        Long userId = userService.findUserIdByEmail(email);
+    //
+    //        return alarmService.subscribe(userId);
+    //    }
 
     // @GetMapping("/sse/subscribe")
     // public SseEmitter subscribe(Authentication authentication) {
