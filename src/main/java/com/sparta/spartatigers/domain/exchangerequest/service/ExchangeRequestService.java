@@ -3,6 +3,8 @@ package com.sparta.spartatigers.domain.exchangerequest.service;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.persistence.EntityManager;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import com.sparta.spartatigers.global.exception.ServerException;
 
 @Slf4j
@@ -38,6 +41,7 @@ public class ExchangeRequestService {
     private final UserRepository userRepository;
     private final DirectRoomService directRoomService;
     private final LocationService locationService;
+    private final EntityManager entityManager;
 
     @Transactional
     public void createExchangeRequest(ExchangeRequestDto request, CustomUserPrincipal principal) {
@@ -141,16 +145,7 @@ public class ExchangeRequestService {
                 user.getId());
         item.complete();
 
-        List<Long> exchangeRequestIds =
-                exchangeRequestRepository.findAllExchangeRequestIds(item.getId());
-
-        for (Long requestId : exchangeRequestIds) {
-            directRoomService.deleteRoomByExchangeRequestId(requestId);
-            log.debug("[completeExchange] 관련 채팅방 삭제 - requestId: {}", requestId);
-        }
-        exchangeRequest.complete();
-
-        exchangeRequestRepository.deleteAllByItemId(item.getId());
+        deleteRelatedExchange(item.getId(), "completeExchange");
 
         Map<String, Object> data = Map.of("itemId", item.getId(), "userId", item.getUser().getId());
         locationService.notifyUsersNearBy(item.getUser().getId(), "REMOVE_ITEM", data);
@@ -159,6 +154,25 @@ public class ExchangeRequestService {
                 "[completeExchange] 교환 완료 - itemId: {}, requestId: {}",
                 item.getId(),
                 exchangeRequestId);
+    }
+
+    @Transactional
+    public void deleteRelatedExchange(Long itemId, String method) {
+        List<Long> exchangeRequestIds = exchangeRequestRepository.findAllExchangeRequestIds(itemId);
+
+        for (Long requestId : exchangeRequestIds) {
+            try {
+                directRoomService.deleteRoomByExchangeRequestId(requestId);
+                log.debug("[{}] 관련 채팅방 삭제 - requestId: {}", method, requestId);
+            } catch (InvalidRequestException e) {
+                log.warn("[{}] 채팅방 없음 - requestId: {}", method, requestId);
+            }
+        }
+
+        entityManager.flush();
+
+        exchangeRequestRepository.deleteAllByItemId(itemId);
+        log.debug("[{}] 교환 요청 모두 삭제 - itemId: {}", method, itemId);
     }
 
     private User getReceiver(Long receiverId) {

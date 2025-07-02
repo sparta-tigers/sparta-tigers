@@ -127,13 +127,10 @@ public class ExchangeRequestQueryRepositoryImpl implements ExchangeRequestQueryR
         return queryFactory
                 .select(exchangeRequest.id)
                 .from(exchangeRequest)
-                .where(exchangeRequestItemIdEq(itemId))
+                .where(
+                        exchangeRequestItemIdEq(itemId),
+                        exchangeRequestStatusEq(ExchangeStatus.ACCEPTED))
                 .fetch();
-    }
-
-    @Override
-    public void deleteAllByItemId(Long itemId) {
-        queryFactory.delete(exchangeRequest).where(exchangeRequestItemIdEq(itemId)).execute();
     }
 
     private BooleanExpression senderIdEq(Long senderId) {

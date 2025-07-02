@@ -11,6 +11,7 @@ cloud:
       folders:
         user: user/
         record: record/
+        item: item/
       upload:
         max-size: 5242880 # 5MB
         allowed-extensions:
