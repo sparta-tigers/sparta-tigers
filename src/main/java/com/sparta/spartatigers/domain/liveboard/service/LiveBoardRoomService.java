@@ -27,13 +27,13 @@ public class LiveBoardRoomService {
     private final RedisTemplate<String, String> redisTemplate;
     private final LiveBoardRoomRepository roomRepository;
     private final LiveBoardConnectionRepository connectionRepository;
-    private final MatchRepository matchRepository; // TODO: 경기일정 크롤러 확인하기 + 스케줄러
+    private final MatchRepository matchRepository;
 
     // 라이브 보드룸 생성
     public String createTodayRoom() {
 
-        // 오늘 경기 일정 찾기 TODO 테스트 용으로 하루 빼놨는데 지워야 함
-        LocalDateTime start = LocalDate.now().minusDays(1).atStartOfDay();
+        // 오늘 경기 일정 찾기
+        LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
         List<Match> matches = matchRepository.findAllByMatchTimeBetween(start, end);
 
