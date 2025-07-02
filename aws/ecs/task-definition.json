@@ -79,6 +79,10 @@
         {
           "name": "S3region",
           "value": "${S3_REGION}"
+        },
+        {
+          "name": "default-image-path",
+          "value": "${DEFAULT_IMAGE_PATH}"
         }
       ],
       "logConfiguration": {
