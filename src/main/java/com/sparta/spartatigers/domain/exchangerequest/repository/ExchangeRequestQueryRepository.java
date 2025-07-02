@@ -24,8 +24,6 @@ public interface ExchangeRequestQueryRepository {
 
     List<Long> findAllExchangeRequestIds(Long itemId);
 
-    void deleteAllByItemId(Long itemId);
-
     default ExchangeRequest findExchangeRequestByIdOrElseThrow(Long exchangeRequestId) {
         return findExchangeRequestById(exchangeRequestId, ExchangeStatus.PENDING)
                 .orElseThrow(() -> new ServerException(ExceptionCode.EXCHANGE_REQUEST_NOT_FOUND));

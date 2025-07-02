@@ -1,6 +1,7 @@
 package com.sparta.spartatigers.domain.item.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.sparta.spartatigers.domain.exchangerequest.service.ExchangeRequestService;
 import com.sparta.spartatigers.domain.item.dto.request.CreateItemWithLocationRequestDto;
 import com.sparta.spartatigers.domain.item.dto.response.CreateItemResponseDto;
 import com.sparta.spartatigers.domain.item.dto.response.ReadItemDetailResponseDto;
@@ -33,6 +35,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final LocationService locationService;
     private final S3Service s3Service;
+    private final ExchangeRequestService exchangeRequestService;
 
     @Transactional
     public CreateItemResponseDto createItem(
@@ -94,5 +97,21 @@ public class ItemService {
         log.debug("[findItemById] 아이템 조회 완료 - itemId: {}", item.getId());
 
         return ReadItemDetailResponseDto.from(item);
+    }
+
+    public void deleteItem(CustomUserPrincipal userPrincipal, Long itemId) {
+
+        User user = userPrincipal.getUser();
+        Item item = itemRepository.findItemByIdOrElseThrow(itemId);
+        item.validateUserIsOwner(user);
+
+        exchangeRequestService.deleteRelatedExchange(itemId, "deleteItem");
+
+        itemRepository.delete(item);
+
+        Map<String, Object> data = Map.of("itemId", item.getId(), "userId", item.getUser().getId());
+        locationService.notifyUsersNearBy(item.getUser().getId(), "REMOVE_ITEM", data);
+
+        log.info("[delete] 아이템 삭제 완료 - itemId: {}", item.getId());
     }
 }
