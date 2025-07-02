@@ -112,7 +112,7 @@ jobs:
             --arg S3_ACCESS_KEY "${{ secrets.S3_ACCESS_KEY }}" \
             --arg S3_SECRET_KEY "${{ secrets.S3_SECRET_KEY }}" \
             --arg S3_REGION "${{ secrets.AWS_REGION }}" \
-            --arg userDefaultImagePath "${{ secrets.USER_DEFAULT_IMAGE_PATH }}" \
+            --arg USER_DEFAULT_IMAGE_PATH "${{ secrets.USER_DEFAULT_IMAGE_PATH }}" \
             '.containerDefinitions[0].image = $IMAGE_URI |
              .containerDefinitions[0].environment = [
                 {"name": "database_prod_url", "value": $DB_URL},
