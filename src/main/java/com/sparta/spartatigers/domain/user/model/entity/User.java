@@ -55,19 +55,20 @@ public class User extends BaseEntity implements Serializable {
     }
 
     // 일반 로그인
-    public User(String email, String nickname, String password) {
+    public User(String email, String nickname, String password, String path) {
         this.email = email;
         this.provider = "local";
         this.providerId = null;
         this.nickname = nickname;
         this.password = password;
-        this.path = null;
+        this.path = path;
         this.roles = Role.USER;
     }
 
-    public static User from(SignUpRequestDto signUpRequestDto, String encodedPassword) {
+    public static User from(
+            SignUpRequestDto signUpRequestDto, String encodedPassword, String path) {
         return new User(
-                signUpRequestDto.getEmail(), signUpRequestDto.getNickname(), encodedPassword);
+                signUpRequestDto.getEmail(), signUpRequestDto.getNickname(), encodedPassword, path);
     }
 
     public static User from(

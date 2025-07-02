@@ -6,11 +6,12 @@ cloud:
     region:
       static: ${S3region}
     s3:
-      default-image-path: "default.png"
+      default-image-path: ${userDefaultImagePath}
       bucket: ${bucket_name}
       folders:
         user: user/
         record: record/
+        item: item/
       upload:
         max-size: 5242880 # 5MB
         allowed-extensions:

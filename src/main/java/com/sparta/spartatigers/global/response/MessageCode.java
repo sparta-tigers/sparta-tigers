@@ -28,7 +28,7 @@ public enum MessageCode {
     COMPLETE_EXCHANGE_SUCCESS("교환을 성공적으로 완료했습니다."),
 
     // 아이템
-
+    ITEM_DELETE_SUCCESS("아이템이 성공적으로 삭제되었습니다."),
     // 직관 기록
     WATCH_LIST_DELETED("직관 기록이 삭제되었습니다.")
 

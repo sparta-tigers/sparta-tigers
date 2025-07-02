@@ -6,10 +6,16 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -114,10 +120,10 @@ public class AlarmController {
     //        return alarmService.subscribe(userId);
     //    }
 
-    @GetMapping("/sse/subscribe")
-    public SseEmitter subscribe(Authentication authentication) {
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
-        Long userId = principal.getUser().getId();
-        return alarmService.subscribe(userId);
-    }
+    // @GetMapping("/sse/subscribe")
+    // public SseEmitter subscribe(Authentication authentication) {
+    // 	CustomUserPrincipal principal = (CustomUserPrincipal)authentication.getPrincipal();
+    // 	Long userId = principal.getUser().getId();
+    // 	return alarmService.subscribe(userId);
+    // }
 }

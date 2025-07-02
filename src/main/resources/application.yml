@@ -9,8 +9,9 @@ spring:
       - redis.yml
       - application-social.yml
       - application-s3.yml
-  # ?? ??? ?? ????
-  web.resources.add-mappings: false
+  web:
+    resources:
+      add-mappings: false
 
 server:
   tomcat:

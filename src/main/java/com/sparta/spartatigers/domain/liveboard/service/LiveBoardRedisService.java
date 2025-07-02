@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.sparta.spartatigers.domain.chatroom.model.security.StompPrincipal;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
 import com.sparta.spartatigers.domain.liveboard.model.MessageType;
@@ -26,8 +25,6 @@ import com.sparta.spartatigers.domain.liveboard.pubsub.RedisMessageSubscriber;
 import com.sparta.spartatigers.domain.liveboard.repository.LiveBoardConnectionRepository;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
-import com.sparta.spartatigers.global.exception.ExceptionCode;
-import com.sparta.spartatigers.global.exception.WebSocketException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -75,29 +72,6 @@ public class LiveBoardRedisService {
 
     // 채팅 전송
     public void handleMessage(LiveBoardMessage message, Principal principal) {
-        if (principal == null) {
-            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-        }
-
-        Long senderId = null;
-        String nickname = "비회원";
-
-        if (principal instanceof StompPrincipal stompPrincipal) {
-            senderId = Long.valueOf(stompPrincipal.getName());
-            nickname = stompPrincipal.getName();
-        } else {
-            throw new WebSocketException(ExceptionCode.WEBSOCKET_UNAUTHORIZED);
-        }
-
-        message =
-                LiveBoardMessage.of(
-                        message.getRoomId(),
-                        senderId,
-                        nickname,
-                        message.getContent(),
-                        MessageType.CHAT);
-
-        // Redis publish
         ChannelTopic topic = getOrInitTopic(message.getRoomId());
         redisPublisher.publish(topic, message);
     }
@@ -107,9 +81,16 @@ public class LiveBoardRedisService {
         Long senderId = null;
         String nickname = "비회원";
 
-        if (principal instanceof StompPrincipal stompPrincipal) {
-            senderId = Long.valueOf(stompPrincipal.getName());
-            nickname = stompPrincipal.getName();
+        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
+            senderId = findSenderId(principal);
+            nickname = customUserPrincipal.getUser().getNickname();
+        } else if (principal != null) {
+            try {
+                senderId = Long.valueOf(principal.getName());
+                nickname = userRepository.findNicknameById(senderId).orElse("비회원");
+            } catch (NumberFormatException e) {
+                // fallback 유지
+            }
         }
 
         String globalSessionId = getGlobalSessionId(message);
