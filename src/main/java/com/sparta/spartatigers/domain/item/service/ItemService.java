@@ -99,6 +99,7 @@ public class ItemService {
         return ReadItemDetailResponseDto.from(item);
     }
 
+    @Transactional
     public void deleteItem(CustomUserPrincipal userPrincipal, Long itemId) {
 
         User user = userPrincipal.getUser();
