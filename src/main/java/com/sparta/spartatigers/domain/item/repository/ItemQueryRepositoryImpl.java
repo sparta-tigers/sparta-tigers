@@ -47,7 +47,10 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                                         item.status,
                                         item.createdAt))
                         .from(item)
-                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
+                        .where(
+                                itemStatusEq(status),
+                                item.user.id.in(nearByUserIds),
+                                itemCreatedDateEq(LocalDate.now()))
                         .join(item.user, user)
                         .orderBy(item.createdAt.desc())
                         .offset(pageable.getOffset())
@@ -59,7 +62,10 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
                         .select(item.count())
                         .from(item)
                         .join(item.user, user)
-                        .where(itemStatusEq(status), item.user.id.in(nearByUserIds))
+                        .where(
+                                itemStatusEq(status),
+                                item.user.id.in(nearByUserIds),
+                                itemCreatedDateEq(LocalDate.now()))
                         .fetchOne();
 
         long count = (total == null) ? 0L : total;
