@@ -15,7 +15,6 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardConnection;
 import com.sparta.spartatigers.domain.liveboard.model.LiveBoardMessage;
@@ -28,7 +27,6 @@ import com.sparta.spartatigers.domain.user.repository.UserRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LiveBoardRedisService {
