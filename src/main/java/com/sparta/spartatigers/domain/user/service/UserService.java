@@ -42,7 +42,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
         return UserInfoResponseDto.from(user);
     }
 
@@ -51,14 +52,15 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
 
         if (userRepository.existsByEmail(signUpRequestDto.getEmail())) {
-            throw new ServerException(ExceptionCode.EMAIL_ALREADY_USED);
+            throw new InvalidRequestException(ExceptionCode.EMAIL_ALREADY_USED);
         }
 
         if (userRepository.existsByNickname(signUpRequestDto.getNickname())) {
-            throw new ServerException(ExceptionCode.NICKNAME_ALREADY_USED);
+            throw new InvalidRequestException(ExceptionCode.NICKNAME_ALREADY_USED);
         }
 
-        User user = User.from(signUpRequestDto, encodedPassword);
+        String defaultImagePath = s3Properties.getDefaultImagePath();
+        User user = User.from(signUpRequestDto, encodedPassword, defaultImagePath);
         userRepository.save(user);
     }
 
@@ -81,7 +83,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         String currentImagePath = user.getPath();
         if (currentImagePath != null
@@ -110,7 +113,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         String currentImagePath = user.getPath();
 
@@ -135,7 +139,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         user.updateNickname(updateNicknameRequestDto.getNickname());
     }
@@ -145,7 +150,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(
                 updatePasswordRequestDto.getOldPassword(), user.getPassword())) {
@@ -167,7 +173,8 @@ public class UserService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         user.deleted();
         userRepository.save(user);
@@ -176,7 +183,7 @@ public class UserService {
     public Long findUserIdByEmail(String email) {
         return userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND))
+                .orElseThrow(() -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND))
                 .getId();
     }
 }

@@ -11,8 +11,8 @@ import com.sparta.spartatigers.domain.favoriteteam.model.entity.FavoriteTeam;
 import com.sparta.spartatigers.domain.favoriteteam.repository.FavoriteTeamRepository;
 import com.sparta.spartatigers.domain.team.model.entity.Team;
 import com.sparta.spartatigers.domain.team.repository.TeamRepository;
-import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.domain.user.model.entity.User;
+import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
 import com.sparta.spartatigers.global.exception.InvalidRequestException;
 
@@ -21,10 +21,11 @@ import com.sparta.spartatigers.global.exception.InvalidRequestException;
 public class FavoriteTeamService {
     private final FavoriteTeamRepository favTeamRepository;
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public FavTeamResponseDto add(FavTeamRequestDto request, CustomUserPrincipal principal) {
-        User user = principal.getUser();
+    public FavTeamResponseDto add(FavTeamRequestDto request, Long userId) {
+        User user = userRepository.findByIdOrElseThrow(userId);
         // 한 명의 유저는 한 팀만 응원하는 팀에 등록할 수 있음
         boolean exists = favTeamRepository.existsByUser(user);
         if (exists) {
@@ -39,16 +40,16 @@ public class FavoriteTeamService {
     }
 
     @Transactional(readOnly = true)
-    public FavTeamResponseDto get(CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public FavTeamResponseDto get(Long userId) {
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         return FavTeamResponseDto.of(findFavoriteTeam);
     }
 
     @Transactional
-    public FavTeamResponseDto update(FavTeamRequestDto request, CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public FavTeamResponseDto update(FavTeamRequestDto request, Long userId) {
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         Team newTeam = teamRepository.findByIdOrElseThrow(request.getTeamId());
@@ -58,8 +59,8 @@ public class FavoriteTeamService {
     }
 
     @Transactional
-    public Void delete(CustomUserPrincipal principal) {
-        Long userId = CustomUserPrincipal.getUserId(principal);
+    public Void delete(Long userId) {
+        userRepository.findByIdOrElseThrow(userId);
         FavoriteTeam findFavoriteTeam = favTeamRepository.findByUserIdOrElseThrow(userId);
 
         favTeamRepository.delete(findFavoriteTeam);

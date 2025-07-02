@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import com.sparta.spartatigers.domain.item.dto.response.ReadItemResponseDto;
 import com.sparta.spartatigers.domain.item.service.ItemService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
 import com.sparta.spartatigers.global.response.ApiResponse;
+import com.sparta.spartatigers.global.response.MessageCode;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,5 +60,14 @@ public class ItemController {
         ReadItemDetailResponseDto response = itemService.findItemById(itemId);
 
         return ApiResponse.ok(response);
+    }
+
+    @DeleteMapping("/{itemId}")
+    public ApiResponse<String> deleteItem(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal, @PathVariable Long itemId) {
+
+        itemService.deleteItem(userPrincipal, itemId);
+
+        return ApiResponse.ok(MessageCode.ITEM_DELETE_SUCCESS.getMessage());
     }
 }

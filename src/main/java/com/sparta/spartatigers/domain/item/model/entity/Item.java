@@ -113,6 +113,13 @@ public class Item extends BaseEntity {
         }
     }
 
+    public void validateUserIsOwner(User user) {
+
+        if (!this.user.getId().equals(user.getId())) {
+            throw new ServerException(ExceptionCode.ITEM_FORBIDDEN);
+        }
+    }
+
     public void complete() {
         this.status = Status.COMPLETED;
         this.createdDate = null;
