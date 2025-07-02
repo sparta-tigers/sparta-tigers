@@ -26,23 +26,27 @@ public class FavoriteTeamController {
     public ApiResponse<?> add(
             @RequestBody FavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.created(favoriteTeamService.add(request, principal));
+        Long userId = principal.getUser().getId();
+        return ApiResponse.created(favoriteTeamService.add(request, userId));
     }
 
     @GetMapping("/fav")
     public ApiResponse<?> get(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(favoriteTeamService.get(principal));
+        Long userId = principal.getUser().getId();
+        return ApiResponse.ok(favoriteTeamService.get(userId));
     }
 
     @PatchMapping("/fav")
     public ApiResponse<?> update(
             @RequestBody FavTeamRequestDto request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(favoriteTeamService.update(request, principal));
+        Long userId = principal.getUser().getId();
+        return ApiResponse.ok(favoriteTeamService.update(request, userId));
     }
 
     @DeleteMapping("/fav")
     public ApiResponse<?> delete(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return ApiResponse.ok(favoriteTeamService.delete(principal));
+        Long userId = principal.getUser().getId();
+        return ApiResponse.ok(favoriteTeamService.delete(userId));
     }
 }
