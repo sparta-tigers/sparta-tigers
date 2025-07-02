@@ -26,10 +26,7 @@ public class FavoriteTeamService {
 
     @Transactional
     public FavTeamResponseDto add(FavTeamRequestDto request, Long userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+        User user = userRepository.findByIdOrElseThrow(userId);
         // 한 명의 유저는 한 팀만 응원하는 팀에 등록할 수 있음
         boolean exists = favTeamRepository.existsByUser(user);
         if (exists) {

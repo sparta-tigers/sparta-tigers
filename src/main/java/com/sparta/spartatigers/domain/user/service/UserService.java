@@ -58,11 +58,8 @@ public class UserService {
             throw new ServerException(ExceptionCode.NICKNAME_ALREADY_USED);
         }
 
-        if (userRepository.existsByEmail(signUpRequestDto.getEmail())) {
-            throw new ServerException(ExceptionCode.NICKNAME_ALREADY_USED);
-        }
-
-        User user = User.from(signUpRequestDto, encodedPassword);
+        String defaultImagePath = s3Properties.getDefaultImagePath();
+        User user = User.from(signUpRequestDto, encodedPassword, defaultImagePath);
         userRepository.save(user);
     }
 
