@@ -35,9 +35,10 @@ public class AlarmScheduler {
     private static final String REDIS_KEY = "alarms";
     private static final String LOCK_KEY = "lock:alarmScheduler";
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedRate = 5_000)
     @Transactional
     public void sendAlarms() {
+        System.out.println("알람 스케줄러 실행@@@@@");
         RLock lock = redissonClient.getLock(LOCK_KEY);
 
         boolean isLocked = false;
@@ -58,7 +59,9 @@ public class AlarmScheduler {
 
             for (String alarmJson : alarmJsons) {
                 try {
-                    AlarmInfo alarmInfo = objectMapper.readValue(alarmJson, AlarmInfo.class);
+                    String innerJson =
+                            objectMapper.readValue(alarmJson, String.class); // JSON 문자열 추출
+                    AlarmInfo alarmInfo = objectMapper.readValue(innerJson, AlarmInfo.class);
                     redisAlarmPublisher.publishAlarm(alarmInfo);
                     redisTemplate.opsForZSet().remove(REDIS_KEY, alarmJson);
 

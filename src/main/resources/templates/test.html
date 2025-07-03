@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE 테스트</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const eventSource = new EventSource("http://localhost:8080/api/sse/subscribe");
+
+            eventSource.onopen = function () {
+                console.log("✅ SSE 연결됨");
+                document.getElementById("status").textContent = "✅ SSE 연결됨";
+            };
+
+            eventSource.onerror = function (err) {
+                console.error("❌ SSE 에러 발생:", err);
+                document.getElementById("status").textContent = "❌ SSE 연결 끊김 또는 오류";
+            };
+
+            eventSource.addEventListener("alarm", function (event) {
+                const msg = event.data;
+                console.log("🔔 알림:", msg);
+                const messageBox = document.getElementById("messages");
+                const div = document.createElement("div");
+                div.textContent = "📢 알림 도착: " + msg;
+                messageBox.appendChild(div);
+            });
+        });
+    </script>
+</head>
+<body>
+<h1>SSE 연결 상태: <span id="status">연결 중...</span></h1>
+<div id="messages">
+    <h2>알림 메시지</h2>
+</div>
+</body>
+</html>

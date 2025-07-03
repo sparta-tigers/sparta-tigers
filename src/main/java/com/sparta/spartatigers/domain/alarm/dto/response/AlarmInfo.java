@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlarmInfo {

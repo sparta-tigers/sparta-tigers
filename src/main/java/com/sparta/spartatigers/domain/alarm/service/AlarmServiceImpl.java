@@ -44,7 +44,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final MatchRepository matchRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     @Override
@@ -165,13 +165,17 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAlarm(AlarmInfo alarm) {
         SseEmitter emitter = emitters.get(alarm.getUserId());
-
+        log.info("알람 전송 시작");
         if (emitter == null) {
             log.warn("SSE 연결 없음 - userId: {}", alarm.getUserId());
             return;
         }
         try {
-            emitter.send(SseEmitter.event().name("alarm").data(alarm));
+            String json = objectMapper.writeValueAsString(alarm);
+            log.info("보낼 알람 JSON: {}", json);
+            String raw = "event: testAlarm\n" + "data: " + json + "\n\n";
+            emitter.send(SseEmitter.event().name("testAlarm").data(raw));
+            //            emitter.send(SseEmitter.event().name("testAlarm").data(json));
         } catch (IOException e) {
             emitter.completeWithError(e);
             emitters.remove(alarm.getUserId());
