@@ -39,7 +39,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     // WebSocket (실시간 통신)
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.5'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     // Redisson (Redis 분산락)
 
