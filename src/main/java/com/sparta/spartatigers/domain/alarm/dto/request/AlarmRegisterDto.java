@@ -1,8 +1,6 @@
 package com.sparta.spartatigers.domain.alarm.dto.request;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +12,12 @@ import lombok.NoArgsConstructor;
 public class AlarmRegisterDto {
     @NotNull private Long id;
 
-    @Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
+    @Min(1)
+    @Max(300)
     private Integer minutes;
 
-    @Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
+    @Min(1)
+    @Max(300)
     private Integer preMinutes;
 
     @AssertTrue(message = "minutes 또는 preMinutes 중 하나는 필수입니다.")
