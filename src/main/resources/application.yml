@@ -1,7 +1,9 @@
-spring.application.name: sparta-tigers
-spring.profiles.active: local
-
 spring:
+  application:
+    name: sparta-tigers
+
+  profiles:
+    default: prod
 
   config:
     import:
