@@ -1,6 +1,6 @@
 {
   "family": "sparta-tigers-task",
-  "networkMode": "bridge",
+  "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "EC2"
   ],
@@ -14,7 +14,6 @@
       "portMappings": [
         {
           "containerPort": 8080,
-          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
