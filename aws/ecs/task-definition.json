@@ -1,11 +1,12 @@
 {
   "family": "sparta-tigers-task",
-  "networkMode": "bridge",
+  "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "EC2"
   ],
   "cpu": "1024",
   "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::679625721793:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "sparta-tigers-container",
@@ -14,7 +15,6 @@
       "portMappings": [
         {
           "containerPort": 8080,
-          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
