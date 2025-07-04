@@ -15,4 +15,5 @@ public class GameMessage {
     private Long matchId;
     private List<GamePlayer> players;
     private MatchScore matchScore;
+    private InningTexts inningTexts;
 }
