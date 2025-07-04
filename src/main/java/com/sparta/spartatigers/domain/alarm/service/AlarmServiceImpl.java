@@ -30,6 +30,7 @@ import com.sparta.spartatigers.domain.team.repository.TeamRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import com.sparta.spartatigers.global.exception.ServerException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,15 +51,35 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public AlarmRegisterDto createAlarm(Long id, AlarmRegisterDto alarmRegisterDto) {
+
         User user =
                 userRepository
                         .findById(id)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         Match match =
                 matchRepository
                         .findById(alarmRegisterDto.getId())
-                        .orElseThrow(() -> new ServerException(ExceptionCode.MATCH_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.MATCH_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime matchTime = match.getMatchTime();
+
+        if (alarmRegisterDto.getMinutes() != null) {
+            LocalDateTime normalAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getMinutes());
+            if (normalAlarmTime.isBefore(now)) {
+                throw new InvalidRequestException(ExceptionCode.ALARM_TIME_BEFORE_NOW);
+            }
+        }
+
+        if (alarmRegisterDto.getPreMinutes() != null) {
+            LocalDateTime preAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getPreMinutes());
+            if (preAlarmTime.isBefore(now)) {
+                throw new InvalidRequestException(ExceptionCode.PRE_ALARM_TIME_BEFORE_NOW);
+            }
+        }
 
         Alarm alarm =
                 Alarm.of(

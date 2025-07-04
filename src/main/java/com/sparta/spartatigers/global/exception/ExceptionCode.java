@@ -42,6 +42,8 @@ public enum ExceptionCode {
 
     // 알람
     ALARM_NOT_FOUND("알람을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ALARM_TIME_BEFORE_NOW("알람 시간이 현재보다 이전입니다.", HttpStatus.BAD_REQUEST),
+    PRE_ALARM_TIME_BEFORE_NOW("알람 시간이 현재보다 이전입니다.", HttpStatus.BAD_REQUEST),
 
     // 채팅방
     CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
