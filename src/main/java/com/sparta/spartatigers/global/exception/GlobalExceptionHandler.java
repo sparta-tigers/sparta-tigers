@@ -3,6 +3,7 @@ package com.sparta.spartatigers.global.exception;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,5 +52,16 @@ public class GlobalExceptionHandler {
         ServerException serverException = new ServerException(ExceptionCode.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(serverException.getStatus())
                 .body(ApiResponse.fail(serverException));
+    }
+
+    // Valid에서 못거르는 타입 불일치 메소외드 예외
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidFormat(HttpMessageNotReadableException ex) {
+        log.warn("요청 데이터 형식 오류: {}", ex.getMessage());
+
+        return ResponseEntity.badRequest()
+                .body(
+                        ApiResponse.fail(
+                                new InvalidRequestException(ExceptionCode.INVALID_TYPE_EXCEPTION)));
     }
 }

@@ -79,6 +79,7 @@ public enum ExceptionCode {
     // 공통
     NOT_FOUND("not found ~~", HttpStatus.NOT_FOUND),
     NOT_VALID_EXCEPTION("validation 예외 발생", HttpStatus.BAD_REQUEST),
+    INVALID_TYPE_EXCEPTION("잘못된 데이터 타입입니다.", HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR("서버 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String message;
