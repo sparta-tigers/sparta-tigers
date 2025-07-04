@@ -13,4 +13,7 @@ public class MatchScore {
     private Long strike = 0L;
     private Long ball = 0L;
     private Long out = 0L;
+    private Long homeScore = 0L;
+    private Long awayScore = 0L;
+    private Long pitcherCount = 0L;
 }
