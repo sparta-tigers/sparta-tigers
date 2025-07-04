@@ -23,12 +23,8 @@ public class RedisAlarmSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             String jsonStr = new String(message.getBody());
-            log.info("TEST 시작");
-            log.info(jsonStr);
             String innerJson = objectMapper.readValue(jsonStr, String.class);
-            log.info(innerJson);
             AlarmInfo info = objectMapper.readValue(innerJson, AlarmInfo.class);
-            log.info(info);
             alarmService.sendAlarm(info);
         } catch (Exception e) {
             e.printStackTrace();

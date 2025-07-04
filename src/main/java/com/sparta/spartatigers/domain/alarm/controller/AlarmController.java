@@ -98,24 +98,9 @@ public class AlarmController {
         return ApiResponse.ok(responseDtos);
     }
 
+    // 알람 (O)
     @GetMapping(path = "/sse/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@PathVariable Long userId) {
-        System.out.println("알람 테스트");
         return alarmService.subscribe(userId);
     }
-
-    //    @GetMapping(path = "/sse/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    //    public SseEmitter subscribe(Authentication authentication) {
-    //        Object principal = authentication.getPrincipal();
-    //        Long userId = ((CustomUserPrincipal) principal).getUser().getId();
-    //        return alarmService.subscribe(userId);
-    //    }
-
-    //        @GetMapping(path = "/sse/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    //        public SseEmitter subscribe(Authentication authentication) {
-    //            CustomUserPrincipal principal = (CustomUserPrincipal)
-    // authentication.getPrincipal();
-    //            Long userId = principal.getUser().getId();
-    //            return alarmService.subscribe(userId);
-    //        }
 }

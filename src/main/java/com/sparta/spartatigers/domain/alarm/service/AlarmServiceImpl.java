@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -123,19 +124,37 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public SseEmitter subscribe(Long id) {
-        SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); // 1시간 유지
+        SseEmitter emitter = new SseEmitter(10 * 60 * 1000L);
+
         emitters.put(id, emitter);
 
         emitter.onCompletion(() -> emitters.remove(id));
         emitter.onTimeout(() -> emitters.remove(id));
+        emitter.onError(e -> emitters.remove(id));
 
         try {
-            emitter.send(SseEmitter.event().name("connect").data("SSE 연결 완료"));
+            emitter.send(
+                    SseEmitter.event()
+                            .name("connect")
+                            .data("SSE 연결 완료")
+                            .reconnectTime(3000L)); // optional
         } catch (IOException e) {
             emitter.completeWithError(e);
         }
 
         return emitter;
+    }
+
+    @Scheduled(fixedRate = 15_000)
+    public void sendHeartbeat() {
+        emitters.forEach(
+                (userId, emitter) -> {
+                    try {
+                        emitter.send(SseEmitter.event().name("heartbeat").data(""));
+                    } catch (IOException e) {
+                        emitters.remove(userId);
+                    }
+                });
     }
 
     @Override
@@ -165,17 +184,14 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAlarm(AlarmInfo alarm) {
         SseEmitter emitter = emitters.get(alarm.getUserId());
-        log.info("알람 전송 시작");
         if (emitter == null) {
-            log.warn("SSE 연결 없음 - userId: {}", alarm.getUserId());
+            log.warn("emitter 예외 발생");
             return;
         }
         try {
             String json = objectMapper.writeValueAsString(alarm);
-            log.info("보낼 알람 JSON: {}", json);
             String raw = "event: testAlarm\n" + "data: " + json + "\n\n";
             emitter.send(SseEmitter.event().name("testAlarm").data(raw));
-            //            emitter.send(SseEmitter.event().name("testAlarm").data(json));
         } catch (IOException e) {
             emitter.completeWithError(e);
             emitters.remove(alarm.getUserId());
