@@ -147,14 +147,18 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Scheduled(fixedRate = 15_000)
     public void sendHeartbeat() {
-        emitters.forEach(
-                (userId, emitter) -> {
-                    try {
-                        emitter.send(SseEmitter.event().name("heartbeat").data(""));
-                    } catch (IOException e) {
-                        emitters.remove(userId);
-                    }
-                });
+        emitters.entrySet()
+                .removeIf(
+                        entry -> {
+                            try {
+                                entry.getValue()
+                                        .send(SseEmitter.event().name("heartbeat").data(""));
+                                return false;
+                            } catch (IOException e) {
+                                log.debug("하트비트 전송 실패 - userId: {}", entry.getKey());
+                                return true;
+                            }
+                        });
     }
 
     @Override
@@ -189,9 +193,7 @@ public class AlarmServiceImpl implements AlarmService {
             return;
         }
         try {
-            String json = objectMapper.writeValueAsString(alarm);
-            String raw = "event: testAlarm\n" + "data: " + json + "\n\n";
-            emitter.send(SseEmitter.event().name("testAlarm").data(raw));
+            emitter.send(SseEmitter.event().name("testAlarm").data(alarm));
         } catch (IOException e) {
             emitter.completeWithError(e);
             emitters.remove(alarm.getUserId());
