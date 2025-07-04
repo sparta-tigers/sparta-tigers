@@ -19,6 +19,7 @@ server:
     threads:
       max: 600
       min-spare: 100
+  address: 0.0.0.0
 
 logging:
   level:
