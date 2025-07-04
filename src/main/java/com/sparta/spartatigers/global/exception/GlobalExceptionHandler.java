@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     // validation 예외 핸들러
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse<?> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
         log.error("Catch Validation Exception: {}", ex.getMessage());
 
         List<ErrorResponse.FieldErrorDetail> fieldErrorDetails =
