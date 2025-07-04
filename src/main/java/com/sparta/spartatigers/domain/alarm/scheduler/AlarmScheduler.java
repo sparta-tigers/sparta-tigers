@@ -35,7 +35,7 @@ public class AlarmScheduler {
     private static final String REDIS_KEY = "alarms";
     private static final String LOCK_KEY = "lock:alarmScheduler";
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(cron = "0 * * * * *")
     @Transactional
     public void sendAlarms() {
         RLock lock = redissonClient.getLock(LOCK_KEY);
@@ -48,7 +48,7 @@ public class AlarmScheduler {
                 return;
             }
 
-            ZoneOffset offset = ZoneOffset.of("+09:00");
+            var offset = ZoneOffset.of("+09:00");
             long now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toEpochSecond(offset);
             long fiveMinutesAgo = now - 300;
 
@@ -58,7 +58,8 @@ public class AlarmScheduler {
 
             for (String alarmJson : alarmJsons) {
                 try {
-                    AlarmInfo alarmInfo = objectMapper.readValue(alarmJson, AlarmInfo.class);
+                    String innerJson = objectMapper.readValue(alarmJson, String.class);
+                    AlarmInfo alarmInfo = objectMapper.readValue(innerJson, AlarmInfo.class);
                     redisAlarmPublisher.publishAlarm(alarmInfo);
                     redisTemplate.opsForZSet().remove(REDIS_KEY, alarmJson);
 
