@@ -16,4 +16,5 @@ public class GameMessage {
     private List<GamePlayer> players;
     private MatchScore matchScore;
     private InningTexts inningTexts;
+    private String currentInning;
 }
