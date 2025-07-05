@@ -53,9 +53,9 @@ jobs:
       - name: Extract Git SHA
         id: git-info
         run: |
-               IMAGE_TAG=main-${{ github.sha }}
-               echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-               echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          IMAGE_TAG=main-${{ github.sha }}
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Build and push docker image
         run: |
@@ -134,10 +134,30 @@ jobs:
              ]' \
             "${GITHUB_WORKSPACE}/aws/ecs/task-definition.json" > "${GITHUB_WORKSPACE}/aws/ecs/task-definition-final.json"
 
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Register task definition
+        id: register-task-defintion
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: aws/ecs/task-definition-final.json
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition ${{ steps.register-task-definition.outputs.task-definition-arn }} \
+            --force-new-deployment \
+            --network-configuration '{
+              "awsvpcConfiguration": {
+                "subnets": [
+                  ${{ secrets.VPC_PRIVATE_SUBNET_A }},
+                  ${{ secrets.VPC_PRIVATE_SUBNET_C }},
+                  ${{ secrets.VPC_PRIVATE_SUBNET_D }}
+                ],
+                "securityGroups": [ ${{ secerts.ECS_SECURITY_GROUP }} ],
+                "assignPublicIp": "DISABLED"
+              }
+            }'

@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -29,6 +30,7 @@ import com.sparta.spartatigers.domain.team.repository.TeamRepository;
 import com.sparta.spartatigers.domain.user.model.entity.User;
 import com.sparta.spartatigers.domain.user.repository.UserRepository;
 import com.sparta.spartatigers.global.exception.ExceptionCode;
+import com.sparta.spartatigers.global.exception.InvalidRequestException;
 import com.sparta.spartatigers.global.exception.ServerException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,20 +46,40 @@ public class AlarmServiceImpl implements AlarmService {
     private final MatchRepository matchRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     @Override
     public AlarmRegisterDto createAlarm(Long id, AlarmRegisterDto alarmRegisterDto) {
+
         User user =
                 userRepository
                         .findById(id)
-                        .orElseThrow(() -> new ServerException(ExceptionCode.USER_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.USER_NOT_FOUND));
 
         Match match =
                 matchRepository
                         .findById(alarmRegisterDto.getId())
-                        .orElseThrow(() -> new ServerException(ExceptionCode.MATCH_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new InvalidRequestException(ExceptionCode.MATCH_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime matchTime = match.getMatchTime();
+
+        if (alarmRegisterDto.getMinutes() != null) {
+            LocalDateTime normalAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getMinutes());
+            if (normalAlarmTime.isBefore(now)) {
+                throw new InvalidRequestException(ExceptionCode.ALARM_TIME_BEFORE_NOW);
+            }
+        }
+
+        if (alarmRegisterDto.getPreMinutes() != null) {
+            LocalDateTime preAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getPreMinutes());
+            if (preAlarmTime.isBefore(now)) {
+                throw new InvalidRequestException(ExceptionCode.PRE_ALARM_TIME_BEFORE_NOW);
+            }
+        }
 
         Alarm alarm =
                 Alarm.of(
@@ -123,19 +145,41 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public SseEmitter subscribe(Long id) {
-        SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); // 1시간 유지
+        SseEmitter emitter = new SseEmitter(10 * 60 * 1000L);
+
         emitters.put(id, emitter);
 
         emitter.onCompletion(() -> emitters.remove(id));
         emitter.onTimeout(() -> emitters.remove(id));
+        emitter.onError(e -> emitters.remove(id));
 
         try {
-            emitter.send(SseEmitter.event().name("connect").data("SSE 연결 완료"));
+            emitter.send(
+                    SseEmitter.event()
+                            .name("connect")
+                            .data("SSE 연결 완료")
+                            .reconnectTime(3000L)); // optional
         } catch (IOException e) {
             emitter.completeWithError(e);
         }
 
         return emitter;
+    }
+
+    @Scheduled(fixedRate = 15_000)
+    public void sendHeartbeat() {
+        emitters.entrySet()
+                .removeIf(
+                        entry -> {
+                            try {
+                                entry.getValue()
+                                        .send(SseEmitter.event().name("heartbeat").data(""));
+                                return false;
+                            } catch (IOException e) {
+                                log.debug("하트비트 전송 실패 - userId: {}", entry.getKey());
+                                return true;
+                            }
+                        });
     }
 
     @Override
@@ -165,13 +209,12 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAlarm(AlarmInfo alarm) {
         SseEmitter emitter = emitters.get(alarm.getUserId());
-
         if (emitter == null) {
-            log.warn("SSE 연결 없음 - userId: {}", alarm.getUserId());
+            log.warn("emitter 예외 발생");
             return;
         }
         try {
-            emitter.send(SseEmitter.event().name("alarm").data(alarm));
+            emitter.send(SseEmitter.event().name("testAlarm").data(alarm));
         } catch (IOException e) {
             emitter.completeWithError(e);
             emitters.remove(alarm.getUserId());
