@@ -134,30 +134,10 @@ jobs:
              ]' \
             "${GITHUB_WORKSPACE}/aws/ecs/task-definition.json" > "${GITHUB_WORKSPACE}/aws/ecs/task-definition-final.json"
 
-      - name: Register task definition
-        id: register-task-defintion
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: aws/ecs/task-definition-final.json
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-      - name: Update ECS service
-        run: |
-          aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
-            --task-definition ${{ steps.register-task-definition.outputs.task-definition-arn }} \
-            --force-new-deployment \
-            --network-configuration '{
-              "awsvpcConfiguration": {
-                "subnets": [
-                  ${{ secrets.VPC_PRIVATE_SUBNET_A }},
-                  ${{ secrets.VPC_PRIVATE_SUBNET_C }},
-                  ${{ secrets.VPC_PRIVATE_SUBNET_D }}
-                ],
-                "securityGroups": [ ${{ secerts.ECS_SECURITY_GROUP }} ],
-                "assignPublicIp": "DISABLED"
-              }
-            }'
