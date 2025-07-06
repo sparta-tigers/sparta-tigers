@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,12 +72,12 @@ public class GlobalExceptionHandler {
     SSE는 클라 동작 없으면 연결 끊김 -> 끊김 시 글로벌 익셉션 핸들러를 타는데 얘는 JSON 예외만 뱉기에 처리 못해서 생성
     예외가 발생해도 재연결을 시도하기에 동작에는 지장없음 해당 예외는 예외 로그가 계성속 생기기에 생성
     */
-    @ExceptionHandler(AsyncRequestNotUsableException.class)
-    public void handleAsyncRequestNotUsable(HttpServletRequest request, Exception e) {
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public void handleSseWritableException(HttpServletRequest request, Exception e) {
         if (request.getRequestURI().contains("/sse/subscribe")) {
-            log.debug("SSE 연결 끊김 감지 (정상 흐름): {}", e.getMessage());
+            log.debug("SSE 응답 처리 중 예외 발생 (무시 가능): {}", e.getMessage());
         } else {
-            log.warn("비동기 요청 오류: ", e);
+            log.warn("HttpMessageNotWritableException 발생: ", e);
         }
     }
 }
