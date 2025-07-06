@@ -29,7 +29,7 @@ public class MatchScheduleResponseDto {
     private String awayTeamPath;
 
     private Integer homeScore;
-	Integer awayScore;
+    Integer awayScore;
 
     public static MatchScheduleResponseDto from(Match match) {
         if (match == null) {
