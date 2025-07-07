@@ -16,12 +16,22 @@ import com.sparta.spartatigers.global.exception.ServerException;
 public class MatchScheduleResponseDto {
     private Long homeId;
     private Long awayId;
+
     @NotBlank private String homeName;
     @NotBlank private String awayName;
+
     @NotBlank private String stadiumName;
     private Match.MatchResult matchResult;
     private Long matchId;
     private LocalDateTime matchTime;
+
+    private String homeTeamPath;
+    private String awayTeamPath;
+
+    private Integer homeScore;
+    private Integer awayScore;
+
+    private LocalDateTime reservationOpenTime;
 
     public static MatchScheduleResponseDto from(Match match) {
         if (match == null) {
@@ -36,6 +46,11 @@ public class MatchScheduleResponseDto {
                 match.getStadium().getName(),
                 match.getMatchResult(),
                 match.getId(),
-                match.getMatchTime());
+                match.getMatchTime(),
+                match.getHomeTeam().getPath(),
+                match.getAwayTeam().getPath(),
+                match.getHomeScore(),
+                match.getAwayScore(),
+                match.getReservationOpenTime());
     }
 }

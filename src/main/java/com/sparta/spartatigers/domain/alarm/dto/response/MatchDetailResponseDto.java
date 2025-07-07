@@ -17,6 +17,7 @@ public class MatchDetailResponseDto {
     private String awayName;
     private String stadiumName;
     private LocalDateTime matchTime;
+    private LocalDateTime reservationOpenTime;
 
     public static MatchDetailResponseDto from(Match match) {
         return new MatchDetailResponseDto(
@@ -26,6 +27,7 @@ public class MatchDetailResponseDto {
                 match.getHomeTeam().getName(),
                 match.getAwayTeam().getName(),
                 match.getStadium().getName(),
-                match.getMatchTime());
+                match.getMatchTime(),
+                match.getReservationOpenTime());
     }
 }

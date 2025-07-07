@@ -25,6 +25,8 @@ public class Team extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Code code;
 
+    @Column private String path;
+
     public enum Code {
         LG,
         KT,

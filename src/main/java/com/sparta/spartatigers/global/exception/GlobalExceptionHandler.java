@@ -2,11 +2,15 @@ package com.sparta.spartatigers.global.exception;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,5 +67,23 @@ public class GlobalExceptionHandler {
                 .body(
                         ApiResponse.fail(
                                 new InvalidRequestException(ExceptionCode.INVALID_TYPE_EXCEPTION)));
+    }
+
+    /*
+    SSE는 클라 동작 없으면 연결 끊김 -> 끊김 시 글로벌 익셉션 핸들러를 타는데 얘는 JSON 예외만 뱉기에 처리 못해서 생성
+    예외가 발생해도 재연결을 시도하기에 동작에는 지장없음 해당 예외는 예외 로그가 계성속 생기기에 생성
+    */
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public void handleSseWritableException(HttpServletRequest request, Exception e) {
+        if (request.getRequestURI().contains("/sse/subscribe")) {
+            log.debug("SSE 응답 처리 중 예외 발생 (무시 가능): {}", e.getMessage());
+        } else {
+            log.warn("HttpMessageNotWritableException 발생: ", e);
+        }
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public void handleAsyncRequestTimeoutException() {
+        log.info("SSE 재연결 중 ");
     }
 }
