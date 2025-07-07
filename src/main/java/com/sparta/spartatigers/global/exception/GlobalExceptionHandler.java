@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,5 +80,10 @@ public class GlobalExceptionHandler {
         } else {
             log.warn("HttpMessageNotWritableException 발생: ", e);
         }
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public void handleAsyncRequestTimeoutException() {
+        log.info("SSE 재연결 중 ");
     }
 }
