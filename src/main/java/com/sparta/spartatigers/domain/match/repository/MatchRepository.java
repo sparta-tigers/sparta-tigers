@@ -42,10 +42,11 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 
     @Query(
             """
-    SELECT m FROM matches m
-    WHERE (m.homeTeam.id = 1 OR m.awayTeam.id = 1)
-      AND m.matchTime > CURRENT_TIMESTAMP
-      AND m.reservationOpenTime > CURRENT_TIMESTAMP
+			SELECT m FROM matches m
+			WHERE (m.homeTeam.id = :teamId OR m.awayTeam.id = :teamId)
+			AND m.matchTime > CURRENT_TIMESTAMP
+			AND m.reservationOpenTime > CURRENT_TIMESTAMP
+			AND FUNCTION('DATE_FORMAT', m.matchTime, '%Y-%m') = :yearMonth
 """)
     List<Match> findReservableMatchesByTeamIdAndYearMonth(
             @Param("teamId") Long teamId, @Param("yearMonth") String yearMonth);
