@@ -12,12 +12,8 @@ import lombok.NoArgsConstructor;
 public class AlarmRegisterDto {
     @NotNull private Long id;
 
-    @Min(1)
-    @Max(300)
     private Integer minutes;
 
-    @Min(1)
-    @Max(300)
     private Integer preMinutes;
 
     @AssertTrue(message = "minutes 또는 preMinutes 중 하나는 필수입니다.")

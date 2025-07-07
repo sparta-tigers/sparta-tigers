@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -65,17 +64,19 @@ public class AlarmServiceImpl implements AlarmService {
                                 () -> new InvalidRequestException(ExceptionCode.MATCH_NOT_FOUND));
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime matchTime = match.getMatchTime();
+        LocalDateTime reservationTime = match.getReservationOpenTime();
 
         if (alarmRegisterDto.getMinutes() != null) {
-            LocalDateTime normalAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getMinutes());
+            LocalDateTime normalAlarmTime =
+                    reservationTime.minusMinutes(alarmRegisterDto.getMinutes());
             if (normalAlarmTime.isBefore(now)) {
                 throw new InvalidRequestException(ExceptionCode.ALARM_TIME_BEFORE_NOW);
             }
         }
 
         if (alarmRegisterDto.getPreMinutes() != null) {
-            LocalDateTime preAlarmTime = matchTime.minusMinutes(alarmRegisterDto.getPreMinutes());
+            LocalDateTime preAlarmTime =
+                    reservationTime.minusMinutes(alarmRegisterDto.getPreMinutes());
             if (preAlarmTime.isBefore(now)) {
                 throw new InvalidRequestException(ExceptionCode.PRE_ALARM_TIME_BEFORE_NOW);
             }
@@ -166,22 +167,6 @@ public class AlarmServiceImpl implements AlarmService {
         return emitter;
     }
 
-    @Scheduled(fixedRate = 15_000)
-    public void sendHeartbeat() {
-        emitters.entrySet()
-                .removeIf(
-                        entry -> {
-                            try {
-                                entry.getValue()
-                                        .send(SseEmitter.event().name("heartbeat").data(""));
-                                return false;
-                            } catch (IOException e) {
-                                log.debug("하트비트 전송 실패 - userId: {}", entry.getKey());
-                                return true;
-                            }
-                        });
-    }
-
     @Override
     @Transactional
     public List<MatchScheduleResponseDto> getMatchScheduleByTeamId(
@@ -242,5 +227,20 @@ public class AlarmServiceImpl implements AlarmService {
         AlarmInfo info = AlarmInfo.from(alarm, alarmTime);
         String json = objectMapper.writeValueAsString(info);
         redisTemplate.opsForZSet().add("alarms", json, score);
+    }
+
+    @Override
+    @Transactional
+    public List<MatchScheduleResponseDto> getReservationOpenScheduleByTeamId(
+            Long teamId, int year, int month) {
+        teamRepository
+                .findById(teamId)
+                .orElseThrow(() -> new ServerException(ExceptionCode.TEAM_NOT_FOUND));
+
+        String yearMonth = String.format("%d-%02d", year, month);
+        List<Match> matches =
+                matchRepository.findReservableMatchesByTeamIdAndYearMonth(teamId, yearMonth);
+
+        return matches.stream().map(MatchScheduleResponseDto::from).collect(Collectors.toList());
     }
 }
