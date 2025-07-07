@@ -31,6 +31,8 @@ public class MatchScheduleResponseDto {
     private Integer homeScore;
     private Integer awayScore;
 
+    private LocalDateTime reservationOpenTime;
+
     public static MatchScheduleResponseDto from(Match match) {
         if (match == null) {
             throw new ServerException(ExceptionCode.MATCH_NOT_FOUND);
@@ -48,6 +50,7 @@ public class MatchScheduleResponseDto {
                 match.getHomeTeam().getPath(),
                 match.getAwayTeam().getPath(),
                 match.getHomeScore(),
-                match.getAwayScore());
+                match.getAwayScore(),
+                match.getReservationOpenTime());
     }
 }

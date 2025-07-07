@@ -26,4 +26,7 @@ public interface AlarmService {
     MatchDetailResponseDto getMatchByMatchId(Long matchId);
 
     public void sendAlarm(AlarmInfo alarmInfo);
+
+    List<MatchScheduleResponseDto> getReservationOpenScheduleByTeamId(
+            Long teamId, int year, int month);
 }

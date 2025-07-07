@@ -49,16 +49,16 @@ public class Alarm {
     }
 
     public static Alarm of(User user, Match match, Integer minutes, Integer preMinutes) {
-        LocalDateTime matchStartTime = match.getMatchTime();
+        LocalDateTime reservationOpenTime = match.getReservationOpenTime();
         LocalDateTime normalAlarmTime = null;
         LocalDateTime preAlarmTime = null;
 
         if (minutes != null) {
-            normalAlarmTime = matchStartTime.minusMinutes(minutes);
+            normalAlarmTime = reservationOpenTime.minusMinutes(minutes);
         }
 
         if (preMinutes != null) {
-            preAlarmTime = matchStartTime.minusMinutes(preMinutes);
+            preAlarmTime = reservationOpenTime.minusMinutes(preMinutes);
         }
 
         Alarm alarm = new Alarm();

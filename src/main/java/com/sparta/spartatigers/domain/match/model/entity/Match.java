@@ -1,8 +1,6 @@
 package com.sparta.spartatigers.domain.match.model.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +51,18 @@ public class Match extends BaseEntity {
 
     @Column private String remark; // 비고
 
+    @Column private LocalDateTime reservationOpenTime;
+
     public static Match from(MatchScheduleDto matchSchedule) {
+        LocalDateTime reservationOpen =
+                matchSchedule
+                        .getMatchTime()
+                        .minusDays(7)
+                        .withHour(11)
+                        .withMinute(0)
+                        .withSecond(0)
+                        .withNano(0);
+
         return new Match(
                 matchSchedule.getMatchTime(),
                 matchSchedule.getHomeTeam(),
@@ -62,11 +71,8 @@ public class Match extends BaseEntity {
                 getResult(matchSchedule),
                 matchSchedule.getHomeScore(),
                 matchSchedule.getAwayScore(),
-                matchSchedule.getRemark());
-    }
-
-    public static List<Match> fromList(List<MatchScheduleDto> dtos) {
-        return dtos.stream().map(Match::from).collect(Collectors.toList());
+                matchSchedule.getRemark(),
+                reservationOpen);
     }
 
     private static MatchResult getResult(MatchScheduleDto matchSchedule) {

@@ -22,10 +22,8 @@ import com.sparta.spartatigers.domain.alarm.dto.response.MatchScheduleResponseDt
 import com.sparta.spartatigers.domain.alarm.dto.response.TeamNameResponseDto;
 import com.sparta.spartatigers.domain.alarm.service.AlarmService;
 import com.sparta.spartatigers.domain.user.model.CustomUserPrincipal;
-import com.sparta.spartatigers.domain.user.service.UserService;
 import com.sparta.spartatigers.global.response.ApiResponse;
 import com.sparta.spartatigers.global.response.MessageCode;
-import com.sparta.spartatigers.global.util.JwtUtil;
 
 @Log4j2
 @RestController
@@ -33,8 +31,6 @@ import com.sparta.spartatigers.global.util.JwtUtil;
 @RequestMapping("/api/alarms")
 public class AlarmController {
     private final AlarmService alarmService;
-    private final JwtUtil jwtUtil;
-    private final UserService userService;
 
     // 알람 조회 (O)
     @GetMapping
@@ -80,7 +76,7 @@ public class AlarmController {
         return ApiResponse.ok(alarmService.findTeamNames());
     }
 
-    // 월별 팀 일정 조회 (O)
+    // 월별 팀 일정 조회 매치 타임 기준 (O)
     @GetMapping("/teams/{teamId}/schedules")
     public ApiResponse<List<MatchScheduleResponseDto>> getMatchSchedule(
             @PathVariable Long teamId,
@@ -88,6 +84,16 @@ public class AlarmController {
             @RequestParam @Min(1) @Max(12) int month) {
         List<MatchScheduleResponseDto> responseDtos =
                 alarmService.getMatchScheduleByTeamId(teamId, year, month);
+        return ApiResponse.ok(responseDtos);
+    }
+
+    @GetMapping("/teams/{teamId}/reservation-open-schedules")
+    public ApiResponse<List<MatchScheduleResponseDto>> getReservationOpenSchedule(
+            @PathVariable Long teamId,
+            @RequestParam @Min(2020) @Max(2100) int year,
+            @RequestParam @Min(1) @Max(12) int month) {
+        List<MatchScheduleResponseDto> responseDtos =
+                alarmService.getReservationOpenScheduleByTeamId(teamId, year, month);
         return ApiResponse.ok(responseDtos);
     }
 
